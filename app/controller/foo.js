@@ -2,15 +2,16 @@
 
 var router = require('express').Router();
 var Promise = require("bluebird");
-var fooModel = require('../model/foo');
+var models  = require('../model');
 
 router.get('/foo', function(req, res, next) {
-    fooModel.getFoo("bar").then(function(fooData) {
-        return res.send(fooData);
+    models.Foo.findAll({
+    }).then(function(foos) {
+        res.send(foos);
     })
     .catch(function(error) {
         next(error);
-    })
+    });
 });
 
 module.exports = router;

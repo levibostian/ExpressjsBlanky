@@ -1,22 +1,15 @@
 /* @flow */
 
-var squel = require('squel').useFlavour('postgres');
-var db = require('../db');
-var Promise = require('bluebird');
+//var squel = require('squel').useFlavour('postgres');
+//var db = require('../db');
 
-exports.getFoo = function(bar: string) {
-    // return new Promise(function(resolve, reject) {
-    //     db.query(squel.select().from(db.foo_table).where("bar=$1").toString(), [bar], function(err, data) {
-    //         if (err) { return reject(err); }
-    //
-    //         return resolve(data);
-    //     });
-    // });
+module.exports = function(sequelize: Object, DataTypes: Object) {
+  var Foo = sequelize.define("Foo", {
+    bar: DataTypes.STRING
+  }, {
+    classMethods: {
+    }
+  });
 
-    return new Promise(function(resolve, reject) {
-        return resolve({
-            "id": 1,
-            "username": "sam"
-        });
-    });
+  return Foo;
 };

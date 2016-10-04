@@ -1,6 +1,8 @@
 # manually added:
 coverage.html
 dist/
+app/config/config.json
+*.sqlite
 
 # Logs
 logs

@@ -11,6 +11,7 @@ var trimBody = require('connect-trim-body');
 var winston = require('winston');
 var helmet = require('helmet');
 var SystemError = require('./responses').SystemError;
+var models = require('./model');
 
 if (process.env.NODE_ENV === "production") {
     winston.add(winston.transports.File, {
@@ -70,11 +71,14 @@ if (cluster.isMaster && process.env.NODE_ENV === "production") {
         app.set('port', 5000);
     }
 
-    var server = app.listen(app.get('port'), function() {
-        var host = server.address().address;
-        var port = server.address().port;
+    models.sequelize.sync().then(function() {
+        var server = app.listen(app.get('port'), function() {
+            var host = server.address().address;
+            var port = server.address().port;
 
-        winston.log('info', 'Server started. Listening at: %s:%s', host, port);
+            winston.log('info', 'Server started. Listening at: %s:%s', host, port);
+        });
+
+        module.exports = server;
     });
-    module.exports = server;
 }
