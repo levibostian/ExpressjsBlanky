@@ -1,5 +1,6 @@
 # manually added:
 coverage.html
+dist/
 
 # Logs
 logs

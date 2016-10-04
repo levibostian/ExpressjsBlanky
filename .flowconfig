@@ -5,3 +5,5 @@
 [libs]
 
 [options]
+# allows you to ignore a line in Flow. // $FlowIssue blah blah blah <--- will ignore the next line. 
+suppress_comment= \\(.\\|\n\\)*\\$FlowIssue

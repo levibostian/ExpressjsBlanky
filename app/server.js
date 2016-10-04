@@ -1,3 +1,5 @@
+/* @flow */
+
 var express = require('express');
 var cluster = require('cluster');
 var bodyParser = require('body-parser');
@@ -8,6 +10,7 @@ var expressValidator = require('express-validator');
 var trimBody = require('connect-trim-body');
 var winston = require('winston');
 var helmet = require('helmet');
+var SystemError = require('./responses').SystemError;
 
 if (process.env.NODE_ENV === "production") {
     winston.add(winston.transports.File, {
@@ -24,10 +27,12 @@ if (cluster.isMaster && process.env.NODE_ENV === "production") {
         cluster.fork();
     }
 
+    // $FlowIssue on() Node function is not recognized by flow
     cluster.on('online', function(worker) {
         winston.log('info', 'Worker ' + worker.process.pid + ' is online');
     });
 
+    // $FlowIssue on() Node function is not recognized by flow
     cluster.on('exit', function(worker, code, signal) {
         winston.log('error', 'Worker ' + worker.process.pid + ' died with code: ' + code + ', and signal: ' + signal);
         winston.log('info', 'Starting a new worker');
