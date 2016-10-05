@@ -3,18 +3,18 @@
     "dialect": "sqlite",
     "storage": "./db.development.sqlite"
   },
-  "test": {
+  "staging": {
     "username": "root",
     "password": null,
-    "database": "expressjsblanky",
+    "database": "expressjsblankystaging",
     "host": "127.0.0.1",
-    "dialect": "psql"
+    "dialect": "postgres"
   },
   "production": {
     "username": "root",
     "password": null,
     "database": "expressjsblanky",
     "host": "127.0.0.1",
-    "dialect": "psql"
+    "dialect": "postgres"
   }
 }
