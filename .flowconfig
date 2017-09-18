@@ -1,5 +1,6 @@
 [ignore]
 .*/node_modules/config-chain/test/broken.json
+.*/node_modules/bcryptjs/src/bower.json
 
 [include]
 

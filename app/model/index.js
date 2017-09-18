@@ -1,12 +1,10 @@
 /* @flow */
 
-var foo = require('./foo');
-
-var fs = require("fs");
-var path = require("path");
-var Sequelize = require("sequelize");
-var env: string = process.env.NODE_ENV || "development";
-var config: Object = require("../config/config.json")[env];
+var fs = require("fs")
+var path = require("path")
+var Sequelize = require("sequelize")
+var env: string = process.env.NODE_ENV || "development"
+var config: Object = require("../../config/config.json")[env]
 
 // define sets defaults for every model that is created.
 config.define = {
@@ -14,25 +12,23 @@ config.define = {
     underscoredAll: true, // convert camelCase table names to underscored.
     paranoid: true // when deleting rows, don't delete, set deleted_at timestamp for row instead.
 }
-var sequelize: Sequelize = new Sequelize(config.database, config.username, config.password, config);
-var db: Object = {};
+var sequelize: Sequelize = new Sequelize(config.database, config.username, config.password, config)
+var db: Object = {}
 
-fs.readdirSync(__dirname)
-.filter(function(file) {
-    return (file.indexOf(".") !== 0) && (file !== "index.js");
+fs.readdirSync(__dirname).filter((file) => {
+    return (file.indexOf(".") !== 0) && (file !== "index.js")
+}).forEach((file): void => {
+    var model = sequelize.import(path.join(__dirname, file))
+    db[model.name] = model
 })
-.forEach(function(file) {
-    var model = sequelize.import(path.join(__dirname, file));
-    db[model.name] = model;
-});
 
-Object.keys(db).forEach(function(modelName) {
+Object.keys(db).forEach((modelName): void => {
     if ("associate" in db[modelName]) {
-        db[modelName].associate(db);
+        db[modelName].associate(db)
     }
-});
+})
 
-db.sequelize = sequelize;
-db.Sequelize = Sequelize;
+db.sequelize = sequelize
+db.Sequelize = Sequelize
 
-module.exports = db;
+module.exports = db

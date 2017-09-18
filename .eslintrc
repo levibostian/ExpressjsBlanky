@@ -1,0 +1,26 @@
+{
+    "parser": "babel-eslint",
+    "plugins": [
+      "import"
+    ],
+    "parserOptions": {
+      "ecmaVersion": 2015,
+      "sourceType": "module"
+    },
+    "env": {
+      "es6": true,
+      "node": true
+    },
+    "extends": [
+      "eslint:recommended"
+    ],
+    "rules": {
+      semi: ["error", "never"],
+      space-before-blocks: "error",
+      arrow-spacing: "error",
+      keyword-spacing: "error",
+      spaced-comment: ["error", "always"],
+      space-in-parens: ["error", "never"],
+      space-before-function-paren: ["error", "never"]
+    }
+}

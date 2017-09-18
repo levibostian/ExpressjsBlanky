@@ -1,0 +1,28 @@
+version: '2'
+services:
+  foo-app:
+    build:
+      context: .
+      dockerfile: Dockerfile-dev
+    command: npm run start
+    volumes:
+      - .:/home/app/
+    environment:
+      - NODE_ENV=development
+      - SLACK_WEBHOOK_URL=https://hooks.slack.com/fake
+      - SLACK_CHANNEL=fake
+      - API_MAILGUN_API_KEY=key-fake
+    depends_on:
+      - db
+  db:
+    image: "postgres:9.6.2-alpine"
+    container_name: db
+    expose:
+        - "5432"
+#     volumes:
+#        - /var/lib/postgresql/data/pgdata:/var/lib/postgresql/data/pgdata
+    environment:
+      - POSTGRES_USER=app
+      - PGDATA=/var/lib/postgresql/data/pgdata
+      - POSTGRES_PASSWORD=12345
+      - POSTGRES_DB=app

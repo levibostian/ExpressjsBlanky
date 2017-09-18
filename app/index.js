@@ -1,1 +1,1 @@
-exports.server = require('./server');
+exports.server = require('./server')

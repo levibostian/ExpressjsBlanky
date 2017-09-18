@@ -1,0 +1,12 @@
+version: '2'
+services:
+  db:
+    image: "postgres:9.6.2-alpine"
+    container_name: db    
+    ports:
+        - "5432:5432"
+    volumes:
+        - /var/lib/postgresql/data/pgdata:/var/lib/postgresql/data/pgdata
+    environment:
+      - POSTGRES_USER=foo
+      - PGDATA=/var/lib/postgresql/data/pgdata

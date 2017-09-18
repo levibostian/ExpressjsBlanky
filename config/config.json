@@ -1,0 +1,27 @@
+{
+  "development": {
+    "username": "app",
+    "password": "1234567890",
+    "database": "app",
+    "host": "db",
+    "dialect": "postgres"
+  },
+  "testing": {
+    "dialect": "sqlite",
+    "storage": "./db.testing.sqlite"
+  },
+  "staging": {
+      "username": "foo",
+      "password": "1234567890",
+      "database": "foo-staging",
+      "host": "12.33.44.55",
+      "dialect": "postgres"
+  },
+  "production": {
+    "username": "foo-prod",
+    "password": "1234567890",
+    "database": "foo-prod",
+    "host": "12.33.44.55",
+    "dialect": "postgres"
+  }
+}

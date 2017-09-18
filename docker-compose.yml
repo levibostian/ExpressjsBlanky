@@ -1,0 +1,7 @@
+version: '2'
+services:
+  foo-app:
+    working_dir: /home/app/foo-app
+    container_name: foo-app
+    expose:
+     - "5000"

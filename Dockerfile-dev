@@ -1,0 +1,9 @@
+FROM node:6.10.0-alpine
+
+EXPOSE 5000
+
+RUN mkdir -p /home/app
+ENV HOME=/home/app
+WORKDIR $HOME
+
+CMD ["ls", "/home/app"]
