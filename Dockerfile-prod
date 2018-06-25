@@ -1,25 +1,16 @@
-FROM node:6.10.0-alpine
+FROM node:8-alpine
 
 EXPOSE 5000
 
-RUN apk add --update python sqlite sqlite-libs alpine-sdk
+ENV HOME=/var/lib/app
+RUN mkdir -p "$HOME"
+WORKDIR $HOME
 
-ENV HOME=/home/app
-RUN addgroup app
-RUN adduser -G app -h $HOME -s /bin/false -D app
-RUN mkdir -p $HOME/foo-app
-WORKDIR $HOME/foo-app
+COPY . $HOME/
+RUN npm install --production &&\
+    chown -R node:node . &&\
+    npm run build
 
-# docker has a cache where as long as files don't change, it caches it.
-# So having the bottom two lines here like this, we only run yarn when
-# package.json or yarn.lock changes.
-COPY package.json package-lock.json $HOME/foo-app/
-RUN chown -R app:app .
-RUN npm install --production
-###########
-COPY . $HOME/foo-app/
-RUN chown -R app:app .
-USER app
+USER node
 
-RUN npm run build
 CMD ["npm", "run", "run-build"]

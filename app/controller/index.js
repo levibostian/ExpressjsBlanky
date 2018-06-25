@@ -1,29 +1,31 @@
-var router = require('express').Router()
-import {FatalApiError, ForbiddenError, UserEnteredBadDataError, FieldsError, Success} from '../responses'
+// @flow
 
-router.use('/v1/', require('./login'))
-router.use('/v1/', require('./groups'))
-router.use('/v1/', require('./admin'))
-router.use('/v1/', require('./user'))
+import type {Router, $Response, $Request} from 'express'
+var app: Object = require('express')()
+var router: Router = require('express').Router()
+import {FatalApiError, ForbiddenError, UserEnteredBadDataError, Success, SystemError} from '../responses'
+import winston from 'winston'
+import validateParamsMiddleware from '../middleware/validate_params'
+import type {MiddlewareFunctionType} from '../middleware'
 
-router.get('/', function(req, res) {
-    return res.send('Hold on, nothing to see here.')
-})
+export const Endpoint: Endpoint = class Endpoint {
+  validate: Array<MiddlewareFunctionType>
+  endpoint: (req: $Request, res: $Response, next: Function) => Promise<void>
+  constructor(validate: Array<MiddlewareFunctionType>, endpoint: (req: $Request, res: $Response, next: Function) => Promise<void>) {
+    this.validate = validate
+    this.endpoint = endpoint
+  }
 
-exports.defaultCatch = function(error, res, next) {
-    if (error instanceof FatalApiError) {
-      return res.status(500).send(error)
-    } else if (error instanceof ForbiddenError) {
-      return res.status(403).send(error)
-    } else if (error instanceof UserEnteredBadDataError) {
-      return res.status(400).send(error)
-    } else if (error instanceof FieldsError) {
-      return res.status(422).send(error)
-    } else if (error instanceof Success) {
-      return res.status(200).send(error)
-    } else {
-      return next(error)
-    }
+  validateMiddleware(): Array<MiddlewareFunctionType> {
+    return this.validate.concat(validateParamsMiddleware)
+  }
 }
 
-module.exports = router
+router.get('/', (req: $Request, res: $Response, next: Function): $Response => {
+  return res.send('Hold on, nothing to see here.')
+})
+
+router.use(require('./routes/admin'))
+router.use(require('./routes/user'))
+
+export default router

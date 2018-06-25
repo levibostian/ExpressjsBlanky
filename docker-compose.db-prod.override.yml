@@ -2,5 +2,5 @@ version: '2'
 services:
   db:
     environment:
-      - POSTGRES_PASSWORD=1234567890
-      - POSTGRES_DB=foo-prod
+      - POSTGRES_PASSWORD=11111
+      - POSTGRES_DB=api-prod
