@@ -1,0 +1,21 @@
+{
+    "version": "0.2.0",
+    "configurations": [        
+      {    
+        "type": "node",        
+        "request": "attach",
+        "name": "Docker tests",
+        "protocol": "inspector",
+        "preLaunchTask": "docker-test",
+        "port": 9229,
+        "address": "0.0.0.0",
+        "sourceMaps": true,
+        "localRoot": "${workspaceFolder}",
+        "timeout": 30000,
+        "remoteRoot": "/home/app/app",
+        "outFiles": [
+          "${workspaceFolder}/dist/**/*.js"
+        ]
+      }
+    ]
+  }

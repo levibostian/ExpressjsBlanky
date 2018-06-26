@@ -3,9 +3,10 @@
 import fs from 'fs'
 import path from 'path'
 import Sequelize from 'sequelize'
+import type {Options} from 'sequelize'
 export {Sequelize}
 const env: string = process.env.NODE_ENV || "development"
-const config: Object = require("../../config/config.json")[env]
+const config: Options = require("../../config/config.json")[env]
 const winston: Object = require('winston')
 
 // define sets defaults for every model that is created.
@@ -14,7 +15,9 @@ config.define = {
   underscoredAll: true, // convert camelCase table names to underscored.
   paranoid: false // when deleting rows, don't delete, set deleted_at timestamp for row instead.
 }
-export const sequelize: Sequelize = new Sequelize(config.database, config.username, config.password, config)
+config.operatorsAliases = false // use the new type of sequelize operators: http://docs.sequelizejs.com/manual/tutorial/querying.html#operators
+config.logging = false // Prevent console.log statements. I can turn them on via DEBUG flag in the test commands anyway.
+export const sequelize: Sequelize = new Sequelize(((config.database: any): string), config.username, config.password, config)
 
 import {User, UserSequelizeModel} from './user'
 import {FcmToken, FcmTokenSequelizeModel} from './fcm_token'
@@ -35,5 +38,3 @@ for (var modelKey: string in models) {
 }
 
 export {User, FcmToken}
-
-// export {sequelize, Sequelize}

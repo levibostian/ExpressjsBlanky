@@ -8,7 +8,7 @@ import nock from 'nock'
 import {FieldsError, ForbiddenError, UserEnteredBadDataError, Success, SystemError, Unauthorized} from '../../app/responses'
 import {describe, it, before, beforeEach, afterEach} from 'mocha'
 import {models, User, FcmToken} from '../../app/model'
-import {TestData} from '../../app/model/def'
+import {TestData} from '../../app/model/type'
 import * as email from '../../app/email'
 
 require("blanket")
@@ -53,8 +53,8 @@ describe(`Receive login email passwordless token. ${endpointVersion}`, () => {
       .send({email: testUser.email})
       .expect(Success.code)
       .then(() => {
-        should.equal(email.testLastEmailSent.to, testUser.email)
-        should.ok(email.testLastEmailTemplateParams.app_login_link)
+        should.equal(email.testing.to, testUser.email)
+        should.ok(email.testing.params.app_login_link)
       })
   })
   it('should succeed. Existing user.', async(): Promise<void> => {
@@ -65,8 +65,8 @@ describe(`Receive login email passwordless token. ${endpointVersion}`, () => {
       .send({email: testUser.email})
       .expect(Success.code)
       .then(() => {
-        should.equal(email.testLastEmailSent.to, testUser.email)
-        should.ok(email.testLastEmailTemplateParams.app_login_link)
+        should.equal(email.testing.to, testUser.email)
+        should.ok(email.testing.params.app_login_link)
       })
   })
 })
@@ -160,12 +160,13 @@ describe(`Update FCM token. ${endpointVersion}`, () => {
   })
   it('should succeed and delete old token', async(): Promise<void> => {
     const testUser: User = User.completeSignupState()
+    const testUserTestData: TestData<User> = testUser.testData()
 
-    const token1: TestData<FcmToken> = FcmToken.testToken().testData(testUser.testData())
-    const token2: TestData<FcmToken> = FcmToken.testToken().testData()
-    const token3: TestData<FcmToken> = FcmToken.testToken().testData()
-    const token4: TestData<FcmToken> = FcmToken.testToken().testData()
-    const token5: TestData<FcmToken> = FcmToken.testToken().testData()
+    const token1: TestData<FcmToken> = FcmToken.testToken().testData(testUserTestData)
+    const token2: TestData<FcmToken> = FcmToken.testToken().testData(testUserTestData)
+    const token3: TestData<FcmToken> = FcmToken.testToken().testData(testUserTestData)
+    const token4: TestData<FcmToken> = FcmToken.testToken().testData(testUserTestData)
+    const token5: TestData<FcmToken> = FcmToken.testToken().testData(testUserTestData)
 
     const newToken: string = uid2(250)
 

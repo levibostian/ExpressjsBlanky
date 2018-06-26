@@ -1,31 +1,18 @@
 // @flow
 
-import type {Router, $Response, $Request} from 'express'
-var app: Object = require('express')()
-var router: Router = require('express').Router()
+import type {Router, $Response, $Request, NextFunction, Middleware, $Application} from 'express'
+const app: $Application = require('express')()
+const router: Router = require('express').Router()
 import {FatalApiError, ForbiddenError, UserEnteredBadDataError, Success, SystemError} from '../responses'
 import winston from 'winston'
-import validateParamsMiddleware from '../middleware/validate_params'
-import type {MiddlewareFunctionType} from '../middleware'
+import userRouter from './routes/user'
+import adminRouter from './routes/admin'
 
-export const Endpoint: Endpoint = class Endpoint {
-  validate: Array<MiddlewareFunctionType>
-  endpoint: (req: $Request, res: $Response, next: Function) => Promise<void>
-  constructor(validate: Array<MiddlewareFunctionType>, endpoint: (req: $Request, res: $Response, next: Function) => Promise<void>) {
-    this.validate = validate
-    this.endpoint = endpoint
-  }
-
-  validateMiddleware(): Array<MiddlewareFunctionType> {
-    return this.validate.concat(validateParamsMiddleware)
-  }
-}
-
-router.get('/', (req: $Request, res: $Response, next: Function): $Response => {
+router.get('/', (req: $Request, res: $Response, next: NextFunction): $Response => {
   return res.send('Hold on, nothing to see here.')
 })
 
-router.use(require('./routes/admin'))
-router.use(require('./routes/user'))
+router.use(userRouter)
+router.use(adminRouter)
 
 export default router

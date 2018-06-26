@@ -1,7 +1,7 @@
 version: '2'
 services:
   app:
-    command: npm run test-ci
+    command: npm run test:run:ci
     environment:
       - CI
       - NODE_ENV=testing

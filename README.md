@@ -62,7 +62,7 @@ And your app is deployed.
 Use ngrok to test the local API.
 
 ```
-$> npm run start
+$> npm run dev:run
 $> ngrok http 5000
 ```
 
@@ -73,7 +73,7 @@ I am trying to get Docker to be my dev environment. `docker-compose -f docker-co
 * To create a migration file for sequelize, run command:
 
 ```
-npm run db-migrate-create --name describe-migration-here
+npm run db:migrate:create --name describe-migration-here
 ```
 
 * Open up this new migration file created under `migrations/` directory. Edit it to code that runs the migration.
@@ -81,7 +81,7 @@ npm run db-migrate-create --name describe-migration-here
 * Run the migration:
 
 ```
-npm run db-migrate-run
+npm run db:migrate:run
 ```
 
 ExpressjsBlanky is designed to read the value of `NODE_ENV` and setup the environment for you. The config file does it all from there.

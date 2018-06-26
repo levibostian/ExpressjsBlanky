@@ -2,13 +2,9 @@
 
 import uid2 from 'uid2'
 import {sequelize, models, Sequelize} from './index'
-import {TestData, SequelizeModel} from './def'
+import {TestData, SequelizeModel} from './type'
 
-export default (sequelize: Object, DataTypes: Object): Object => {
-  return new UserSequelizeModel(sequelize, DataTypes).define()
-}
-
-export const UserSequelizeModel: UserSequelizeModel = class UserSequelizeModel extends SequelizeModel {
+export class UserSequelizeModel extends SequelizeModel {
   constructor(sequelize: Object) {
     super(sequelize,
       User.tableName, {
@@ -21,7 +17,7 @@ export const UserSequelizeModel: UserSequelizeModel = class UserSequelizeModel e
   }
 }
 
-export const User: User = class User {
+export class User {
   instance: Object
 
   id: number

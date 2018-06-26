@@ -23,7 +23,7 @@ passport.use('admin_basic_auth', new BasicStrategy((userid: string, password: st
 }))
 
 passport.use('access_token_bearer', new BearerStrategy(async(token: string, done: Function): Promise<Function> => {
-  const user: User = await User.findUserByAccessToken(token)
+  const user: User = (await User.findUserByAccessToken(token): any)
   if (user) { return done(null, user) }
   return done(null, false)
 }))

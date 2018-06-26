@@ -2,7 +2,7 @@
 
 import {models} from '../app/model'
 import {sequelize, User} from '../app/model'
-import {TestData} from '../app/model/def'
+import {TestData} from '../app/model/type'
 import winston from 'winston'
 import {startServer as serverStart, closeServer as serverClose} from '../app/server'
 import {adminToken} from '../app/middleware/auth'
@@ -47,12 +47,13 @@ const createModels: (modelsToCreate: ?Array<TestData<any>>) => Promise<void> = a
     modelsToCreate.forEach((modelToCreate: TestData<any>) => {
       modelObjectToBeInserted = modelObjectToBeInserted.concat(createModelDependenciesList(modelToCreate))
     })
+    const modelsToBeCreatedSet: Set<TestData<any>> = new Set(modelObjectToBeInserted) // Remove the duplicates.
 
     await sequelize.transaction({
       deferrable: sequelize.Deferrable.SET_DEFERRED // this allows us to insert teams and games right after each other without postgres saying foreign key constaints are not satisfied even though, they are because I *just* inserted the team the game maps to.
     }, (transaction: Object): Promise<Array<Object>> => {
       var promises: Array<Promise<any>> = []
-      modelObjectToBeInserted.forEach((modelToCreate: TestData<any>) => {
+      Array.from(modelsToBeCreatedSet).forEach((modelToCreate: TestData<any>) => {
         // Some test data may have an "id" property to be used *after* an object has been queried from a database. Here, we are simply going to delete it since it will be an autoincremented field.
         const testObject: Object = modelToCreate.testData
         delete testObject.id

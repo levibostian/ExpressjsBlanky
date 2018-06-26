@@ -9,8 +9,8 @@ WORKDIR $HOME
 COPY . $HOME/
 RUN npm install --production &&\
     chown -R node:node . &&\
-    npm run build
+    npm run production:build
 
 USER node
 
-CMD ["npm", "run", "run-build"]
+CMD ["npm", "run", "production:run"]

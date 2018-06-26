@@ -1,13 +1,13 @@
 /* @flow */
 
-import {Job, JobData} from './def'
+import {Job, JobData} from './type'
 const admin: Object = require('firebase-admin')
 
 // admin.initializeApp({
 //   credential: admin.credential.cert(require('../../../config/firebase_key.json'))
 // })
 
-export const SendPushNotificationData: SendPushNotificationData = class SendPushNotificationData extends JobData {
+export class SendPushNotificationData extends JobData {
   fcmTokens: Array<string>
   title: string
   message: string

@@ -2,5 +2,5 @@
 
 set -e
 
-npm run docker-test-ci-build
-npm run docker-test-ci
+npm run docker:test:build:ci
+npm run docker:test:run:ci

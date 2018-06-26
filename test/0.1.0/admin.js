@@ -8,7 +8,7 @@ import nock from 'nock'
 import {FatalApiError, ForbiddenError, UserEnteredBadDataError, Success, SystemError, Unauthorized, FieldsError} from '../../app/responses'
 import {describe, it, before, beforeEach, afterEach} from 'mocha'
 import {User} from '../../app/model'
-import {testLastEmailSent, testLastEmailTemplateParams, resetTestLastEmail} from '../../app/email'
+import {testing, resetTestLastEmail} from '../../app/email'
 
 require("blanket")
 

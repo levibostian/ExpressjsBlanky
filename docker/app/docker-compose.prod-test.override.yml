@@ -4,7 +4,7 @@ services:
   app:
     image: "curiosityio/app:docker-test"
 #    user: app
-    command: npm run run-build
+    command: npm run production:run
     ports: # Since we are not using nginx-proxy, we need to communicate some way.
       - "5000:5000"
     environment:

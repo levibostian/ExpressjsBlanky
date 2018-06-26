@@ -2,7 +2,7 @@
 
 import winston from 'winston'
 
-exports.Success = class Success {
+export class Success {
   static code: number = 200
   message: string
   constructor(message: string) {
@@ -10,7 +10,7 @@ exports.Success = class Success {
   }
 }
 
-exports.SystemError = class SystemError {
+export class SystemError {
   static code: number = 500
   message: string
   constructor(message: string) {
@@ -18,7 +18,7 @@ exports.SystemError = class SystemError {
   }
 }
 
-exports.UserEnteredBadDataError = class UserEnteredBadDataError {
+export class UserEnteredBadDataError {
   static code: number = 400
   message: string
   constructor(errorMessage: string) {
@@ -26,7 +26,7 @@ exports.UserEnteredBadDataError = class UserEnteredBadDataError {
   }
 }
 
-exports.ForbiddenError = class ForbiddenError {
+export class ForbiddenError {
   static code: number = 403
   message: string
   constructor(errorMessage: string) {
@@ -34,7 +34,7 @@ exports.ForbiddenError = class ForbiddenError {
   }
 }
 
-exports.FatalApiError = class FatalApiError {
+export class FatalApiError {
   static code: number = 500
   message: string
   constructor(errorMessage: string) {
@@ -42,11 +42,11 @@ exports.FatalApiError = class FatalApiError {
   }
 }
 
-exports.Unauthorized = class Unauthorized {
+export class Unauthorized {
   static code: number = 401
 }
 
-exports.FieldsError = class FieldsError {
+export class FieldsError {
   static code: number = 422
   errors: Array<Object>
   message: string

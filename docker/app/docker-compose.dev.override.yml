@@ -2,31 +2,34 @@ version: '2'
 services:
   app:
     build:
-      context: .
+      context: ../../
       dockerfile: Dockerfile-dev
-    command: npm run test:debug
+    command: npm run dev:run
     volumes:
-      - .:/home/app/app
+      - ../../:/home/app/app
     environment:
-      - NODE_ENV=testing
+      - NODE_ENV=development
       - SLACK_WEBHOOK_URL=https://hooks.slack.com/fake
       - SLACK_CHANNEL=fake
       - API_MAILGUN_API_KEY=key-fake
       - EMAIL_FROM_DOMAIN=example.com
       - EMAIL_FROM_NAME=Joe Boe
       - EMAIL_FROM_EMAIL_ADDRESS=joe@example.com
-    depends_on:
-      - db
     ports:
       - "5000:5000"
       - "9229:9229"
+    depends_on:
+      - db
+      - redis
   db:
     image: "postgres:9.6-alpine"
-    container_name: test-db
+    container_name: dev-db
     expose:
-      - "5432"
+        - "5432"
+    ports:
+      - "5432:5432"
     environment:
-      - POSTGRES_USER=test
+      - POSTGRES_USER=dev
       - PGDATA=/var/lib/postgresql/data/pgdata
       - POSTGRES_PASSWORD=12345
-      - POSTGRES_DB=test
+      - POSTGRES_DB=dev

@@ -1,6 +1,7 @@
 /* @flow */
 
-import type {Router, $Response, $Request} from 'express'
+import type {Server} from "http"
+import type {Router, $Response, $Request, $Application, NextFunction, Middleware} from 'express'
 const express: Function = require('express')
 const cluster: Object = require('cluster')
 const bodyParser: Object = require('body-parser')
@@ -13,15 +14,15 @@ const helmet: Function = require('helmet')
 const SystemError: SystemError = require('./responses').SystemError
 import {sequelize} from './model'
 import {jobs} from './jobs'
-import type {Job} from './jobs/def'
+import type {Job} from './jobs/type'
 import {errorResponseHandler as errorResponseHandlerMiddleware} from './middleware'
 import controllers from './controller'
 import {redisHost} from './jobs'
 import './email'
 import './jobs'
 
-export const app: Object = express()
-var server: Object
+export const app: $Application = express()
+var server: Server
 
 var winstonSlackerOptions: {
   webhook: string,
@@ -75,13 +76,13 @@ jobs.forEach((job: Job) => {
     hostId: redisHostId
   })
 })
-const arena: Arena = Arena(bullRedisQueues, {
+const arena: Middleware = Arena(bullRedisQueues, {
   port: 4568,
   basePath: '/bull',
   disableListen: true
 })
 
-export const startServer: () => Object = (): Object => {
+export const startServer: () => Server = (): Server => {
   if (server) { return server }
 
   if (process.env.NODE_ENV != "testing") {
@@ -135,15 +136,14 @@ if (cluster.isMaster && (process.env.NODE_ENV === "production" || process.env.NO
   app.use(passport.initialize())
   app.use(helmet())
 
-  app.use((req: $Request, res: $Response, next: Function) => {
+  app.use((req: $Request, res: $Response, next: NextFunction) => {
     res.header('Access-Control-Allow-Origin', '*') // for now do this because I need the admin endpoints to be open for me.
     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,PATCH')
     res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, accept-version')
     next()
   })
 
-  app.use('/bull', passport.authenticate('admin_basic_auth', {session: false}), (req: $Request, res: $Response, next: Function) => {
-    //    req.basepath = '/bull'
+  app.use('/bull', passport.authenticate('admin_basic_auth', {session: false}), (req: $Request, res: $Response, next: NextFunction) => {
     res.locals.basepath = '/bull'
     next()
   })
@@ -155,17 +155,17 @@ if (cluster.isMaster && (process.env.NODE_ENV === "production" || process.env.NO
     winston.log('error', 'SYSTEM ERROR (caught in uncaughtException handler). Message: ' + err.message + ' stack: ' + err.stack)
   })
 
-  app.use((err: SystemError | Error, req: $Request, res: $Response, next: Function): void => {
+  app.use((err: Error, req: $Request, res: $Response, next: NextFunction) => {
     if (err) {
       const errorMessage: string = err.message
       winston.log('error', 'SYSTEM ERROR. Message: ' + errorMessage + ' stack: ' + err.stack)
 
       if (res.headersSent) {
-        return next(err)
-      }
-
-      var message: string = (process.env.NODE_ENV != "production") ? errorMessage : 'System error. Please try again.'
-      res.status(SystemError.code).send(new SystemError(message).response)
+        next(err)
+      } else {
+        const message: string = (process.env.NODE_ENV != "production") ? errorMessage : 'System error. Please try again.'
+        res.status(SystemError.code).send(new SystemError(message).response)
+      }      
     }
   })
 

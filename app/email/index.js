@@ -13,32 +13,31 @@ if (!API_KEY || !DOMAIN || !FROM_EMAIL_NAME || !FROM_EMAIL) { throw new Error(`M
 const mailgun: Object = require('mailgun-js')({apiKey: API_KEY, domain: DOMAIN})
 
 // Used for testing purposes only. If running tests, these variables are set for the last sent email to inspect.
-export var testLastEmailSent: {
+type EmailTestingDataType = {
   from: string,
   to: string,
   subject: string,
-  html: string
-} = {
-  from: "",
-  to: "",
-  subject: "",
-  html: ""
+  html: string,
+  params: { [templateVariable: string]: string },  
 }
-export var testLastEmailTemplateParams: { [templateVariable: string]: string } = {}
-export const resetTestLastEmail: () => void = () => {
-  testLastEmailSent = {
+
+const blankTestingData: () => EmailTestingDataType = (): EmailTestingDataType => {
+  return {
     from: "",
     to: "",
     subject: "",
-    html: ""
+    html: "",
+    params: {}
   }
-  testLastEmailTemplateParams = {}
+}
+export var testing: EmailTestingDataType = blankTestingData()
+export const resetTestLastEmail: () => void = () => {
+  testing = blankTestingData()
 }
 
 export const sendEmail: (to: string, subject: string, templateName: string, templateParams: { [templateVariable: string]: string }) => Promise<void> = (to: string, subject: string, templateName: string, templateParams: { [templateVariable: string]: string }): Promise<void> => {
-  return new Promise((resolve: Function, reject: Function) => {
-    getHtmlString(templateName, templateParams).then((body: string): void => {
-      var data: {
+  return getHtmlString(templateName, templateParams).then((body: string): Promise<any> => {
+    var data: {
         from: string,
         to: string,
         subject: string,
@@ -49,26 +48,31 @@ export const sendEmail: (to: string, subject: string, templateName: string, temp
         subject: subject,
         html: body
       }
-      if (process.env.NODE_ENV === "production" || process.env.NODE_ENV === "beta") {
-        mailgun.messages().send(data, (error: Error, body: string): Promise<void> => {
-          if (error) { return reject(error) }
-          return resolve()
-        })
-      } else {
-        testLastEmailTemplateParams = templateParams
-        testLastEmailSent = data
-        winston.log('info', `sending email with subject: ${subject}`)
-        winston.log('info', `email params: ${JSON.stringify(templateParams)}`)
-        return resolve()
+    if (process.env.NODE_ENV === "production" || process.env.NODE_ENV === "beta") {
+      return mailgun.messages().send(data, (error: Error, body: string): Promise<void> => {
+        if (error) { return Promise.reject(error) }
+        return Promise.resolve()
+      })
+    } else {
+      testing = {
+        params: templateParams,
+        from: data.from,
+        to: data.to,
+        subject: data.subject,
+        html: data.html
       }
-    }).catch((error: Error): Promise<void> => {
-      return reject(error)
-    })
+      winston.log('info', `sending email with subject: ${subject}`)
+      winston.log('info', `email params: ${JSON.stringify(templateParams)}`)
+      return Promise.resolve()
+    }
+  }).catch((error: Error): Promise<void> => {
+    return Promise.reject(error)
   })
 }
-function getHtmlString(templateName: string, params: Object): Promise<string> {
+
+const getHtmlString: (templateName: string, params: Object) => Promise<string> = (templateName: string, params: Object): Promise<string> => {
   return new Promise((resolve: Function, reject: Function) => {
-    fs.readFile(__dirname + '/templates/' + templateName, "utf-8", (err: any, html: string): void => {
+    fs.readFile(__dirname + '/templates/' + templateName, "utf-8", (err: ?Error, html: string): void => {
       if (err) { return reject(err) }
       return resolve(mustache.render(html, params))
     })

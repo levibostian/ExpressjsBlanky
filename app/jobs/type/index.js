@@ -4,7 +4,7 @@ import Queue from 'bull'
 import {redisHost} from '../index'
 import winston from 'winston'
 
-export const Job: Job = class Job {
+export class Job {
   name: string
   port: number
   job: (data: Object & JobData) => Promise<any>
@@ -19,7 +19,7 @@ export const Job: Job = class Job {
   }
 }
 
-export const JobData: JobData = class JobData {
+export class JobData {
   job: Job
   constructor(job: Job) {
     this.job = job

@@ -2,14 +2,10 @@
 
 import uid2 from 'uid2'
 import {sequelize, models, Sequelize} from './index'
-import {TestData, SequelizeModel} from './def'
+import {TestData, SequelizeModel} from './type'
 import {User} from './user'
 
-export default (sequelize: Object, DataTypes: Object): Object => {
-  return new FcmTokenSequelizeModel(sequelize, DataTypes).define()
-}
-
-export const FcmTokenSequelizeModel: FcmTokenSequelizeModel = class FcmTokenSequelizeModel extends SequelizeModel {
+export class FcmTokenSequelizeModel extends SequelizeModel {
   constructor(sequelize: Object) {
     super(sequelize,
       FcmToken.tableName, {
@@ -20,7 +16,7 @@ export const FcmTokenSequelizeModel: FcmTokenSequelizeModel = class FcmTokenSequ
   }
 }
 
-export const FcmToken: FcmToken = class FcmToken {
+export class FcmToken {
   instance: Object
 
   id: number
@@ -68,10 +64,10 @@ export const FcmToken: FcmToken = class FcmToken {
     })
   }
 
-  testData(user: ?TestData<User>): TestData<FcmToken> {
+  testData(user: TestData<User>): TestData<FcmToken> {
     return new TestData(
       FcmToken._model(),
-      (user) ? [user] : [],
+      [user],
       this
     )
   }
