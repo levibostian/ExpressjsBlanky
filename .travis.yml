@@ -46,11 +46,11 @@ jobs:
     - stage: development
       script: ./bin/ci/development_pull.sh
     - stage: beta
-      script: ./bin/beta/build-test-deploy-docker-image.sh
-      script: ./bin/beta/deployment.sh
+      script: ./bin/app/build-test-deploy-docker-image.sh beta # Split apart the pushing of docker image and deploying in case 1 fails, we don't need to rerun the whole thing. 
+      script: ./bin/app/deployment.sh beta
     - stage: production
-      script: ./bin/prod/build-test-deploy-docker-image.sh
-      script: ./bin/prod/deployment.sh
+      script: ./bin/app/build-test-deploy-docker-image.sh prod
+      script: ./bin/app/deployment.sh prod
 stages:
   - name: danger
     if: type IN (pull_request)

@@ -5,7 +5,7 @@ import {sequelize, User} from '../app/model'
 import {TestData} from '../app/model/type'
 import winston from 'winston'
 import {startServer as serverStart, closeServer as serverClose} from '../app/server'
-import {adminToken} from '../app/middleware/auth'
+import {ADMIN_TOKEN} from '../app/middleware/auth'
 
 export const authHeader: (user: User) => Object = (user: User): Object => {
   if (!user.access_token) { throw new Error(`Access token cannot be null.`) }
@@ -13,7 +13,7 @@ export const authHeader: (user: User) => Object = (user: User): Object => {
 }
 
 export const adminAuthHeader: () => Object = (): Object => {
-  return {'Authorization': `Bearer ${adminToken}`}
+  return {'Authorization': `Bearer ${ADMIN_TOKEN}`}
 }
 
 export const endpointVersionHeader: (version: string) => Object = (version: string): Object => {

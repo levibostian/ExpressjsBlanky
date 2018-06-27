@@ -17,6 +17,8 @@ services:
       - LETSENCRYPT_HOST=beta.example.com
       - LETSENCRYPT_EMAIL=you@example.com
       - VIRTUAL_PORT=5000
+      - ADMIN_AUTH_PASSWORD=12345
+      - ADMIN_AUTH_TOKEN=12345
   redis:
     restart: always
     volumes:

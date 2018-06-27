@@ -2,7 +2,7 @@
 version: '2'
 services:
   app:
-    image: "curiosityio/app:docker-test"
+    image: "docker-production-image-test"
 #    user: app
     command: npm run production:run
     ports: # Since we are not using nginx-proxy, we need to communicate some way.
