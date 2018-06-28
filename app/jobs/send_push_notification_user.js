@@ -1,29 +1,32 @@
 /* @flow */
 
 import {Job, JobData} from './type'
+import {FcmToken} from '../model/fcm_token'
 const admin: Object = require('firebase-admin')
 
+// TODO Uncomment the 3 lines below to configure Firebase Cloud Messaging. 
 // admin.initializeApp({
 //   credential: admin.credential.cert(require('../../../config/firebase_key.json'))
 // })
 
 export class SendPushNotificationData extends JobData {
-  fcmTokens: Array<string>
+  userId: number
   title: string
   message: string
-  constructor(fcmTokens: Array<string>, title: string, message: string) {
+  constructor(userId: number, title: string, message: string) {
     super(job)
-    this.fcmTokens = fcmTokens
+    this.userId = userId
     this.title = title
     this.message = message
   }
 }
 
 const job: Job = new Job('SendPushNotificationUser',
-  (data: SendPushNotificationData): Promise<any> => {
+  async(data: SendPushNotificationData): Promise<any> => {
+    const fcmTokens: Array<FcmToken> = await FcmToken.findByUserId(data.userId)
     var sendPushNotificationRequests: Array<Promise<void>> = []
-    data.fcmTokens.forEach((fcmToken: string) => {
-      sendPushNotificationRequests.push(sendPushNotificationToDevice(fcmToken, data.title, data.message))
+    fcmTokens.forEach((fcmToken: FcmToken) => {
+      sendPushNotificationRequests.push(sendPushNotificationToDevice(fcmToken.token, data.title, data.message))
     })
 
     return Promise.all(sendPushNotificationRequests)

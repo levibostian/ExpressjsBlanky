@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "main": "app/server.js",
   "scripts": {
+    "init": "npm install",
     "production:build": "./node_modules/babel-cli/bin/babel.js app --out-dir dist --copy-files",
     "production:run": "./node_modules/forever/bin/forever dist/server.js",
     "test:run": "DEBUG=nock.intercept,sequelize:sql:* ./node_modules/mocha/bin/mocha \"test/**/*.js\" -b --exit --retries 1 --timeout 12000 --colors --require babel-core/register",
@@ -16,7 +17,9 @@
     "dev:run": "DEBUG=*,-babel*,-express*,-ioredis*,-winston:create-logger ./node_modules/babel-watch/babel-watch.js --inspect -L -w app app/server.js",
     "docker:dev:build": "docker-compose -f docker-compose.yml -f docker-compose.dev.override.yml build",
     "docker:dev:run": "docker-compose -f docker-compose.yml -f docker-compose.dev.override.yml up",
-    "generate:doc": "apidoc -i app/ -o apidoc/",
+    "docker:db:beta:run": "docker-compose -f docker/db/docker-compose.db.yml -f docker/db/docker-compose.db-beta.override.yml up --build -d",
+    "docker:db:prod:run": "docker-compose -f docker/db/docker-compose.db.yml -f docker/db/docker-compose.db-beta.override.yml -f docker/db/docker-compose.db-prod.override.yml up --build -d",
+    "generate:doc": "apidoc -i app/ -o docs/",
     "generate:coverage": "./node_modules/mocha/bin/mocha --require blanket -R html-cov --compilers js:babel-core/register > coverage.html",
     "db:migrate:create": "./node_modules/.bin/sequelize migration:create",
     "db:migrate:run": "./node_modules/.bin/sequelize db:migrate",

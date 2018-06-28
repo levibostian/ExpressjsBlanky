@@ -50,7 +50,7 @@ const createModels: (modelsToCreate: ?Array<TestData<any>>) => Promise<void> = a
     const modelsToBeCreatedSet: Set<TestData<any>> = new Set(modelObjectToBeInserted) // Remove the duplicates.
 
     await sequelize.transaction({
-      deferrable: sequelize.Deferrable.SET_DEFERRED // this allows us to insert teams and games right after each other without postgres saying foreign key constaints are not satisfied even though, they are because I *just* inserted the team the game maps to.
+      deferrable: sequelize.Deferrable.SET_DEFERRED // If I do not include this, postgres will throw a fit with foreign key constraints even if I insert data into the database in the correct order to satisfy constraints. 
     }, (transaction: Object): Promise<Array<Object>> => {
       var promises: Array<Promise<any>> = []
       Array.from(modelsToBeCreatedSet).forEach((modelToCreate: TestData<any>) => {

@@ -66,7 +66,7 @@ describe(`Receive login email passwordless token. ${endpointVersion}`, () => {
       .expect(Success.code)
       .then(() => {
         should.equal(email.testing.to, testUser.email)
-        should.ok(email.testing.params.app_login_link)
+        should.ok(email.testing.params.app_login_link)        
       })
   })
 })

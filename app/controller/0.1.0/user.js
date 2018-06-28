@@ -27,7 +27,8 @@ export const loginEmail: Endpoint = new Endpoint(
       const user: User = await User.findUserOrCreateByEmail(body.email)
       const loginLink: string = `https://yourdomain.com/?passwordless_token=${user.password_token}`
       const androidPackageName: string = "com.example.appname"
-      const passwordlessLoginLink: string = `https://your_subdomain.page.link/?link=${loginLink}&apn=${androidPackageName}`
+      const iosBundleId: string = "com.example.appname"
+      const passwordlessLoginLink: string = `https://your_subdomain.page.link/?link=${loginLink}&apn=${androidPackageName}&ibi=${iosBundleId}`
       await sendEmail(user.email, `Welcome! Time to login.`, "passwordless_login.html", {app_login_link: passwordlessLoginLink})
       return Promise.reject(new AddUserSuccess("Successfully created user.", user))
     }
