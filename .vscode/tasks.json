@@ -1,0 +1,14 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+     {
+       "label": "docker-test",
+       "command": "npm",
+       "args": [ "run", "docker-test" ],
+       "type": "shell",
+       "isBackground": false,
+       "group": "test",
+       "presentation" : { "reveal": "always" }
+     }
+   ]
+ }

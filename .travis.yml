@@ -1,0 +1,62 @@
+# To verify this file, call `travis lint .travis.yml` with travis-cli gem installed. To install, call `bundle install` in this directory.
+# To make life easier, I made a git commit hook to run this after each commit for reference. Create a file: `.git/hooks/pre-commit` and put inside (without the '#' before the line):
+# echo "----linting .travis.yml----"
+# travis lint .travis.yml
+# exit 0
+sudo: required
+language: node_js
+node_js:
+  - "8"
+services:
+  - docker
+env:
+  # We need to set AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, DANGER_GITHUB_API_TOKEN (and add your bot to the repo), BETA_DEPLOY_USER, BETA_DEPLOY_HOST, PROD_DEPLOY_USER, PROD_DEPLOY_HOST
+  global:
+    - DOCKER_COMPOSE_VERSION=1.16.0
+    - BETA_DEPLOY_USER=core
+    - BETA_DEPLOY_HOST=111.111.111.111
+    - PROD_DEPLOY_USER=core
+    - PROD_DEPLOY_HOST=222.222.222.222
+    - AWS_ACCESS_KEY_ID=fofofof
+    - AWS_SECRET_ACCESS_KEY=fofofof
+    # DANGER_GITHUB_API_TOKEN
+    - secure: "fefefe"
+before_install:
+  # Install docker compose custom version.
+  - sudo rm /usr/local/bin/docker-compose
+  - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
+  - chmod +x docker-compose
+  - sudo mv docker-compose /usr/local/bin
+  - docker-compose version
+  # Setup .aws directory for AWS CLI tool to work
+  - mkdir ~/.aws
+  - printf "%s\n%s\n%s" "[default]" "aws_access_key_id = ${AWS_ACCESS_KEY_ID}" "aws_secret_access_key = ${AWS_SECRET_ACCESS_KEY}" > ~/.aws/credentials
+  - printf "%s\n%s\n%s" "[default]" "region = us-east-1" "output = json" > ~/.aws/config
+  - sudo chmod 444 ~/.aws/c*
+install:
+  - npm install
+cache:
+  directories:
+    - node_modules
+    - vendor/bundle
+jobs:
+  include:
+    - stage: danger
+      script: bundle install --path vendor/bundle && bundle exec danger --fail-on-errors=true
+    - stage: development
+      script: ./bin/ci/development_pull.sh
+    - stage: beta
+      script: ./bin/app/build-test-deploy-docker-image.sh beta # Split apart the pushing of docker image and deploying in case 1 fails, we don't need to rerun the whole thing. 
+      script: ./bin/app/deployment.sh beta
+    - stage: production
+      script: ./bin/app/build-test-deploy-docker-image.sh prod
+      script: ./bin/app/deployment.sh prod
+stages:
+  - name: danger
+    if: type IN (pull_request)
+  - name: development
+    if: branch = development AND type IN (pull_request)
+  - name: beta
+    if: branch = beta AND type IN (pull_request)
+  - name: production
+    if: branch = production AND type IN (pull_request)

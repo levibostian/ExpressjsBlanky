@@ -1,0 +1,7 @@
+version: '2'
+services:
+  db:
+    environment:
+      - POSTGRES_PASSWORD=11111
+      - POSTGRES_DB=api-beta
+      - POSTGRES_USER=username

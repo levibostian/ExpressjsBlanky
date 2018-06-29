@@ -1,7 +1,0 @@
-version: '2'
-services:
-  db:
-    restart: always
-    environment:
-      - POSTGRES_PASSWORD=0987654321
-      - POSTGRES_DB=foo-staging

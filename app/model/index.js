@@ -1,34 +1,40 @@
 /* @flow */
 
-var fs = require("fs")
-var path = require("path")
-var Sequelize = require("sequelize")
-var env: string = process.env.NODE_ENV || "development"
-var config: Object = require("../../config/config.json")[env]
+import fs from 'fs'
+import path from 'path'
+import Sequelize from 'sequelize'
+import type {Options} from 'sequelize'
+export {Sequelize}
+const env: string = process.env.NODE_ENV || "development"
+const config: Options = require("../../config/config.json")[env]
+const winston: Object = require('winston')
 
 // define sets defaults for every model that is created.
 config.define = {
-    underscored: true, // convert camelCase column names to underscored.
-    underscoredAll: true, // convert camelCase table names to underscored.
-    paranoid: true // when deleting rows, don't delete, set deleted_at timestamp for row instead.
+  underscored: true, // convert camelCase column names to underscored.
+  underscoredAll: true, // convert camelCase table names to underscored.
+  paranoid: false // when deleting rows, don't delete, set deleted_at timestamp for row instead.
 }
-var sequelize: Sequelize = new Sequelize(config.database, config.username, config.password, config)
-var db: Object = {}
+config.operatorsAliases = false // use the new type of sequelize operators: http://docs.sequelizejs.com/manual/tutorial/querying.html#operators
+config.logging = false // Prevent console.log statements. I can turn them on via DEBUG flag in the test commands anyway.
+export const sequelize: Sequelize = new Sequelize(((config.database: any): string), config.username, config.password, config)
 
-fs.readdirSync(__dirname).filter((file) => {
-    return (file.indexOf(".") !== 0) && (file !== "index.js")
-}).forEach((file): void => {
-    var model = sequelize.import(path.join(__dirname, file))
-    db[model.name] = model
-})
+import {User, UserSequelizeModel} from './user'
+import {FcmToken, FcmTokenSequelizeModel} from './fcm_token'
 
-Object.keys(db).forEach((modelName): void => {
-    if ("associate" in db[modelName]) {
-        db[modelName].associate(db)
-    }
-})
+// Used for other models to refer to each other for foreign keys and such. These are Sequelize models.
+export const models: Object = {}
 
-db.sequelize = sequelize
-db.Sequelize = Sequelize
+new UserSequelizeModel(sequelize).define()
+new FcmTokenSequelizeModel(sequelize).define()
 
-module.exports = db
+models[User.tableName] = sequelize.model(User.tableName)
+models[FcmToken.tableName] = sequelize.model(FcmToken.tableName)
+
+// We must first *define* all of the models with Sequelize before we call associate because of foreign key constraints, create them all to avoid "model not found" exceptions before dependencies are created.
+for (var modelKey: string in models) {
+  const model: Object = models[modelKey]
+  model.associate(model)
+}
+
+export {User, FcmToken}

@@ -1,27 +1,37 @@
 {
   "development": {
-    "username": "app",
-    "password": "1234567890",
-    "database": "app",
-    "host": "db",
+    "username": "dev",
+    "password": "12345",
+    "database": "dev",
+    "host": "dev-db",
     "dialect": "postgres"
   },
   "testing": {
-    "dialect": "sqlite",
-    "storage": "./db.testing.sqlite"
+    "username": "test",
+    "password": "12345",
+    "database": "test",
+    "host": "test-db",
+    "dialect": "postgres"
   },
-  "staging": {
-      "username": "foo",
-      "password": "1234567890",
-      "database": "foo-staging",
-      "host": "12.33.44.55",
-      "dialect": "postgres"
+  "beta": {
+    "username": "api-beta",
+    "password": "11111",
+    "database": "api-beta",
+    "host": "api-db",
+    "dialect": "postgres"
   },
   "production": {
-    "username": "foo-prod",
-    "password": "1234567890",
-    "database": "foo-prod",
-    "host": "12.33.44.55",
+    "username": "api-prod",
+    "password": "11111",
+    "database": "api-prod",
+    "host": "111.111.111",
+    "dialect": "postgres"
+  },
+  "docker-test": {
+    "username": "test",
+    "password": "12345",
+    "database": "test",
+    "host": "db-docker-test",
     "dialect": "postgres"
   }
 }

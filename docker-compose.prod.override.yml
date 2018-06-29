@@ -1,6 +1,0 @@
-version: '2'
-services:
-  foo-app:
-    environment:
-      - NODE_ENV=production
-      - VIRTUAL_HOST=foo.levibostian.com

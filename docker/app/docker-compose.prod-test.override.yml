@@ -1,0 +1,33 @@
+# Used by CI servers to test if newly built production image works.
+version: '2'
+services:
+  app:
+    image: "docker-production-image-test"
+#    user: app
+    command: npm run production:run
+    ports: # Since we are not using nginx-proxy, we need to communicate some way.
+      - "5000:5000"
+    environment:
+      - CI
+      - NODE_ENV=docker-test
+      - SLACK_WEBHOOK_URL=fake
+      - SLACK_CHANNEL=fake
+      - API_MAILGUN_API_KEY=fake
+      - VIRTUAL_HOST=foo.com
+    depends_on:
+      - redis
+      - db
+  redis:
+    image: "redis:4.0-alpine"
+    expose:
+      - "6379"
+  db:
+    image: "postgres:9.6-alpine"
+    container_name: db-docker-test
+    expose:
+      - "5432"
+    environment:
+      - POSTGRES_USER=test
+      - PGDATA=/var/lib/postgresql/data/pgdata
+      - POSTGRES_PASSWORD=12345
+      - POSTGRES_DB=test

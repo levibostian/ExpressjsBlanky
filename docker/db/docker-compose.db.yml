@@ -1,0 +1,13 @@
+version: '2'
+services:
+  db:
+    image: "postgres:9.6-alpine"
+    container_name: api-db
+    restart: always
+    ports:
+        - "5432:5432"
+    volumes:
+        - /var/lib/postgresql/api/data/pgdata:/var/lib/postgresql/data/pgdata
+    environment:
+      - POSTGRES_USER=username
+      - PGDATA=/var/lib/postgresql/data/pgdata

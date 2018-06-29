@@ -1,9 +1,10 @@
-FROM node:6.10.0-alpine
+FROM node:8-alpine
 
 EXPOSE 5000
+EXPOSE 9229
 
-RUN mkdir -p /home/app
-ENV HOME=/home/app
+RUN mkdir -p /home/app/app
+ENV HOME=/home/app/app
 WORKDIR $HOME
 
 CMD ["ls", "/home/app"]

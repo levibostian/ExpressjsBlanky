@@ -1,29 +1,18 @@
-var router = require('express').Router()
-import {FatalApiError, ForbiddenError, UserEnteredBadDataError, FieldsError, Success} from '../responses'
+// @flow
 
-router.use('/v1/', require('./login'))
-router.use('/v1/', require('./groups'))
-router.use('/v1/', require('./admin'))
-router.use('/v1/', require('./user'))
+import type {Router, $Response, $Request, NextFunction, Middleware, $Application} from 'express'
+const app: $Application = require('express')()
+const router: Router = require('express').Router()
+import {FatalApiError, ForbiddenError, UserEnteredBadDataError, Success, SystemError} from '../responses'
+import winston from 'winston'
+import userRouter from './routes/user'
+import adminRouter from './routes/admin'
 
-router.get('/', function(req, res) {
-    return res.send('Hold on, nothing to see here.')
+router.get('/', (req: $Request, res: $Response, next: NextFunction): $Response => {
+  return res.send('Hold on, nothing to see here.')
 })
 
-exports.defaultCatch = function(error, res, next) {
-    if (error instanceof FatalApiError) {
-      return res.status(500).send(error)
-    } else if (error instanceof ForbiddenError) {
-      return res.status(403).send(error)
-    } else if (error instanceof UserEnteredBadDataError) {
-      return res.status(400).send(error)
-    } else if (error instanceof FieldsError) {
-      return res.status(422).send(error)
-    } else if (error instanceof Success) {
-      return res.status(200).send(error)
-    } else {
-      return next(error)
-    }
-}
+router.use(userRouter)
+router.use(adminRouter)
 
-module.exports = router
+export default router

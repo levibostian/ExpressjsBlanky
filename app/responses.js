@@ -1,43 +1,60 @@
 /* @flow */
 
-exports.Success = class Success {
-    message: string;
-    constructor(message: string) {
-        this.message = message;
-    }
+import winston from 'winston'
+
+export class Success {
+  static code: number = 200
+  message: string
+  constructor(message: string) {
+    this.message = message
+  }
 }
 
-exports.SystemError = class SystemError {
-    message: string;
-    constructor(message: string) {
-        this.message = message;
-    }
+export class SystemError {
+  static code: number = 500
+  message: string
+  constructor(message: string) {
+    this.message = message
+  }
 }
 
-exports.UserEnteredBadDataError = class UserEnteredBadDataError {
-    message: string;
-    constructor(errorMessage: string) {
-        this.message = errorMessage;
-    }
+export class UserEnteredBadDataError {
+  static code: number = 400
+  message: string
+  constructor(errorMessage: string) {
+    this.message = errorMessage
+  }
 }
 
-exports.ForbiddenError = class ForbiddenError {
-    message: string;
-    constructor(errorMessage: string) {
-        this.message = errorMessage;
-    }
+export class ForbiddenError {
+  static code: number = 403
+  message: string
+  constructor(errorMessage: string) {
+    this.message = errorMessage
+  }
 }
 
-exports.FatalApiError = class FatalApiError {
-    message: string;
-    constructor(errorMessage: string) {
-        this.message = errorMessage;
-    }
+export class FatalApiError {
+  static code: number = 500
+  message: string
+  constructor(errorMessage: string) {
+    this.message = errorMessage
+  }
 }
 
-exports.FieldsError = class FieldsError {
-    errors: Object;
-    constructor(errors: Object) {
-        this.errors = errors;
+export class Unauthorized {
+  static code: number = 401
+}
+
+export class FieldsError {
+  static code: number = 422
+  errors: Array<Object>
+  message: string
+  constructor(errors: Array<Object>) {
+    if (errors.length <= 0) {
+      winston.log('error', "FieldsError got constructed, but without any error objects given. Stacktrace: " + new Error().stack)
     }
+    this.errors = errors
+    this.message = (errors.length > 0) ? errors[0].msg : "Sorry, there has been an error. The team has been notified to fix this issue. Try again later."
+  }
 }
