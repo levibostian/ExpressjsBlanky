@@ -1,13 +1,12 @@
-// Setup .env
-import "../../app/util"
+import "@app/util" // Setup .env
 
-import { ADMIN_TOKEN } from "../../app/middleware/auth"
-import { isTesting } from "../../app/util"
+import { ADMIN_TOKEN } from "@app/middleware/auth"
+import { isTesting } from "@app/util"
 import { FakeDataGenerator } from "./fake_data_generators/types"
 import { createDependencies } from "./fake_data_generators/util"
-import { initDatabase, resetDatabase, closeDatabase } from "../../app/model"
-import { container } from "../../app/di"
-import { startServer } from "../../app/server"
+import { initDatabase, resetDatabase, closeDatabase } from "@app/model"
+import { container } from "@app/di"
+import { startServer } from "@app/server"
 import { Server } from "http"
 import request, { Test, SuperTest } from "supertest"
 

@@ -1,10 +1,10 @@
-import { UserModel, FcmTokenModel, UserPublic } from "../../model"
-import { Success, UserEnteredBadDataError } from "../../responses"
-import { Endpoint } from "../type"
+import { UserModel, FcmTokenModel, UserPublic } from "@app/model"
+import { Success, UserEnteredBadDataError } from "@app/responses"
+import { Endpoint } from "@app/controller/type"
 import { check } from "express-validator/check"
-import { container, ID } from "../../di"
-import { EmailSender } from "../../email"
-import constants from "../../constants"
+import { container, ID } from "@app/di"
+import { EmailSender } from "@app/email"
+import constants from "@app/constants"
 
 class AddUserSuccess extends Success {
   constructor(message: string, public user: UserPublic) {

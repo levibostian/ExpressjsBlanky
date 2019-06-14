@@ -1,8 +1,8 @@
 # ExpressjsBlanky
 
-Nodejs API boilerplate project I use for all the rest API apps that I build. Clone the repo, edit some configurations, and get off to building your next awesome app!
+Clone the repo, edit some configurations, and get off to building your next awesome Nodejs!
 
-This project is _very_ opinionated. It is not designed with the best practices, common libraries, and design patterns for _the general public_. It's designed for the apps that [I](https://github.com/levibostian/) build.
+This project is _very_ opinionated because, well, it's designed for the apps that [I](https://github.com/levibostian/) build.
 
 iOS developer? I have [a boilerplate project for you!](https://github.com/levibostian/iosblanky)
 Android developer? I have [a boilerplate project for you!](https://github.com/levibostian/androidblanky)
@@ -17,44 +17,79 @@ You know the feeling when you go to begin a new project. The day you begin a pro
 
 ExpressjsBlanky works to avoid that. By having a blank Expressjs app already created, am able to copy it and am ready to jump right into developing my new app. ExpressjsBlanky works to get you to building your app within minutes instead of hours or days.
 
-# What is included in AndroidBlanky?
+# What are some cool things about ExpressjsBlanky?
+
+ExpressjsBlanky has been modified over years of building nodejs rest APIs. Through experience, you are guaranteed to find many annoyances and bugs. After each encounter, some engineering work is done to help remove that annoyance and prevent that bug from happening again.
+
+ExpressjsBlanky comes equipped with the following features:
+
+- Strongly typed programming language via Typescript. After years of runtime exceptions from Javascript, it's time for something better.
+- Deploy a staging and production server of application. This allows you to perform internal and external beta testing of your APIs to make sure everything works great.
+- ExpressjsBlanky is setup with dependency injection and mocking to allow you to unit test easily.
+- When creating integration tests, it can be necessary to insert fake data into your database and then run a HTTP request against your code to test it. ExpressjsBlanky is setup to insert fake data into your database super easily.
+- Run tests on each commit of your code, build and test your production docker container, and deploy your applications all by just pushing code to GitHub. All of this is done via ExpressjsBlanky being setup with a CI server.
+- Database backups for production database.
+- Run application in Docker for CI tasks and deployment - Makes deployment painless and portable.
+
+# Getting started
+
+- First, clone this repo:
+
+```
+git clone https://github.com/levibostian/ExpressjsBlanky.git NameOfYourNewApp
+cd NameOfYourNewApp
+rm -rf .git/
+git init
+git config user.email "you@example.com"
+git config user.name "First Last"
+git add .; git commit -m "Initial commit. Created project from levibostian/ExpressjsBlanky boilerplate.";
+npm run init
+```
+
+- Next, follow all of the directions below in the [services](#Services) section to configuring the services this project is setup to work with.
+- When you want to run the application locally on your machine for development purposes, follow the directions for [development](#development).
+- If you want to run unit, integration tests for your application, check out the section for [tests](#tests).
+- If you wish to deploy your application to a staging or production server, check out the section on [deployment](#deploy).
+
+Enjoy!
+
+# What is included in ExpressjsBlanky?
 
 ### Language:
 
-- ES6 Javascript compiled via [Babeljs](https://babeljs.io/) with [Flowtype](https://flow.org/) - I love type systems. Flowtype helps me write better Javascript.
+- [Typescript](https://www.typescriptlang.org/) compiled via [Babeljs](https://babeljs.io/).
 
 ### Libraries:
 
+- [API doc](http://apidocjs.com/) - Generate documentation on each API endpoint for an API.
 - [Axios](https://github.com/axios/axios) - For performing HTTP requests to other services within my API.
-- [Babel](https://babeljs.io/) - Enables me to use new features of Javascript, today.
 - [Bull](https://github.com/OptimalBits/bull) - Queue of jobs that are more heavy duty to run in the background of my API to not slow down my API requests for users.
 - [Bull Arena](https://github.com/bee-queue/arena) - Web UI to view Bull jobs. Used primarily for debugging.
 - [Connect trim body](https://github.com/samora/connect-trim-body) - Small middleware used to trim whitespace from all of the strings of a request body.
 - [cors](https://github.com/expressjs/cors) - Middleware to enable [CORS](http://en.wikipedia.org/wiki/Cross-origin_resource_sharing) support, easily.
+- [dotenv]() - Change your code at runtime easily by using environment variables.
 - [Express](https://expressjs.com/) - The web framework used to create the API.
 - [Express routes versioning](https://github.com/Prasanna-sr/express-routes-versioning) - Allows me to create versioning API endpoints. Used to scale an API while keeping backwards compatibility with existing apps built.
 - [Express validator](https://github.com/express-validator/express-validator) - Validate request body/query for parameters I require for each endpoint.
 - [Forever](https://github.com/foreverjs/forever) - Automatically restarts my nodejs app if it ever fails in production.
 - [Helmet](https://github.com/helmetjs/helmet) - Middleware to add best practice, common, security protection to your API.
-- [Mustache](https://github.com/janl/mustache.js) - Inject variables into HTML files that are then emailed out to our users.
+- [husky]() - Run commands during development when you run git commands. Very handy for auto formatting your code on git commits!
+- [inversify]() - Dependency injection framework to make unit testing of your code nice and easy.
 - [Passport](http://www.passportjs.org/) - Middleware for Basic and OAuth Bearer authentication (and many other authentication forms) to authenticate endpoints of my API.
+- [Prettier]() - Code formatting to make your code prettier.
 - [Sequelize](https://github.com/sequelize/sequelize) - Module to interact with the database. Makes all CRUD operations less prone to bugs instead of writing raw SQL strings.
 - [uid2](https://www.npmjs.com/package/uid2) - Generate UID strings.
-- [Winston](https://github.com/winstonjs/winston), [Winston Slacker](https://github.com/meerkats/winston-slacker) - Logger used for logging to console for development and Slack for beta/production releases.
-- [eslint](https://eslint.org/) - Linter for keeping the code consistent and helping me write better, less prone to bugs code.
 
-# Testing libraries
+#### Testing libraries
 
-- [Nock](https://github.com/nock/nock) - Mock HTTP calls for testing purposes when making HTTP requests to remote hosts.
-- [Shouldjs](https://github.com/shouldjs/should.js/) - Assertions library for testing.
-- [Mochajs](https://mochajs.org/) - Testing framework.
+- [Jest](https://jestjs.io/) - Testing framework.
 - [Supertest](https://github.com/visionmedia/supertest) - Test HTTP requests easily. Makes creating integration tests against the API endpoints easy.
-- [Blanket](https://github.com/alex-seville/blanket) - Report on test coverage.
-- [API doc](http://apidocjs.com/) - Generate documentation on each API endpoint for an API.
 
-# Database
+#### Database
 
 I am a fan of [Postgres](https://www.postgresql.org/). Stable, SQL based database. I am using the [sequelize](https://github.com/sequelize/sequelize) npm module to interact with the database for all CRUD operations.
+
+ExpressjsBlanky is setup to run Postgres for development, testing, staging, and production environments. Because the same database is always used, you can expect less issues at runtime in production.
 
 # Services
 
@@ -62,21 +97,15 @@ I am a fan of [Postgres](https://www.postgresql.org/). Stable, SQL based databas
   Configure:
 
 1. Follow the directions for [Generating the .json file with your private keys](https://firebase.google.com/docs/admin/setup). _Note: Put the .json file in the path: `config/firebase_key.json`. The API is already configured to use that file and work from there._
-2. Uncomment the initialization code in `jobs/send_push_notification_user.js`.
-3. Uncomment the push notification payload JSON in the bottom of `jobs/send_push_notification_user.js` for Android and iOS specific payloads according to [the docs](https://firebase.google.com/docs/cloud-messaging/admin/send-messages).
-4. Anytime you wnat to send a push notification to a user, use this code: `await new SendPushNotificationData(userId, "title", "message").add()`
+2. Uncomment the initialization code in `jobs/send_push_notification_user.ts`.
+3. Uncomment the push notification payload JSON in the bottom of `jobs/send_push_notification_user.ts` for Android and iOS specific payloads according to [the docs](https://firebase.google.com/docs/cloud-messaging/admin/send-messages).
+4. Anytime you want to send a push notification to a user, use this code: `await jobQueueManager.queueSendPushNotificationToUser({...})`
 
-- [Firebase Dynamic Links](https://firebase.google.com/docs/dynamic-links/) - Enable logging into your mobile app via passwordless login by having the backend API email your user a login token that is then exchanged with an access token.
+- [Firebase Dynamic Links](https://firebase.google.com/docs/dynamic-links/) - Send URLs that can route your client applications to specific parts of your app.
   Configure:
 
 1. If you want to use your own custom domain name for your dynamic links, [go to the Firebase Console to add your custom URL](https://console.firebase.google.com/project/_/durablelinks/links/).
-2. If you use your custom domain or you use the generated URL that Firebase makes for you [in the Firebase Console](https://console.firebase.google.com/project/_/durablelinks/links/), you need to copy that URL and paste it in: `app/controller/0.1.0/user.js`. Edit this line of code:
-
-```
-const passwordlessLoginLink: string = `https://your_subdomain.page.link/?link=${loginLink}&apn=${androidPackageName}`
-```
-
-You will also want to add your Android package name and/or your iOS package name to the dynamic link too.
+2. If you use your custom domain or you use the generated URL that Firebase makes for you [in the Firebase Console](https://console.firebase.google.com/project/_/durablelinks/links/), you need to copy that URL and paste it in: `app/constants/index.ts`. Edit `login > dynamic_link_url` You will also want to add your Android package name and/or your iOS package name in the constants file if you have an Android or iOS app.
 
 All of the query parameters you want to add to the dynamic link can be found [in these docs](https://firebase.google.com/docs/dynamic-links/create-manually).
 
@@ -93,32 +122,33 @@ To follow this workflow, create a git branch `development`, `beta`, and `product
 - [Danger](http://danger.systems/ruby/) - Bot that looks over my pull requests and make sure I do not forget to complete certain tasks.
   Configure: [Here are instructions](http://danger.systems/guides/getting_started.html#creating-a-bot-account-for-danger-to-use) for adding a Danger bot to your repo. This depends on if your app is an open source or closed source project.
 
-- [Mailgun](https://www.mailgun.com/) - Sending emails to users.
+- [Postmark](https://postmarkapp.com/) - Sending emails to users.
   Configure:
 
-1. Create an account [at mailgun's website](https://www.mailgun.com/). Add your domain name and set it up in Mailgun on the website. Get your domain's API key, paste that in the file `docker/app/docker-compose.beta.override.yml` for the variable `API_MAILGUN_API_KEY`. While you're at it, also edit the variables `EMAIL_FROM_DOMAIN`, `EMAIL_FROM_NAME`, `EMAIL_FROM_EMAIL_ADDRESS` to the domain, name, and email address you want to send email as in your application.
-2. Create an HTML file containing your email you want to send. I personally use [Mailchimp](https://mailchimp.com/) to create the template file (Mailchimp has an email builder where you can then download a .html file of that template). Download the .html file email template of yours and save it under `email/templates/` as a `.html` file.
-3. In the `.html` file you downloaded, go inside and create variables for yourself. Anywhere you want some text injected into the file dynamically, create variables using [mustachejs](https://github.com/janl/mustache.js) template strings like this: `{{variable_name_here}}`, `{{user_email_address}}`. If you need your variable to be escaped (such as a URL), add a `&` before your variable name like this: `{{&download_link}}`.
-4. Time to send an email! In your code, import the email module with: `import {sendEmail} from '../../email'` and then send the email: `await sendEmail(user.email, "Subject here", "template_name_here.html", {variable_name_here: variableValue, other_variable_here: "dynamicString"})`.
+1. Create an account [at Postmark's website](https://postmarkapp.com/). Add your domain name you want to send email from.
+2. After all of your setup is complete, you will have an API key for the server you want to send from. _Note: It may be a good idea to create multiple servers in Postmark: One for staging and production, one for development. However, you do what you feel is best_.
+
+Copy the example config files if you have not already:
+
+```
+cp .env.staging.example .env.staging
+cp .env.production.example .env.production
+```
+
+Edit the environment variables in `.env.development`, `.env.production`, and `.env.staging` with your Postmark server's API key and the email address, name, you want to send emails from.
+
+3. Create HTML templates in the Postmark website. You can include variables to make them dynamic!
+4. Add or edit the functions in `app/email/index.ts`. Create 1 function for each type of email you want to send. Then, when you're ready to send an email, `await emailSender.sendWelcome(toEmailAddress, {variable_name_here: variableValue})`.
 
 - [AWS ECR](https://aws.amazon.com/ecr/) - Host private Docker images built from the API codebase.
   Configure:
 
 1. [Create an AWS account](https://aws.amazon.com/).
 2. [Create a new repository for ECR](https://console.aws.amazon.com/ecs/home?region=us-east-1#/repositories/create/new) which is where you will store API Docker images. I recommend naming your repository with this convention: `nameOfYourCompany/nameOfYourProject`.
-3. Open `bin/app/build-test-deploy-docker-image.sh` and `bin/app/deployment.sh`. Edit the variables at the top of the file: `AWS_IMAGE_NAME`, `BETA_IMAGE_NAME`, and `PROD_IMAGE_NAME`. Once you have your server created where you will host your API code, you can also edit the `BETA_DEPLOY_USER`, `BETA_DEPLOY_HOST`, `PROD_DEPLOY_USER`, `PROD_DEPLOY_HOST` variables in the `.travis.yml` file.
+3. Open `bin/app/build-test-deploy-docker-image.rb` and `bin/app/deployment.rb`. Edit the variables at the top of the file: `AWS_IMAGE_NAME`, `STAGING_IMAGE_NAME`, and `PROD_IMAGE_NAME`. Once you have your server created where you will host your API code, you can also edit the `STAGING_DEPLOY_USER`, `STAGING_DEPLOY_HOST`, `PROD_DEPLOY_USER`, `PROD_DEPLOY_HOST` variables in the `.travis.yml` file.
 4. Open up [AWS IAM to create a new user](https://console.aws.amazon.com/iam/home?region=us-east-1#/users$new?step=details). Name it something like `travis-ci` since we are creating a user for your CI server. Check `Programmatic access` checkbox. Click next. For attaching permissions, choose `Attach existing policy directly`, search for `AmazonEC2ContainerRegistryPowerUser` and attach that permission. You will get an access key and a password generated for you. Save this information! You cannot recover it. I usually use a password manager like Lastpass to save this information in it.
 5. The access key and password generated for you in AWS IAM needs to be given to our Travis CI configuration. Follow [these directions](https://docs.travis-ci.com/user/environment-variables/#Defining-encrypted-variables-in-.travis.yml) to encrypt these sensitive keys and add them to your `.travis.yml` file. For the environment variable names that you use for encryption, use: `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`.
-6. Open up the file `docker/db/docker-compose.db-beta.override.yml` and `docker/db/docker-compose.db-prod.override.yml` and edit the `image` entry at the top to the correct name of your Docker image created inside of AWS.
-
-- [Slack](https://slack.com/) - Instant messaging application for teams. I use Slack to notify me when errors happen on my API. App crashes result in sending a Slack message to me with the error message and stacktrace.
-  Configure:
-
-1. Create a [Slack team](https://slack.com/get-started).
-2. Open the [Slack apps directory](https://slack.com/apps). Search for "Incoming WebHooks". Select it.
-3. Select "Add configuration". Select the channel you wish to post the error messages to. Click "Add Incoming WebHook integration".
-4. You should receive a URL in the form: `https://hooks.slack.com/services/.../.../...`. Open the file: `docker/app/docker-compose.beta.override.yml` and edit the environment variable `SLACK_WEBHOOK_URL` to the URL you received. Edit `SLACK_CHANNEL` to the channel you wish to post the message to. Do not include the `#` character in this.
-5. When you get an error in production or beta, you will receive a Slack message. You will know if this is working when you deploy your application for the first time. You will get a notification telling you that your application has started.
+6. Open up the file `docker/db/docker-compose.db-staging.override.yml` and `docker/db/docker-compose.db-production.override.yml` and edit the `image` entry at the top to the correct name of your Docker image created inside of AWS.
 
 - [AWS S3](https://aws.amazon.com/s3/) - Store database backups of the production database.
   Configure:
@@ -160,7 +190,7 @@ Replace `nameofbuckethere` above with the name of your bucket that you created b
 When asked what to name this policy, name of something like `name-of-project-s3-rw`.
 
 4. Open up [AWS IAM to create a new user](https://console.aws.amazon.com/iam/home?region=us-east-1#/users$new?step=details). Name it something like `db-backups`. Check `Programmatic access` checkbox. Click next. For attaching permissions, choose `Attach existing policy directly`, search for `name-of-project-s3-rw` (or whatever you named your policy you created above) and attach that permission. You will get an access key and a password generated for you. Save this information! You cannot recover it. I usually use a password manager like Lastpass to save this information in it.
-5. Open the file `docker/db/docker-compose.db-prod.override.yml`. There are a lot of environment variables you need to it. `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`, `S3_BUCKET`, `S3_PREFIX`. These variables are all named to your access key and password for your new IAM account as well as the name of your bucket and the name of your folder you created (aka: prefix). `POSTGRES_DATABASE`, `POSTGRES_HOST`, `POSTGRES_USER`, `POSTGRES_PASSWORD`. These are how to authenticate with your postgres database. This information should match the configuration details you have in `config/config.json` for the production database connection.
+5. Edit the file `.env.production` file in the backups section. Backups are currently only enabled for the production database.
 
 ## Misc services setup
 
@@ -168,38 +198,7 @@ Besides the services listed above and how to configure them, there is some more 
 
 - Finish setting up passportjs. The API is designed to have endpoints designed for an administrator of your application to use. The admin endpoints are designed to authenticate with OAuth Bearer or Basic authentication using a hard coded password.
 
-Open `docker/app/docker-compose.beta.override.yml` and edit `ADMIN_AUTH_PASSWORD` and `ADMIN_AUTH_TOKEN` to the hard coded Bearer and Basic password respectively you wish to use.
-
-\*Note: This set password will be the same for beta and for production environments. If you want to have separate passwords, copy and paste:
-
-```
-- ADMIN_AUTH_PASSWORD=12345
-- ADMIN_AUTH_TOKEN=12345
-```
-
-Into `docker/app/docker-compose.prod.override.yml` and edit the passwords there as well to set production specific values.
-
-# Getting started
-
-- First, clone this repo:
-
-```
-git clone https://github.com/levibostian/ExpressjsBlanky.git NameOfYourNewApp
-cd NameOfYourNewApp
-rm -rf .git/
-git init
-git config user.email "you@example.com"
-git config user.name "First Last"
-git add .; git commit -m "Initial commit. Created project from levibostian/ExpressjsBlanky boilerplate.";
-npm run init
-```
-
-- Next, follow all of the directions above in the [services](#Services) section to configuring the services this project is setup to work with.
-- When you want to run the application locally on your machine for development purposes, follow the directions for [development](#development).
-- If you want to run unit, integration tests for your application, check out the section for [tests](#tests).
-- If you wish to deploy your application to a beta or production server, check out the section on [deployment](#deploy).
-
-Enjoy!
+Open `.env.staging` and `.env.production` and edit `ADMIN_AUTH_PASSWORD` and `ADMIN_AUTH_TOKEN` to the hard coded Bearer and Basic password respectively you wish to use.
 
 # Development
 
@@ -207,53 +206,37 @@ _Warning: Make sure to follow the [getting started](#getting-started) section to
 
 Do you wish to build and run this Expressjs application locally on your machine for development? Let's do it.
 
-This project is setup to run the Expressjs application inside of a [Docker](https://www.docker.com/) container. This is awesome because it allows you to develop your Expressjs application without having to install any extra software packages and configure them. It's all compacted inside of a nice little Docker package.
+To develop with ExpressjsBlanky, you need Docker and Nodejs installed. That is it!
 
-Pretty simple. To run the application: `npm run docker:dev:run`. That's it.
+```bash
+npm run init
+npm run dev:setup
+npm run dev
+```
 
-# Debugging
+This will install everything you need, start up services such as Redis and Postgres, then start your node application.
 
-This project is setup to work with Nodejs's inspector feature. This makes it super easy to setup breakpoints for your API for dev and testing debugging.
-
-Here is how to debug your app during development:
-
-- Open up Google Chrome on your machine. Other browsers might work, but Google Chrome is the only one that I know works for now. It has the built-in Nodejs dev tools toolset.
-- Enter `about:inspect` into the address bar and hit Enter. Once there, select `Open dedicated DevTools for Node`.
-- In the next window that appears, in the "Connection" tab, make sure that `localhost:9229`, `127.0.0.1:9229`, and `0.0.0.0:9229` are all added. I doubt you need each of them, but I add them all to make sure it works.
-- Start the development application with the commands: `npm run docker:dev:build`, and `npm run docker:dev:run`. When it runs, you should automatically attach to the debugger. In the Node Chrome DevTools, you should see in the "Sources" tab the ability to browse the source code of your app. You can set breakpoints, call your endpoints and hit the breakpoints.
-
-Debug your application during tests:
-
-- Follow the directions above for debugging your app during development. Except instead of running the `npm run ...` commands to start up the development app, start up your tests using the commands: `npm run docker:test:build`, `npm run docker:test:run:debug`.
+To debug your code, this project is setup to work with VSCode's built-in debugger. All you need to do is run the "Local development debug" task in VSCode and done! It will even reset the debugger and recompile your code on code change.
 
 # Tests
 
-This project is setup to create and run integration tests against your endpoints super easily. You can create and run unit tests as well. However, some of the design decisions made for setting up the testing environment is made for integration testing of the endpoints in mind.
+This project is setup to create and run unit and integration tests against your code base super easily. For information on how to _write_ tests, check out the `tests/` directory.
 
-For information on how to _write_ tests, check out `test/0.1.0/admin.js` and `test/0.1.0/user.js` for tests that are created and all passing at this time. They are great reference for you to check out how to create tests.
-
-The testing environment created for this project is super sweet (well, at least I think so 😊). Here are some of the features:
-
-- Tests run inside of a Docker container. No dependencies you need to install or configuration on your machine to run them.
-- You can populate your testing database with dummy data super easily. One line of code in fact: `await tests.setupDb([User.newUserState().testData()])`. This inserts an entry into the User table with a predefined set of data and all foreign key dependencies also inserted to get future CRUD operations to succeed. This is super easy to extend on with your own models as well. Check out the `app/model/user.js` and `app/model/fcm_token.js` files to see the `TestData` functions setup.
-- Super quick debugger setup. See the directions [for debugging](#debugging) to learn how.
-
-In order to _run_ tests, here is how we do that. Just as we development and deploy our application, running tests also happen inside of a [Docker](https://www.docker.com/) container.
-
-To run tests, it's simple.
-
-```
-npm run test:build # You only need to run this command one time for setup. Then, just run command below to run.
+```bash
+npm run init
+npm run test:setup
 npm run test
 ```
 
-If you ever want to run tests with Nodejs debugging, check out the [debugging](#debugging) section.
+This will run all of your tests: unit and integration.
+
+It's recommended that while you are developing your tests you use the [Jest Runner](https://marketplace.visualstudio.com/items?itemName=firsttris.vscode-jest-runner) VSCode extension for when you want to run or debug individual tests.
 
 # Deploy
 
 _Warning: Before you try and deploy your application, you need to follow the directions on getting your [development](#development) environment setup and the application running locally. Also, recommended [your tests](#testing) run and pass._
 
-This project is setup to deploy your Nodejs application via a [Docker](https://www.docker.com/) container. It is also setup to run in either a "beta" or a "production" environment. Directions below are very similar between the production and beta versions. It is recommended to run these beta and production applications on separate servers in case your beta version has a bug and it crashes the server resulting in your production application going down.
+This project is setup to deploy your Nodejs application via a [Docker](https://www.docker.com/) container. It is also setup to run in either a "staging" or a "production" environment. Directions below are very similar between the production and staging versions. It is recommended to run these staging and production applications on separate servers in case your staging version has a bug and it crashes the server resulting in your production application going down as well.
 
 - First off, we need to deploy our database. To do this, we need to setup the usernames and passwords for our database.
 
@@ -276,7 +259,7 @@ Run `docker logs db` anytime you wish to see if the database has started success
 
 - Next it is time to start up your application.
 
-First off, this project is setup to using a CI server to test, build, and deploy your application for you. After you configure it, your CI server will take care of all of this work for you. However, I will still include the directions below for how to deploy manually. You need to follow these directions below the **first time** to get your application setup to work with a CI server. Then, your CI server can work on it's own for you.
+First off, this project is setup to using a CI server to test, build, and deploy your application for you. After you configure it, your CI server will take care of all of this work for you. However, I will still include the directions below for how to deploy manually so you can setup your server for CI deployments.
 
 First, create a docker network: `docker network create nginx-proxy-network`.
 
@@ -289,7 +272,7 @@ First, create a docker network: `docker network create nginx-proxy-network`.
 
 - To create a migration file for sequelize, run command: `npm run db:migrate:create --name describe-migration-here`
 - Open up this new migration file created under `migrations/` directory. Edit it to code that runs the migration. Check out [the docs](http://docs.sequelizejs.com/manual/tutorial/migrations.html) on how to program migration code.
-- Run the migration: `npm run db:migrate:run --debug --env "beta"` for beta or change `"beta"` to `"production"` for production.
+- Run the migration: `npm run db:migrate:run --debug --env "staging"` for staging or change `"staging"` to `"production"` for production.
 
 # Documentation
 

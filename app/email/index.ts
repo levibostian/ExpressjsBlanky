@@ -1,6 +1,6 @@
 import { ServerClient } from "postmark"
 import { injectable } from "inversify"
-import { container, ID } from "../di"
+import { container, ID } from "@app/di"
 
 const API_KEY = process.env.POSTMARK_API_KEY
 const DOMAIN = process.env.EMAIL_FROM_DOMAIN

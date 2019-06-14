@@ -1,8 +1,8 @@
 import express from "express"
 import expressRoutesVersioning from "express-routes-versioning"
-import * as controller_0_1_0 from "../0.1.0/user"
+import * as controller_0_1_0 from "@app/controller/0.1.0/user"
 import passport from "passport"
-import { prepareValidateMiddlewares } from "../util"
+import { prepareValidateMiddlewares } from "@app/controller/util"
 
 const router = express.Router()
 const routesVersioning = expressRoutesVersioning()

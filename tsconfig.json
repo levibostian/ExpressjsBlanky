@@ -14,7 +14,9 @@
     "baseUrl": ".",
     "strictNullChecks": true,
     "paths": {
-      "*": ["node_modules/*", "app/types/*"]
+      "*": ["node_modules/*", "app/types/*"],
+      "@app/*": ["app/*"],
+      "@test/*": ["tests/*"]
     }
   },
   "include": ["app/**/*", "tests/**/*"],

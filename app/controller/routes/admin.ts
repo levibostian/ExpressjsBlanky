@@ -1,13 +1,13 @@
 import express from "express"
 import expressRoutesVersioning from "express-routes-versioning"
-import * as controller_0_1_0 from "../0.1.0/admin"
+import * as controller_0_1_0 from "@app/controller/0.1.0/admin"
 import passport from "passport"
 import Arena from "bull-arena"
-import { container, ID } from "../../di"
-import { JobQueueManager } from "../../jobs"
-import constants from "../../constants"
-import { prepareValidateMiddlewares } from "../util"
-import { isTesting } from "../../util"
+import { container, ID } from "@app/di"
+import { JobQueueManager } from "@app/jobs"
+import constants from "@app/constants"
+import { prepareValidateMiddlewares } from "@app/controller/util"
+import { isTesting } from "@app/util"
 
 const routesVersioning = expressRoutesVersioning()
 const router = express.Router()

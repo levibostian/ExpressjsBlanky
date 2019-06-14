@@ -5,7 +5,7 @@ import {
   UserEnteredBadDataError,
   Success,
   SystemError,
-} from "../responses"
+} from "@app/responses"
 
 export const ErrorResponseHandlerMiddleware: ErrorRequestHandler = (
   error: ForbiddenError | UserEnteredBadDataError | Success | Error,

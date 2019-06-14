@@ -3,24 +3,24 @@ import {
   serverRequest,
   endpointVersionHeader,
   authHeader,
-} from "../../index"
+} from "@test/integration/index"
 import uid2 from "uid2"
 import {
   UserEnteredBadDataError,
   Success,
   Unauthorized,
   FieldsError,
-} from "../../../../app/responses"
+} from "@app/responses"
 import {
   UserFakeDataGenerator,
   FcmTokenFakeDataGenerator,
-} from "../../fake_data_generators"
-import { UserModel, FcmTokenModel } from "../../../../app/model"
-import { EmailSender } from "../../../../app/email"
-import { container, ID } from "../../../../app/di"
+} from "@test/integration/fake_data_generators"
+import { UserModel, FcmTokenModel } from "@app/model"
+import { EmailSender } from "@app/email"
+import { container, ID } from "@app/di"
 import { endpointVersion } from "./index"
-import constants from "../../../../app/constants"
-import * as arrayExtensions from "../../../../app/extensions/array"
+import constants from "@app/constants"
+import * as arrayExtensions from "@app/extensions/array"
 
 const sendWelcomeMock = jest.fn()
 const emailSenderMock: EmailSender = {

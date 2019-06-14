@@ -1,4 +1,4 @@
-import dotenv from "dotenv"
+import dotenv, { DotenvConfigOptions } from "dotenv"
 import path from "path"
 
 export const isDevelopment = process.env.NODE_ENV === "development"
@@ -41,10 +41,11 @@ const setupEnv = () => {
     return unreachableCode(env)
   })()
 
-  const result = dotenv.config({
-    debug: enableLogging ? true : null,
+  const dotEnvConfig: DotenvConfigOptions = {
     path: path.join(__dirname, "../", envFilename!),
-  })
+  }
+  if (enableLogging) dotEnvConfig.debug = "true"
+  const result = dotenv.config(dotEnvConfig)
 
   if (result.error) {
     throw result.error

@@ -1,9 +1,7 @@
 import { Sequelize, Options } from "sequelize"
 import dbConfig, { DatabaseConnection } from "../../config/db"
-import { env, enableLogging, isDevelopment, isTesting } from "../util"
-
-import { UserSequelizeModel } from "./user"
-import { FcmTokenSequelizeModel } from "./fcm_token"
+import { env, enableLogging, isDevelopment, isTesting } from "@app/util"
+import { UserSequelizeModel, FcmTokenSequelizeModel } from "@app/model"
 
 let databaseConnection = (dbConfig as { [key: string]: DatabaseConnection })[
   env

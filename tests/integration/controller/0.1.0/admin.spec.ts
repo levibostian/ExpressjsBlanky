@@ -3,17 +3,17 @@ import {
   serverRequest,
   endpointVersionHeader,
   adminAuthHeader,
-} from "../../index"
+} from "@test/integration/index"
 import uid2 from "uid2"
 import {
   UserEnteredBadDataError,
   Success,
   Unauthorized,
   FieldsError,
-} from "../../../../app/responses"
-import { UserFakeDataGenerator } from "../../fake_data_generators"
-import { EmailSender } from "../../../../app/email"
-import { container, ID } from "../../../../app/di"
+} from "@app/responses"
+import { UserFakeDataGenerator } from "@test/integration/fake_data_generators"
+import { EmailSender } from "@app/email"
+import { container, ID } from "@app/di"
 import { endpointVersion } from "./index"
 
 describe(`Create user ${endpointVersion}`, () => {

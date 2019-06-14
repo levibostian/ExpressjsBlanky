@@ -5,7 +5,7 @@
   "scripts": {
     "init": "npm install && bundle install",
     "production:build": "npx babel app --out-dir dist --copy-files --extensions '.ts,.tsx'",
-    "_production": "npx forever dist/server.js",
+    "_production": "npx forever -m 5 dist/server.js",
     "test:integration": "NODE_ENV=test npx jest --testPathPattern=\".+tests/integration/.+.spec.ts\" --runInBand --forceExit",
     "test:unit": "NODE_ENV=test npx jest --testPathPattern=\".+tests/unit/.+.spec.ts\"",
     "test": "npx concurrently --names \"unit, integration\" -c \"blue,green\" \"npm run test:unit\" \"npm run test:integration\"",
@@ -34,6 +34,7 @@
   },
   "author": "Levi Bostian <levi@curiosityio.com>",
   "dependencies": {
+    "@types/redis": "^2.8.13",
     "axios": "^0.19.0",
     "body-parser": "^1.19.0",
     "bull": "^3.10.0",
@@ -80,6 +81,7 @@
     "@types/supertest": "^2.0.7",
     "@types/validator": "^10.11.0",
     "apidoc": "^0.17.7",
+    "babel-plugin-module-resolver": "^3.2.0",
     "babel-plugin-transform-typescript-metadata": "^0.2.2",
     "concurrently": "^4.1.0",
     "husky": "^2.4.0",

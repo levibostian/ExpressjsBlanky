@@ -3,12 +3,12 @@ import {
   serverRequest,
   endpointVersionHeader,
   adminAuthHeader,
-} from "../index"
+} from "@test/integration/index"
 import {
   UserFakeDataGenerator,
   FcmTokenFakeDataGenerator,
-} from "../fake_data_generators"
-import { FcmTokenModel } from "../../../app/model"
+} from "@test/integration/fake_data_generators"
+import { FcmTokenModel } from "@app/model"
 
 describe(`FcmModel tests`, () => {
   it("should delete fcm token after deleting user", async () => {

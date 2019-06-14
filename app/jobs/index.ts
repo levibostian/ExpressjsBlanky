@@ -4,10 +4,10 @@ import {
   SendPushNotificationParam,
 } from "./send_push_notification_user"
 import { Job } from "./type"
-import * as logger from "../../app/logger"
+import * as logger from "@app/logger"
 import { injectable, inject, named } from "inversify"
-import { container, ID, NAME } from "../di"
-import constants from "../constants"
+import { container, ID, NAME } from "@app/di"
+import constants from "@app/constants"
 
 export const jobQueues: { [key: string]: JobContainer } = {}
 

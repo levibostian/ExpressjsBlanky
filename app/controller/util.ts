@@ -1,5 +1,5 @@
 import { RequestHandler } from "express"
-import { ValidateParamsMiddleware } from "../middleware"
+import { ValidateParamsMiddleware } from "@app/middleware"
 
 export const prepareValidateMiddlewares = (
   validateMiddlewares: RequestHandler[]

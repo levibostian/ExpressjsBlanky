@@ -1,7 +1,7 @@
 import passport from "passport"
 import { Strategy as BearerStrategy } from "passport-http-bearer"
 import { BasicStrategy } from "passport-http"
-import { UserModel } from "../model"
+import { UserModel } from "@app/model"
 
 if (!process.env.ADMIN_AUTH_PASSWORD || !process.env.ADMIN_AUTH_TOKEN) {
   throw new Error(`Must set all environment variables in auth middleware.`)

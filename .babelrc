@@ -8,13 +8,13 @@
       "babel-plugin-transform-typescript-metadata",
       ["@babel/plugin-proposal-decorators", { "legacy": true }],
       ["@babel/plugin-proposal-class-properties", { "loose": true }],
-      // ["module-resolver", {
-      //   // "roots": ["./app", "./tests"],
-      //   "alias": {
-      //     "app": "./app",
-      //     "test": "./tests"
-      //   }
-      // }]
+      ["module-resolver", {
+        "root": ["."],
+        "alias": {
+          "@app": "./app",
+          "@test": "./tests"
+        }
+}]
     ],
   "env": {
 		"debug": {

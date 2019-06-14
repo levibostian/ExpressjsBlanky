@@ -1,11 +1,7 @@
-import { UserModel, UserPublic } from "../../model/user"
-import {
-  Success,
-  UserEnteredBadDataError,
-  ForbiddenError,
-} from "../../responses"
+import { UserModel, UserPublic } from "@app/model/user"
+import { Success, UserEnteredBadDataError } from "@app/responses"
 import { check } from "express-validator/check"
-import { Endpoint } from "../../controller/type"
+import { Endpoint } from "@app/controller/type"
 
 class AddUserSuccess extends Success {
   constructor(message: string, public user: UserPublic) {

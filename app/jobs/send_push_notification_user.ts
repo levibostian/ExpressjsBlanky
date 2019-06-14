@@ -1,8 +1,8 @@
-import { Job } from "./type"
-import { FcmTokenModel } from "../model/fcm_token"
+import { Job } from "@app/jobs/type"
+import { FcmTokenModel } from "@app/model/fcm_token"
 import admin from "firebase-admin"
 import { injectable } from "inversify"
-import { container, ID, NAME } from "../di"
+import { container, ID, NAME } from "@app/di"
 
 // TODO Uncomment the 3 lines below to configure Firebase Cloud Messaging.
 // admin.initializeApp({

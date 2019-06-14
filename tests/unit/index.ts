@@ -1,7 +1,5 @@
-// Setup .env
-import "../../app/util"
-
-import { isTesting } from "../../app/util"
+import "@app/util" // Setup .env
+import { isTesting } from "@app/util"
 
 beforeEach(async () => {
   if (!isTesting) {

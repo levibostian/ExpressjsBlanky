@@ -5,8 +5,8 @@ module.exports = {
   },
   transformIgnorePatterns: ["/node_modules/"],
   moduleNameMapper: {
-    "^app/(.*)": "<rootDir>/app/$1",
-    "^test/(.*)$": "<rootDir>/tests/$1",
+    "^@app/(.*)": "<rootDir>/app/$1",
+    "^@test/(.*)$": "<rootDir>/tests/$1",
   },
   // testMatch: [
   //   "**/tests/**/*.spec.(js|jsx|ts|tsx)|**/__tests__/*.(js|jsx|ts|tsx)",
