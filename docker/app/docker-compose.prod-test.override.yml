@@ -1,19 +1,13 @@
 # Used by CI servers to test if newly built production image works.
-version: '2'
+version: '3'
 services:
   app:
     image: "docker-production-image-test"
-#    user: app
-    command: npm run production:run
+    command: npm run _production
     ports: # Since we are not using nginx-proxy, we need to communicate some way.
       - "5000:5000"
     environment:
       - CI
-      - NODE_ENV=docker-test
-      - SLACK_WEBHOOK_URL=fake
-      - SLACK_CHANNEL=fake
-      - API_MAILGUN_API_KEY=fake
-      - VIRTUAL_HOST=foo.com
     depends_on:
       - redis
       - db

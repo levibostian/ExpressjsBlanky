@@ -1,0 +1,18 @@
+version: '2'
+services:
+  db:    
+    env_file:
+      - ../../.env.production
+    environment:
+      - PGDATA=/var/lib/postgresql/data/pgdata 
+  db-backup:
+    image: schickling/postgres-backup-s3
+    container_name: db-backup
+    restart: unless-stopped
+    links:
+      - db
+    env_file:
+      - ../../.env.production
+    environment:      
+      - POSTGRES_PORT=5432
+      - 'POSTGRES_EXTRA_OPTS=--schema=public --blobs'

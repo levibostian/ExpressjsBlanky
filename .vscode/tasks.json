@@ -1,14 +1,63 @@
 {
-    "version": "2.0.0",
-    "tasks": [
-     {
-       "label": "docker-test",
-       "command": "npm",
-       "args": [ "run", "docker-test" ],
-       "type": "shell",
-       "isBackground": false,
-       "group": "test",
-       "presentation" : { "reveal": "always" }
-     }
-   ]
- }
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "local_dev_debug",
+      "command": "npm",
+      "args": ["run", "_dev:debug"],
+      "type": "shell",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "echo": true
+      },
+      "isBackground": true,
+      "problemMatcher": [
+        {
+          "pattern": [
+            {
+              "regexp": ".",
+              "file": 1,
+              "location": 2,
+              "message": 3
+            }
+          ],
+          "background": {
+            "activeOnStart": true,
+            "beginsPattern": ".",
+            "endsPattern": "."
+          }
+        }
+      ]
+    },
+    {
+      "label": "docker_dev_debug",
+      "command": "npm",
+      "args": ["run", "dev:debug"],
+      "type": "shell",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "echo": true
+      },
+      "isBackground": true,
+      "problemMatcher": [
+        {
+          "pattern": [
+            {
+              "regexp": ".",
+              "file": 1,
+              "location": 2,
+              "message": 3
+            }
+          ],
+          "background": {
+            "activeOnStart": true,
+            "beginsPattern": ".",
+            "endsPattern": "."
+          }
+        }
+      ]
+    }
+  ]
+}

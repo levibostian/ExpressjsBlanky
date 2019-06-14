@@ -1,0 +1,1 @@
+[  {    "type": "post",    "url": "/admin/user",    "title": "Request Add user",    "version": "0.0.0",    "filename": "app/controller/0.1.0/admin.ts",    "group": "_Users_levibostian_code_ExpressjsBlanky_app_controller_0_1_0_admin_ts",    "groupTitle": "_Users_levibostian_code_ExpressjsBlanky_app_controller_0_1_0_admin_ts",    "name": "PostAdminUser"  }]
