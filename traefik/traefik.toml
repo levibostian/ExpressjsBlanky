@@ -1,0 +1,43 @@
+debug = false
+
+loglevel = "ERROR" 
+defaultEntryPoints = ["https", "http"]
+
+[entryPoints]
+   [entryPoints.http]
+      address = ":80"
+      [entryPoints.http.redirect]
+      entryPoint = "https"
+   [entryPoints.https]
+      address = ":443"
+      [entryPoints.https.tls]
+   [entryPoints.dashboard]
+      address = ":8080"
+      [entryPoints.dashboard.auth.basic]
+      users = ["admin:12345"]
+
+[api]
+  entryPoint = "dashboard"
+
+[retry]
+
+[docker]
+   endpoint = "unix:///var/run/docker.sock"
+   domain = "foo.com"
+   network = "external"
+   watch = true 
+   exposedByDefault = false 
+
+[acme]
+   email = "foo@gmail.com"
+   storage = "acme.json"   
+   onHostRule = true
+   entryPoint = "https"
+
+   [acme.dnsChallenge]
+      provider = "cloudflare"
+      delayBeforeCheck = 0
+
+   [[acme.domains]]
+      main = "*.foo.com"
+      sans = ["foo.com"]

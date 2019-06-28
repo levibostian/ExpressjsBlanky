@@ -1,12 +1,12 @@
 # manually added:
 coverage.html
 dist/
-*.sqlite
 .babel.json
 .bundle/
 vendor/
-.config/configstore/update-notifier-npm.json
-flow-typed/
+.config/configstore/
+.env.staging
+.env.production
 
 # Logs
 logs

@@ -1,0 +1,9 @@
+version: '3.7'
+services:  
+  test-db:
+    image: "postgres:9.6-alpine"
+    container_name: test-db
+    ports:
+      - "5433:5432"
+    env_file:
+      - ../../.env.development

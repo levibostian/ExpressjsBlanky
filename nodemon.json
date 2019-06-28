@@ -1,0 +1,10 @@
+{
+  "restartable": "rs",
+  "ignore": [".git", "node_modules/**/node_modules"],
+  "verbose": true,
+  "execMap": {
+    "ts": "babel-node --inspect --extensions \".ts,.tsx\""
+  },
+  "watch": ["app/"],
+  "ext": "js,json,ts,tsx"
+}
