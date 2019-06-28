@@ -48,8 +48,8 @@ class AppJobQueueManager implements JobQueueManager {
     const getQueue = <T>(job: Job<any, any>): Queue<T> => {
       const queue = new BullQueue(job.name, {
         redis: {
-          port: constants.bull.redis_port,
-          host: constants.bull.redis_host,
+          port: constants.redis.port,
+          host: constants.redis.host,
         },
       })
 
@@ -87,8 +87,8 @@ class AppJobQueueManager implements JobQueueManager {
         name: queue.name,
         hostId: queue.name,
         type: "bull",
-        host: constants.bull.redis_host,
-        port: constants.bull.redis_port,
+        port: constants.redis.port,
+        host: constants.redis.host,
       })
     }
 

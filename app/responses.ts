@@ -6,30 +6,45 @@ export class Success {
   constructor(public message: string) {}
 }
 
+/**
+ * @apiDefine SystemError
+ */
 export class SystemError {
   static code: number = 500
 
   constructor(public message: string) {}
 }
 
+/**
+ * @apiDefine UserEnteredBadDataError
+ */
 export class UserEnteredBadDataError {
   static code: number = 400
 
   constructor(public errorMessage: string) {}
 }
 
+/**
+ * @apiDefine ForbiddenError
+ */
 export class ForbiddenError {
   static code: number = 403
 
   constructor(public errorMessage: string) {}
 }
 
+/**
+ * @apiDefine FatalApiError
+ */
 export class FatalApiError {
   static code: number = 500
 
   constructor(public errorMessage: string) {}
 }
 
+/**
+ * @apiDefine Unauthorized
+ */
 export class Unauthorized {
   static code: number = 401
 }

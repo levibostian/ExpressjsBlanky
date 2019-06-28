@@ -4,21 +4,6 @@
     {
       "type": "node",
       "request": "attach",
-      "name": "Docker development debug",
-      "protocol": "inspector",
-      "port": 9229,
-      "address": "0.0.0.0",
-      "sourceMaps": true,
-      "localRoot": "${workspaceFolder}",
-      "timeout": 20000,
-      "stopOnEntry": false,
-      "remoteRoot": "/home/app/app/",
-      "preLaunchTask": "docker_dev_debug",
-      "restart": true
-    },
-    {
-      "type": "node",
-      "request": "attach",
       "name": "Local development debug",
       "protocol": "inspector",
       "port": 9229,

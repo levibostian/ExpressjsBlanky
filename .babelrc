@@ -1,8 +1,8 @@
 {
   "presets": [["@babel/env", {
-      "targets": {
-        "node": "current"
-      }
+    "targets": {
+      "node": "current"
+    }
     }], "@babel/preset-typescript"],  
     "plugins": [
       "babel-plugin-transform-typescript-metadata",
@@ -14,12 +14,12 @@
           "@app": "./app",
           "@test": "./tests"
         }
-}]
-    ],
-  "env": {
-		"debug": {
-			"sourceMaps": "inline",
-			"retainLines": true
-		}
-	}
-}
+        }]
+      ],
+      "env": {
+        "debug": {
+          "sourceMaps": "inline",
+          "retainLines": true
+        }
+      }
+    }

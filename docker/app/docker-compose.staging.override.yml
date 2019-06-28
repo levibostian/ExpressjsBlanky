@@ -1,7 +1,7 @@
-version: '3'
+version: '3.7'
 services:
   app:
-    image: "111111.dkr.ecr.us-east-1.amazonaws.com/curiosityio/api:beta-$API_VERSION"
+    image: "111111.dkr.ecr.us-east-1.amazonaws.com/curiosityio/api:staging-$API_VERSION"
     user: node
     command: npm run _production
     restart: unless-stopped

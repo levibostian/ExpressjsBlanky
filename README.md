@@ -115,9 +115,16 @@ All of the query parameters you want to add to the dynamic link can be found [in
 1. Create a [Travis](https://travis-ci.com/) account, and enable your GitHub repo for your API project in your Travis profile page.
 2. I have setup the CI server workflow to follow a strict git workflow. It is as follows:
 
-Features, bug fixes, any new work done on app are developed using a new git branch. ---> Merge work into `development` git branch using a GitHub pull request. After you have decided you want to create a beta release of the software that has been merged into the `development` branch, make a GitHub pull request from the `development` branch into the `beta` branch. If you find bugs in the beta build as you beta test, go ahead and simply start at the beginning of the cycle by creating a separate branch, merging it into `development` and then into `beta` again. ---> After you feel your `beta` deployment is production ready, create a GitHub pull request from `beta` branch into `production` branch to deploy to production.
+The travis configuration for this project is setup to follow the following git flow:
 
-To follow this workflow, create a git branch `development`, `beta`, and `production` and push those all up to GitHub. I _highly_ recommend to protect each of these 3 branches in the GitHub repo settings to make sure that only pull requests can update these branches instead of a push! You can also delete the `master` branch at this point and set the default branch to `development` in the GitHub repo settings as you will no longer be using the `master` branch.
+Bug fixes, feature additions, and other code changes:
+
+- Create a new git branch for the changes.
+- Make a pull request into the `master` branch. Make sure that travis successfully runs all of your tests.
+
+When you want to take the master branch and deploy a staging release, create a git tag with the format: `<version>-staging` where you change `<version>` to the version found in `Versionfile`. Push it up to GitHub and travis will deploy to staging for you.
+
+When you want to deploy a production release, create a git tag with the format: `<version>` where you change `<version>` to the version found in `Versionfile`. It's recommended to create a git tag off of an existing staging git tag as the staging release has been (hopefully) tested by you and your team. Push it up to GitHub and travis will deploy to production for you.
 
 - [Danger](http://danger.systems/ruby/) - Bot that looks over my pull requests and make sure I do not forget to complete certain tasks.
   Configure: [Here are instructions](http://danger.systems/guides/getting_started.html#creating-a-bot-account-for-danger-to-use) for adding a Danger bot to your repo. This depends on if your app is an open source or closed source project.
@@ -192,6 +199,13 @@ When asked what to name this policy, name of something like `name-of-project-s3-
 4. Open up [AWS IAM to create a new user](https://console.aws.amazon.com/iam/home?region=us-east-1#/users$new?step=details). Name it something like `db-backups`. Check `Programmatic access` checkbox. Click next. For attaching permissions, choose `Attach existing policy directly`, search for `name-of-project-s3-rw` (or whatever you named your policy you created above) and attach that permission. You will get an access key and a password generated for you. Save this information! You cannot recover it. I usually use a password manager like Lastpass to save this information in it.
 5. Edit the file `.env.production` file in the backups section. Backups are currently only enabled for the production database.
 
+- [Honeybadger](https://www.honeybadger.io/for/node/) - Error reporting
+  Configure:
+
+* Create a Honeybadger account.
+* Create a new Honeybadger project.
+* Search in the code for `HONEY_BADGER_API_KEY` and edit the value to your api key for the project.
+
 ## Misc services setup
 
 Besides the services listed above and how to configure them, there is some more setup you need to complete as well to get your application running successfully.
@@ -257,18 +271,19 @@ _Note: If you are running a production version of your database, make sure to vi
 
 Run `docker logs db` anytime you wish to see if the database has started successfully. Check the logs in there to see if it looks good.
 
+- Proxy
+
+In order for you to be able to use a domain name with your API, you need a proxy server to forward your request to your application running. It's recommended to use the tool, [traefik](https://traefik.io/). There is a sample traefik setup already for you in the `traefik/` directory. Check out the README there to learn more.
+
 - Next it is time to start up your application.
 
-First off, this project is setup to using a CI server to test, build, and deploy your application for you. After you configure it, your CI server will take care of all of this work for you. However, I will still include the directions below for how to deploy manually so you can setup your server for CI deployments.
+This project is setup to using a CI server to test, build, and deploy your application for you. As long as a database is running and you edit the file `bin/ci/deploy.rb`, then the CI will take care of all deployments.
 
-First, create a docker network: `docker network create nginx-proxy-network`.
-
-- Decide what URL you would like to host your application under. I usually use subdomains. `api.yourdomain.com` for production and `beta-api.yourdomain.com` for beta.
-- Go into your DNS settings for your site (I prefer Cloudflare for instant propigation) and change your DNS for your subdomain you want to host your app under. We need this to get SSL running.
-- Open the file `docker/app/docker-compose.beta.override.yml` for beta and `docker/app/docker-compose.prod.override.yml` for production. Edit the variables: `VIRTUAL_HOST` and `LETSENCRYPT_HOST` to your domain you are using to host your app.
-- Build, test, and push the Docker image to AWS ECR. `./bin/app/build-test-deploy-docker-image.sh beta` and `./bin/app/deployment.sh beta` for a beta application and `./bin/app/build-test-deploy-docker-image.sh prod` and `./bin/app/deployment.sh prod` for production. You will need to set some environment variables on your system to get this to work successfully!
+So, all you need to do to deploy your code is to make a git tag. It's recommended to do this off of the master branch. Create a git tag named `0.1.0-staging` to deploy to staging. Create a git tag named `0.1.0` to deploy to production.
 
 # DB migrations
+
+_Note:_ You must create a migration for all database operations _including_ the very first initial database create. It's highly recommended to not use `sequelize.sync()` unless it's for testing and development.
 
 - To create a migration file for sequelize, run command: `npm run db:migrate:create --name describe-migration-here`
 - Open up this new migration file created under `migrations/` directory. Edit it to code that runs the migration. Check out [the docs](http://docs.sequelizejs.com/manual/tutorial/migrations.html) on how to program migration code.

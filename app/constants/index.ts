@@ -1,7 +1,9 @@
 export default {
+  redis: {
+    port: 6379,
+    host: process.env.REDIS_HOST!,
+  },
   bull: {
-    redis_port: 6379,
-    redis_host: process.env.REDIS_HOST!,
     arena: {
       port: 4568,
     },

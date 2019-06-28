@@ -17,9 +17,12 @@ import * as logger from "./logger"
 import { isProduction, isStaging } from "./util"
 import { SystemError } from "./responses"
 import { ErrorRequestHandler } from "express-serve-static-core"
+import compression from "compression"
 
 export const startServer = (): Server => {
   let app = express()
+
+  logger.initAppBeforeMiddleware(app)
 
   app.enable("trust proxy")
   app.use("/", express.static(__dirname + "/static")) // Host files located in the `./static` directory at the root.
@@ -28,10 +31,13 @@ export const startServer = (): Server => {
   app.use(trimBody())
   app.use(passport.initialize())
   app.use(helmet())
+  app.use(compression())
 
   app.use(controllers)
 
   app.use(ErrorResponseHandlerMiddleware)
+
+  logger.initAppAfterMiddleware(app)
 
   process.on("uncaughtException", (err: Error) => {
     logger.error(err)

@@ -6,12 +6,30 @@ import { container, ID } from "@app/di"
 import { EmailSender } from "@app/email"
 import constants from "@app/constants"
 
+/**
+ * @apiDefine AddUserSuccess_010
+ * @apiSuccessExample {json} Success-Response:
+ *     {
+ *        message: "Human readable successful message",
+ *        user: {
+ *          ...
+ *        }
+ *     }
+ */
 class AddUserSuccess extends Success {
   constructor(message: string, public user: UserPublic) {
     super(message)
   }
 }
 
+/**
+ * @api {post} /user/login Add user
+ * @apiVersion 0.1.0
+ * @apiGroup User
+ * @apiUse Endpoint_POST_useradmin
+ *
+ * @apiUse AddUserSuccess_010
+ */
 export const loginEmail: Endpoint = {
   validate: [check("email").isEmail()],
   endpoint: async (req, res, next) => {

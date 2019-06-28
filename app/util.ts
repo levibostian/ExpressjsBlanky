@@ -19,10 +19,10 @@ export enum Env {
 }
 
 export const env: Env = ((): Env => {
-  if (process.env.NODE_ENV == "development") return Env.development
-  if (process.env.NODE_ENV == "test") return Env.test
-  if (process.env.NODE_ENV == "production") return Env.production
-  if (process.env.NODE_ENV == "staging") return Env.staging
+  if (isDevelopment) return Env.development
+  if (isTesting) return Env.test
+  if (isProduction) return Env.production
+  if (isStaging) return Env.staging
   return unreachableCode(process.env.NODE_ENV)
 })()
 

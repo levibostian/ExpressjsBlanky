@@ -1,4 +1,4 @@
-version: '3'
+version: '3.7'
 services:
   app:
     container_name: app
@@ -10,4 +10,4 @@ services:
     image: "redis:4.0-alpine"
     container_name: app-redis
     expose:
-        - "6379"
+      - "6379"
