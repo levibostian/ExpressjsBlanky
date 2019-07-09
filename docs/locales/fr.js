@@ -20,6 +20,6 @@ define({
     "show up to version:": "Montrer à partir de la version :",
     "Size range:": "Ordre de grandeur :",
     Type: "Type",
-    url: "url",
-  },
+    url: "url"
+  }
 })

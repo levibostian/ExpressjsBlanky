@@ -4,14 +4,10 @@ import { FakeDataGenerator } from "./types"
 import { UserFakeDataGenerator } from "./user"
 import { createDependencies } from "./util"
 
-export class FcmTokenFakeDataGenerator extends FcmTokenModel
-  implements FakeDataGenerator {
+export class FcmTokenFakeDataGenerator extends FcmTokenModel implements FakeDataGenerator {
   private dependencies: FakeDataGenerator[] = []
 
-  static tokenForUserDevice(
-    id: number,
-    user: UserFakeDataGenerator
-  ): FcmTokenFakeDataGenerator {
+  static tokenForUserDevice(id: number, user: UserFakeDataGenerator): FcmTokenFakeDataGenerator {
     let token = uid2(200)
     let fakeModel = new FcmTokenFakeDataGenerator(id, token, user.id)
 

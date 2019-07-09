@@ -52,14 +52,9 @@ export class Unauthorized {
 export class FieldsError {
   static code: number = 422
 
-  constructor(
-    public errors: FieldError[],
-    public message: string = errors[0].msg
-  ) {
+  constructor(public errors: FieldError[], public message: string = errors[0].msg) {
     if (errors.length <= 0) {
-      throw new Error(
-        "FieldsError got constructed, but without any error objects given."
-      )
+      throw new Error("FieldsError got constructed, but without any error objects given.")
     }
   }
 }

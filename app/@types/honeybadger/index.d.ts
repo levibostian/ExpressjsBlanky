@@ -1,10 +1,7 @@
 declare module "honeybadger" {
   import { RequestHandler, ErrorRequestHandler } from "express"
 
-  export function configure(options: {
-    apiKey: string
-    developmentEnvironments: string[]
-  }): void
+  export function configure(options: { apiKey: string; developmentEnvironments: string[] }): void
 
   export function setContext(event: Object): void
 

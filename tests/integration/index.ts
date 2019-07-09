@@ -4,11 +4,13 @@ import { ADMIN_TOKEN } from "@app/middleware/auth"
 import { isTesting } from "@app/util"
 import { FakeDataGenerator } from "./fake_data_generators/types"
 import { createDependencies } from "./fake_data_generators/util"
-import { initDatabase, resetDatabase, closeDatabase } from "@app/model"
+import { initDatabase, closeDatabase } from "@app/model"
 import { container } from "@app/di"
 import { startServer } from "@app/server"
 import { Server } from "http"
 import request, { Test, SuperTest } from "supertest"
+
+var server: Server
 
 beforeEach(async () => {
   if (!isTesting) {
@@ -51,11 +53,10 @@ export const serverRequest = (): SuperTest<Test> => {
   return request(server)
 }
 
-var server: Server
 export const setup = async (
   fakeData?: FakeDataGenerator[],
   overrideDependencies?: () => void
-) => {
+): Promise<void> => {
   if (fakeData) await createDependencies(fakeData)
   if (overrideDependencies) overrideDependencies()
 

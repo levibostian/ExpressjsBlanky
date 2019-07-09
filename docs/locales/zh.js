@@ -20,6 +20,6 @@ define({
     "show up to version:": "顯示到版本:",
     "Size range:": "尺寸範圍:",
     Type: "類型",
-    url: "網址",
-  },
+    url: "網址"
+  }
 })

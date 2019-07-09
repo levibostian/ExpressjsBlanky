@@ -20,6 +20,6 @@ define({
     "show up to version:": "mostrar versió:",
     "Size range:": "Tamany de rang:",
     Type: "Tipus",
-    url: "url",
-  },
+    url: "url"
+  }
 })

@@ -39,30 +39,23 @@ export const loginEmail: Endpoint = {
 
     const createUser = async () => {
       const user = await UserModel.findUserOrCreateByEmail(body.email)
-      const loginLink = `${
-        constants.login.login_link_prefix
-      }${user.passwordToken!}`
-      const passwordlessLoginLink = `${
-        constants.login.dynamic_link_url
-      }/?link=${loginLink}&apn=${constants.android_app_package_name}&ibi=${
-        constants.ios_app_bundle_id
-      }`
+      const loginLink = `${constants.login.loginLinkPrefix}${user.passwordToken!}`
+      const passwordlessLoginLink = `${constants.login.dynamicLinkUrl}/?link=${loginLink}&apn=${
+        constants.androidAppPackageName
+      }&ibi=${constants.iosAppBundleId}`
 
       let email = container.get<EmailSender>(ID.EMAIL_SENDER)
       await email.sendWelcome(user.email, {
-        app_login_link: passwordlessLoginLink,
+        app_login_link: passwordlessLoginLink
       })
 
       return Promise.reject(
-        new AddUserSuccess(
-          "Successfully created user.",
-          user.publicRepresentation()
-        )
+        new AddUserSuccess("Successfully created user.", user.publicRepresentation())
       )
     }
 
     createUser().catch(next)
-  },
+  }
 }
 
 class LoginAccessTokenSuccess extends Success {
@@ -79,9 +72,7 @@ export const loginPasswordlessToken: Endpoint = {
     } = req.body
 
     const redeemToken = async () => {
-      var user = await UserModel.findByPasswordlessToken(
-        body.passwordless_token
-      )
+      var user = await UserModel.findByPasswordlessToken(body.passwordless_token)
       if (!user || !user.passwordTokenCreated) {
         return Promise.reject(
           new UserEnteredBadDataError(
@@ -90,9 +81,7 @@ export const loginPasswordlessToken: Endpoint = {
         )
       }
 
-      const yesterday24HoursAgo: Date = new Date(
-        new Date().getTime() - 24 * 60 * 60 * 1000
-      )
+      const yesterday24HoursAgo: Date = new Date(new Date().getTime() - 24 * 60 * 60 * 1000)
       if (user.passwordTokenCreated < yesterday24HoursAgo) {
         return Promise.reject(
           new UserEnteredBadDataError(
@@ -104,15 +93,12 @@ export const loginPasswordlessToken: Endpoint = {
       user = await user.newAccessToken()
 
       return Promise.reject(
-        new LoginAccessTokenSuccess(
-          "Successfully logged in.",
-          user.privateRepresentation()
-        )
+        new LoginAccessTokenSuccess("Successfully logged in.", user.privateRepresentation())
       )
     }
 
     redeemToken().catch(next)
-  },
+  }
 }
 
 export const updateFcmToken: Endpoint = {
@@ -125,7 +111,7 @@ export const updateFcmToken: Endpoint = {
     const updateToken = async () => {
       const existingTokens = await FcmTokenModel.findByUserId(req.user.id)
 
-      if (existingTokens.length >= constants.max_fcm_tokens_per_user) {
+      if (existingTokens.length >= constants.maxFcmTokensPerUser) {
         await existingTokens[0].delete()
       }
 
@@ -135,5 +121,5 @@ export const updateFcmToken: Endpoint = {
     }
 
     updateToken().catch(next)
-  },
+  }
 }

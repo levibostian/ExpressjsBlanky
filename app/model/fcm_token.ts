@@ -1,35 +1,34 @@
-import uid2 from "uid2"
-import { Sequelize, DataTypes, BelongsTo } from "sequelize"
+import { Sequelize, DataTypes } from "sequelize"
 import { Model, SequelizeModel } from "./type"
 import { UserSequelizeModel } from "./user"
 
 export class FcmTokenSequelizeModel extends SequelizeModel {
   public id!: number
   public token!: string
-  public user_id!: number
+  public userId!: number
 
-  static initModel(sequelize: Sequelize) {
+  static initModel(sequelize: Sequelize): void {
     FcmTokenSequelizeModel.init(
       {
-        token: { type: DataTypes.STRING, allowNull: false, unique: true },
+        token: { type: DataTypes.STRING, allowNull: false, unique: true }
       },
       {
-        modelName: "fcm_token",
-        sequelize: sequelize,
+        modelName: "FcmToken",
+        sequelize: sequelize
       }
     )
   }
 
-  static setupAssociations() {
+  static setupAssociations(): void {
     FcmTokenSequelizeModel.belongsTo(UserSequelizeModel, {
       as: "user",
-      foreignKey: "user_id",
-      onDelete: "CASCADE", // delete fcm token if user ever deleted.
+      foreignKey: "userId",
+      onDelete: "CASCADE" // delete fcm token if user ever deleted.
     })
   }
 
   getModel(): FcmTokenModel {
-    return new FcmTokenModel(this.id, this.token, this.user_id)
+    return new FcmTokenModel(this.id, this.token, this.userId)
   }
 }
 
@@ -44,27 +43,25 @@ export class FcmTokenModel implements Model<FcmTokenPublic> {
   static findByUserId(userId: number): Promise<FcmTokenModel[]> {
     return FcmTokenSequelizeModel.findAll({
       where: {
-        user_id: userId,
+        userId: userId
       },
-      order: [["id", "ASC"]],
-    }).then(results =>
-      results.map(fcmSequelizeModel => fcmSequelizeModel.getModel())
-    )
+      order: [["id", "ASC"]]
+    }).then(results => results.map(fcmSequelizeModel => fcmSequelizeModel.getModel()))
   }
 
   static create(userId: number, token: string): Promise<FcmTokenModel> {
     return FcmTokenSequelizeModel.create(
       {
         token: token,
-        user_id: userId,
+        userId: userId
       },
       {
         include: [
           {
             model: UserSequelizeModel,
-            as: "user",
-          },
-        ],
+            as: "user"
+          }
+        ]
       }
     ).then(res => res.getModel())
   }
@@ -73,23 +70,23 @@ export class FcmTokenModel implements Model<FcmTokenPublic> {
     return FcmTokenSequelizeModel.findCreateFind({
       where: {
         token: this.token,
-        user_id: this.userId,
-      },
+        userId: this.userId
+      }
     }).then(res => res[0].getModel())
   }
 
-  async delete() {
+  async delete(): Promise<void> {
     await FcmTokenSequelizeModel.destroy({
       where: {
-        id: this.id,
-      },
+        id: this.id
+      }
     }).then()
   }
 
   publicRepresentation(): FcmTokenPublic {
     return {
       id: this.id,
-      token: this.token,
+      token: this.token
     }
   }
 }

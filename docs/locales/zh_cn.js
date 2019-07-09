@@ -20,6 +20,6 @@ define({
     "show up to version:": "显示到指定版本:",
     "Size range:": "取值范围:",
     Type: "类型",
-    url: "网址",
-  },
+    url: "网址"
+  }
 })

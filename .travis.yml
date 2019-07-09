@@ -30,15 +30,16 @@ before_install:
   - sudo chmod 444 ~/.aws/c*
 install:
   - npm install
-  - bundle install --path vendor/bundle
+  - bundle install
 cache:
+  bundler: true 
   directories:
     - node_modules
     - vendor/bundle
 jobs:
   include:
     - stage: danger
-      script: bundle exec danger --fail-on-errors=true
+      script: danger --fail-on-errors=true
     - stage: tests
       script: ruby bin/ci/tests.rb
       script: ruby bin/ci/test_docker_container.rb    

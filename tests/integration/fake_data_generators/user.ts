@@ -2,19 +2,13 @@ import { UserModel } from "@app/model"
 import uid2 from "uid2"
 import { FakeDataGenerator } from "./types"
 
-export class UserFakeDataGenerator extends UserModel
-  implements FakeDataGenerator {
+export class UserFakeDataGenerator extends UserModel implements FakeDataGenerator {
   static newSignup(id: number): UserFakeDataGenerator {
     let email = `${uid2(10)}@example.com`
     let passwordToken = uid2(255)
     let passwordTokenCreated = new Date()
 
-    return UserFakeDataGenerator.construct(
-      id,
-      email,
-      passwordToken,
-      passwordTokenCreated
-    )
+    return UserFakeDataGenerator.construct(id, email, passwordToken, passwordTokenCreated)
   }
 
   static completeSignup(id: number): UserFakeDataGenerator {

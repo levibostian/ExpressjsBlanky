@@ -9,13 +9,13 @@ const shouldRun = !isTesting
 let bruteforce: ExpressBrute
 if (shouldRun) {
   const bruteOptions = {
-    freeRetries: 5,
+    freeRetries: 5
   }
 
   const redisStore = new RedisStore({
     host: constants.redis.host,
     port: constants.redis.port,
-    prefix: "ExpressBrute",
+    prefix: "ExpressBrute"
   })
 
   bruteforce = new ExpressBrute(redisStore, bruteOptions)

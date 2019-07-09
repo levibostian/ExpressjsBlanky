@@ -1,17 +1,11 @@
-import {
-  isDevelopment,
-  isProduction,
-  isTesting,
-  enableLogging,
-  isStaging,
-} from "./util"
+import { isDevelopment, isProduction, isTesting, enableLogging, isStaging } from "./util"
 import Honeybadger from "honeybadger"
 import { Application } from "express"
 
 Honeybadger.configure({
   apiKey: process.env.HONEY_BADGER_API_KEY!,
   // Ignore the following environments to report errors.
-  developmentEnvironments: ["development", "test"],
+  developmentEnvironments: ["development", "test"]
 })
 
 const shouldLoadHoneybadger: () => boolean = (): boolean => {
@@ -40,15 +34,11 @@ export const initAppAfterMiddleware = (app: Application) => {
 export const error = (error: Error, extra?: Object) => {
   if (isDevelopment || isTesting) {
     let extraInfo = extra ? JSON.stringify(extra) : "(none)"
-    console.error(
-      `ERROR: Extra: ${extraInfo}, message: ${error.message}, stack: ${
-        error.stack
-      }`
-    )
+    console.error(`ERROR: Extra: ${extraInfo}, message: ${error.message}, stack: ${error.stack}`)
   } else {
     Honeybadger.notify(error, {
       context: extra || {},
-      message: error.message || "none",
+      message: error.message || "none"
     })
   }
 }

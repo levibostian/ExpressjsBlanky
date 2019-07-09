@@ -1,7 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import BullQueue, { Queue } from "bull"
 import {
   SendPushNotificationJobUserJob,
-  SendPushNotificationParam,
+  SendPushNotificationParam
 } from "./send_push_notification_user"
 import { Job } from "./type"
 import * as logger from "@app/logger"
@@ -29,14 +31,12 @@ export interface JobQueueManager {
 
   getQueueInfo(): BullQueueInfo[]
 
-  queueSendPushNotificationToUser(
-    params: SendPushNotificationParam
-  ): Promise<void>
+  queueSendPushNotificationToUser(params: SendPushNotificationParam): Promise<void>
 }
 
 @injectable()
 class AppJobQueueManager implements JobQueueManager {
-  queues: {
+  public queues: {
     sendPushNotificationUser: Queue<SendPushNotificationParam>
   }
 
@@ -49,8 +49,8 @@ class AppJobQueueManager implements JobQueueManager {
       const queue = new BullQueue(job.name, {
         redis: {
           port: constants.redis.port,
-          host: constants.redis.host,
-        },
+          host: constants.redis.host
+        }
       })
 
       queue.on("error", err => {
@@ -72,7 +72,7 @@ class AppJobQueueManager implements JobQueueManager {
     }
 
     this.queues = {
-      sendPushNotificationUser: getQueue(sendPushNotificationUserJob),
+      sendPushNotificationUser: getQueue(sendPushNotificationUserJob)
     }
   }
 
@@ -88,16 +88,14 @@ class AppJobQueueManager implements JobQueueManager {
         hostId: queue.name,
         type: "bull",
         port: constants.redis.port,
-        host: constants.redis.host,
+        host: constants.redis.host
       })
     }
 
     return info
   }
 
-  queueSendPushNotificationToUser(
-    params: SendPushNotificationParam
-  ): Promise<void> {
+  queueSendPushNotificationToUser(params: SendPushNotificationParam): Promise<void> {
     return this.queues.sendPushNotificationUser.add(params).then()
   }
 }

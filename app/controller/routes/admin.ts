@@ -22,7 +22,7 @@ router.post(
   "/admin/user",
   passport.authenticate("admin_bearer_auth", { session: false }),
   routesVersioning({
-    "0.1.0": getMiddleware(controller_0_1_0.addUser),
+    "0.1.0": getMiddleware(controller_0_1_0.addUser)
   })
 )
 
@@ -31,12 +31,12 @@ if (!isTesting) {
 
   const arena = Arena(
     {
-      queues: jobQueueManager.getQueueInfo(),
+      queues: jobQueueManager.getQueueInfo()
     },
     {
       port: constants.bull.arena.port,
       basePath: "/bull",
-      disableListen: true,
+      disableListen: true
     }
   )
 

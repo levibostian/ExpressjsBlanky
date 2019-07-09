@@ -1,19 +1,9 @@
-import {
-  setup,
-  serverRequest,
-  endpointVersionHeader,
-  authHeader,
-} from "@test/integration/index"
+import { setup, serverRequest, endpointVersionHeader, authHeader } from "@test/integration/index"
 import uid2 from "uid2"
-import {
-  UserEnteredBadDataError,
-  Success,
-  Unauthorized,
-  FieldsError,
-} from "@app/responses"
+import { UserEnteredBadDataError, Success, Unauthorized, FieldsError } from "@app/responses"
 import {
   UserFakeDataGenerator,
-  FcmTokenFakeDataGenerator,
+  FcmTokenFakeDataGenerator
 } from "@test/integration/fake_data_generators"
 import { UserModel, FcmTokenModel } from "@app/model"
 import { EmailSender } from "@app/email"
@@ -24,7 +14,7 @@ import * as arrayExtensions from "@app/extensions/array"
 
 const sendWelcomeMock = jest.fn()
 const emailSenderMock: EmailSender = {
-  sendWelcome: sendWelcomeMock,
+  sendWelcome: sendWelcomeMock
 }
 
 const overrideDependencies = () => {
@@ -59,10 +49,10 @@ describe(`Receive login email passwordless token. ${endpointVersion}`, () => {
       .then(() => {
         expect(sendWelcomeMock).toBeCalledTimes(1)
         expect(sendWelcomeMock.mock.calls[0][1].app_login_link).toEqual(
-          expect.stringContaining(constants.login.dynamic_link_url)
+          expect.stringContaining(constants.login.dynamicLinkUrl)
         )
         expect(sendWelcomeMock.mock.calls[0][1].app_login_link).toEqual(
-          expect.stringContaining(constants.login.login_link_prefix)
+          expect.stringContaining(constants.login.loginLinkPrefix)
         )
       })
   })
@@ -77,10 +67,10 @@ describe(`Receive login email passwordless token. ${endpointVersion}`, () => {
       .then(() => {
         expect(sendWelcomeMock).toBeCalledTimes(1)
         expect(sendWelcomeMock.mock.calls[0][1].app_login_link).toEqual(
-          expect.stringContaining(constants.login.dynamic_link_url)
+          expect.stringContaining(constants.login.dynamicLinkUrl)
         )
         expect(sendWelcomeMock.mock.calls[0][1].app_login_link).toEqual(
-          expect.stringContaining(constants.login.login_link_prefix)
+          expect.stringContaining(constants.login.loginLinkPrefix)
         )
       })
   })
@@ -129,9 +119,7 @@ describe(`Get access token from passwordless token. ${endpointVersion}`, () => {
       .expect(Success.code)
       .then(async res => {
         const testUserAfterCall = await UserModel.findUserById(testUser.id)
-        expect(res.body.user).toEqual(
-          testUserAfterCall!.privateRepresentation()
-        )
+        expect(res.body.user).toEqual(testUserAfterCall!.privateRepresentation())
       })
   })
 })
@@ -186,12 +174,10 @@ describe(`Update FCM token. ${endpointVersion}`, () => {
     const testUser = UserFakeDataGenerator.completeSignup(1)
 
     var tokens: FcmTokenFakeDataGenerator[] = []
-    for (let index = 0; index < constants.max_fcm_tokens_per_user; index++) {
-      tokens.push(
-        FcmTokenFakeDataGenerator.tokenForUserDevice(index + 1, testUser)
-      )
+    for (let index = 0; index < constants.maxFcmTokensPerUser; index++) {
+      tokens.push(FcmTokenFakeDataGenerator.tokenForUserDevice(index + 1, testUser))
     }
-    expect(tokens).toHaveLength(constants.max_fcm_tokens_per_user)
+    expect(tokens).toHaveLength(constants.maxFcmTokensPerUser)
 
     const newToken = uid2(250)
 
@@ -205,7 +191,7 @@ describe(`Update FCM token. ${endpointVersion}`, () => {
       .then(async res => {
         const tokensForUser = await FcmTokenModel.findByUserId(testUser.id)
 
-        expect(tokensForUser).toHaveLength(constants.max_fcm_tokens_per_user)
+        expect(tokensForUser).toHaveLength(constants.maxFcmTokensPerUser)
         expect(arrayExtensions.last(tokensForUser).token).toBe(newToken)
       })
   })

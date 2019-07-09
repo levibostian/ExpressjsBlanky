@@ -20,6 +20,6 @@ define({
     "show up to version:": "bu versiyona kadar göster:",
     "Size range:": "Boyut aralığı:",
     Type: "Tip",
-    url: "url",
-  },
+    url: "url"
+  }
 })
