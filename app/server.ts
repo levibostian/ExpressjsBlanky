@@ -9,7 +9,7 @@ import { AddressInfo } from "net"
 import passport from "passport"
 import trimBody from "connect-trim-body"
 import helmet from "helmet"
-import { ErrorResponseHandlerMiddleware } from "./middleware"
+import { ErrorResponseHandlerMiddleware, ConvertCaseMiddleware } from "./middleware"
 import { Server } from "http"
 import controllers from "./controller"
 import "./middleware/auth"
@@ -35,6 +35,7 @@ export const startServer = (): Server => {
 
   app.use(controllers)
 
+  app.use(ConvertCaseMiddleware)
   app.use(ErrorResponseHandlerMiddleware)
 
   logger.initAppAfterMiddleware(app)
@@ -50,10 +51,7 @@ export const startServer = (): Server => {
       if (res.headersSent) {
         next(err)
       } else {
-        const message =
-          isProduction || isStaging
-            ? "System error. Please try again."
-            : err.message
+        const message = isProduction || isStaging ? "System error. Please try again." : err.message
         res.status(SystemError.code).send(new SystemError(message))
       }
     }
@@ -63,9 +61,9 @@ export const startServer = (): Server => {
 
   let server = app.listen(app.get("port"), () => {
     logger.debug(
-      `Server started. Listening at: ${
-        (<AddressInfo>server.address()).address
-      }:${(<AddressInfo>server.address()).port}`
+      `Server started. Listening at: ${(<AddressInfo>server.address()).address}:${
+        (<AddressInfo>server.address()).port
+      }`
     )
   })
 

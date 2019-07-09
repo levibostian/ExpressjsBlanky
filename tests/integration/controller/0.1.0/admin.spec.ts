@@ -2,15 +2,10 @@ import {
   setup,
   serverRequest,
   endpointVersionHeader,
-  adminAuthHeader,
+  adminAuthHeader
 } from "@test/integration/index"
 import uid2 from "uid2"
-import {
-  UserEnteredBadDataError,
-  Success,
-  Unauthorized,
-  FieldsError,
-} from "@app/responses"
+import { UserEnteredBadDataError, Success, Unauthorized, FieldsError } from "@app/responses"
 import { UserFakeDataGenerator } from "@test/integration/fake_data_generators"
 import { EmailSender } from "@app/email"
 import { container, ID } from "@app/di"
@@ -21,7 +16,7 @@ describe(`Create user ${endpointVersion}`, () => {
 
   const sendWelcomeMock = jest.fn()
   const emailSenderMock: EmailSender = {
-    sendWelcome: sendWelcomeMock,
+    sendWelcome: sendWelcomeMock
   }
 
   const overrideDependencies = () => {

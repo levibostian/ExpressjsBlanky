@@ -2,11 +2,11 @@ import {
   setup,
   serverRequest,
   endpointVersionHeader,
-  adminAuthHeader,
+  adminAuthHeader
 } from "@test/integration/index"
 import {
   UserFakeDataGenerator,
-  FcmTokenFakeDataGenerator,
+  FcmTokenFakeDataGenerator
 } from "@test/integration/fake_data_generators"
 import { FcmTokenModel } from "@app/model"
 

@@ -15,7 +15,7 @@ export enum Env {
   development = "development",
   production = "production",
   test = "test",
-  staging = "staging",
+  staging = "staging"
 }
 
 export const env: Env = ((): Env => {
@@ -42,7 +42,7 @@ const setupEnv = () => {
   })()
 
   const dotEnvConfig: DotenvConfigOptions = {
-    path: path.join(__dirname, "../", envFilename!),
+    path: path.join(__dirname, "../", envFilename!)
   }
   if (enableLogging) dotEnvConfig.debug = "true"
   const result = dotenv.config(dotEnvConfig)

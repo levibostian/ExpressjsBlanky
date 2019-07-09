@@ -23,12 +23,12 @@ export interface EmailSender {
 class AppEmailSender implements EmailSender {
   constructor() {}
 
-  async sendWelcome(to: string, params: { app_login_link: string }) {
+  async sendWelcome(to: string, params: { app_login_link: string }): Promise<void> {
     await postmarkClient.sendEmailWithTemplate({
       TemplateId: 1234567,
       From: FROM_EMAIL!,
       To: to,
-      TemplateModel: params,
+      TemplateModel: params
     })
   }
 }

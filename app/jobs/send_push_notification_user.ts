@@ -9,33 +9,6 @@ import { container, ID, NAME } from "@app/di"
 //   credential: admin.credential.cert(require('../../../config/firebase_key.json'))
 // })
 
-export interface SendPushNotificationParam {
-  userId: number
-  title: string
-  message: string
-}
-
-@injectable()
-export class SendPushNotificationJobUserJob
-  implements Job<SendPushNotificationParam, void> {
-  name = "SendPushNotificationJobUserJob"
-
-  async run(param: SendPushNotificationParam): Promise<void> {
-    const fcmTokens = await FcmTokenModel.findByUserId(param.userId)
-
-    return sendPushNotificationToDevices(
-      fcmTokens.map(fcmToken => fcmToken.token),
-      param.title,
-      param.message
-    ).then()
-  }
-}
-
-container
-  .bind(ID.JOB)
-  .to(SendPushNotificationJobUserJob)
-  .whenTargetNamed(NAME.SEND_PUSH_NOTIFICATION)
-
 const sendPushNotificationToDevices = async (
   fcmTokens: string[],
   title: string,
@@ -50,7 +23,7 @@ const sendPushNotificationToDevices = async (
   } = {
     notification: {
       title: title,
-      body: body,
+      body: body
     },
     // android: { // See https://firebase.google.com/docs/cloud-messaging/admin/send-messages#android_specific_fields
     //   ttl: 3600 * 1000, // 1 hour in milliseconds
@@ -76,8 +49,34 @@ const sendPushNotificationToDevices = async (
     //     }
     //   }
     // },
-    tokens: fcmTokens,
+    tokens: fcmTokens
   }
 
   return admin.messaging().sendMulticast(message)
 }
+
+export interface SendPushNotificationParam {
+  userId: number
+  title: string
+  message: string
+}
+
+@injectable()
+export class SendPushNotificationJobUserJob implements Job<SendPushNotificationParam, void> {
+  public name = "SendPushNotificationJobUserJob"
+
+  async run(param: SendPushNotificationParam): Promise<void> {
+    const fcmTokens = await FcmTokenModel.findByUserId(param.userId)
+
+    return sendPushNotificationToDevices(
+      fcmTokens.map(fcmToken => fcmToken.token),
+      param.title,
+      param.message
+    ).then()
+  }
+}
+
+container
+  .bind(ID.JOB)
+  .to(SendPushNotificationJobUserJob)
+  .whenTargetNamed(NAME.SEND_PUSH_NOTIFICATION)

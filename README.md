@@ -206,6 +206,15 @@ When asked what to name this policy, name of something like `name-of-project-s3-
 * Create a new Honeybadger project.
 * Search in the code for `HONEY_BADGER_API_KEY` and edit the value to your api key for the project.
 
+- [GitHub Actions](https://developer.github.com/actions/) - Misc automation
+  GitHub Actions is a great tool that can help automate some tasks on your GitHub repo. We use it for some misc tasks as you will see in configuring below.
+
+Configure "merge on green" action that will automatically merge your pull request when the status checks all pass on a pull request:
+
+- Create 2 labels in your GitHub repo (Issues > Labels > Create label).
+  - name: `wip`, description: `Work in progress. Do not merge this until the label is removed`
+  - name: `merge-on-green`, description: `When the status checks all pass, merge this pull request automatically`
+
 ## Misc services setup
 
 Besides the services listed above and how to configure them, there is some more setup you need to complete as well to get your application running successfully.

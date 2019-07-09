@@ -12,28 +12,28 @@ require.config({
     semver: "./vendor/semver.min",
     utilsSampleRequest: "./utils/send_sample_request",
     webfontloader: "./vendor/webfontloader",
-    list: "./vendor/list.min",
+    list: "./vendor/list.min"
   },
   shim: {
     bootstrap: {
-      deps: ["jquery"],
+      deps: ["jquery"]
     },
     diffMatchPatch: {
-      exports: "diff_match_patch",
+      exports: "diff_match_patch"
     },
     handlebars: {
-      exports: "Handlebars",
+      exports: "Handlebars"
     },
     handlebarsExtended: {
       deps: ["jquery", "handlebars"],
-      exports: "Handlebars",
+      exports: "Handlebars"
     },
     prettify: {
-      exports: "prettyPrint",
-    },
+      exports: "prettyPrint"
+    }
   },
   urlArgs: "v=" + new Date().getTime(),
-  waitSeconds: 15,
+  waitSeconds: 15
 })
 
 require([
@@ -49,7 +49,7 @@ require([
   "webfontloader",
   "bootstrap",
   "pathToRegexp",
-  "list",
+  "list"
 ], function(
   $,
   _,
@@ -73,9 +73,7 @@ require([
   var templateHeader = Handlebars.compile($("#template-header").html())
   var templateFooter = Handlebars.compile($("#template-footer").html())
   var templateArticle = Handlebars.compile($("#template-article").html())
-  var templateCompareArticle = Handlebars.compile(
-    $("#template-compare-article").html()
-  )
+  var templateCompareArticle = Handlebars.compile($("#template-compare-article").html())
   var templateGenerator = Handlebars.compile($("#template-generator").html())
   var templateProject = Handlebars.compile($("#template-project").html())
   var templateSections = Handlebars.compile($("#template-sections").html())
@@ -86,14 +84,11 @@ require([
   //
   if (!apiProject.template) apiProject.template = {}
 
-  if (apiProject.template.withCompare == null)
-    apiProject.template.withCompare = true
+  if (apiProject.template.withCompare == null) apiProject.template.withCompare = true
 
-  if (apiProject.template.withGenerator == null)
-    apiProject.template.withGenerator = true
+  if (apiProject.template.withGenerator == null) apiProject.template.withGenerator = true
 
-  if (apiProject.template.forceLanguage)
-    locale.setLanguage(apiProject.template.forceLanguage)
+  if (apiProject.template.forceLanguage) locale.setLanguage(apiProject.template.forceLanguage)
 
   // Setup jQuery Ajax
   $.ajaxSetup(apiProject.template.jQueryAjaxSetup)
@@ -184,7 +179,7 @@ require([
     nav.push({
       group: group,
       isHeader: true,
-      title: apiGroupTitles[group],
+      title: apiGroupTitles[group]
     })
 
     // Submenu
@@ -197,7 +192,7 @@ require([
             group: group,
             name: entry.name,
             type: entry.type,
-            version: entry.version,
+            version: entry.version
           })
         } else {
           nav.push({
@@ -206,7 +201,7 @@ require([
             hidden: true,
             name: entry.name,
             type: entry.type,
-            version: entry.version,
+            version: entry.version
           })
         }
         oldName = entry.name
@@ -239,7 +234,7 @@ require([
             group: group,
             isHeader: true,
             title: title,
-            isFixed: true,
+            isFixed: true
           })
           index++
           found_level1 = true
@@ -251,7 +246,7 @@ require([
             isHeader: false,
             title: title,
             isFixed: false,
-            version: "1.0",
+            version: "1.0"
           })
           index++
         }
@@ -268,11 +263,8 @@ require([
       nav.unshift({
         group: "_",
         isHeader: true,
-        title:
-          apiProject.header.title == null
-            ? locale.__("General")
-            : apiProject.header.title,
-        isFixed: true,
+        title: apiProject.header.title == null ? locale.__("General") : apiProject.header.title,
+        isFixed: true
       })
     }
   }
@@ -287,7 +279,7 @@ require([
         group: "_footer",
         isHeader: true,
         title: apiProject.footer.title,
-        isFixed: true,
+        isFixed: true
       })
     }
   }
@@ -303,7 +295,7 @@ require([
 
   // render sidenav
   var fields = {
-    nav: nav,
+    nav: nav
   }
   $("#sidenav").append(templateSidenav(fields))
 
@@ -338,33 +330,27 @@ require([
         if (oldName !== entry.name) {
           // determine versions
           api.forEach(function(versionEntry) {
-            if (
-              groupEntry === versionEntry.group &&
-              entry.name === versionEntry.name
-            ) {
+            if (groupEntry === versionEntry.group && entry.name === versionEntry.name) {
               if (!articleVersions[entry.group].hasOwnProperty(entry.name)) {
                 articleVersions[entry.group][entry.name] = []
               }
-              articleVersions[entry.group][entry.name].push(
-                versionEntry.version
-              )
+              articleVersions[entry.group][entry.name].push(versionEntry.version)
             }
           })
           fields = {
             article: entry,
-            versions: articleVersions[entry.group][entry.name],
+            versions: articleVersions[entry.group][entry.name]
           }
         } else {
           fields = {
             article: entry,
             hidden: true,
-            versions: articleVersions[entry.group][entry.name],
+            versions: articleVersions[entry.group][entry.name]
           }
         }
 
         // add prefix URL for endpoint
-        if (apiProject.url)
-          fields.article.url = apiProject.url + fields.article.url
+        if (apiProject.url) fields.article.url = apiProject.url + fields.article.url
 
         addArticleSettings(fields, entry)
 
@@ -376,7 +362,7 @@ require([
         articles.push({
           article: templateArticle(fields),
           group: entry.group,
-          name: entry.name,
+          name: entry.name
         })
         oldName = entry.name
       }
@@ -387,7 +373,7 @@ require([
       group: groupEntry,
       title: title,
       description: description,
-      articles: articles,
+      articles: articles
     }
     content += templateSections(fields)
   })
@@ -402,16 +388,14 @@ require([
     .on("click", function(e) {
       e.preventDefault()
       var id = $(this).attr("href")
-      if ($(id).length > 0)
-        $("html,body").animate({ scrollTop: parseInt($(id).offset().top) }, 400)
+      if ($(id).length > 0) $("html,body").animate({ scrollTop: parseInt($(id).offset().top) }, 400)
       window.location.hash = $(this).attr("href")
     })
 
   // Quickjump on Pageload to hash position.
   if (window.location.hash) {
     var id = window.location.hash
-    if ($(id).length > 0)
-      $("html,body").animate({ scrollTop: parseInt($(id).offset().top) }, 0)
+    if ($(id).length > 0) $("html,body").animate({ scrollTop: parseInt($(id).offset().top) }, 0)
   }
 
   /**
@@ -450,12 +434,10 @@ require([
       $("#sidenav li[data-version='" + version + "']").each(function() {
         var group = $(this).data("group")
         var name = $(this).data("name")
-        var length = $(
-          "#sidenav li[data-group='" + group + "'][data-name='" + name + "']"
-        ).length
-        var index = $(
-          "#sidenav li[data-group='" + group + "'][data-name='" + name + "']"
-        ).index($(this))
+        var length = $("#sidenav li[data-group='" + group + "'][data-name='" + name + "']").length
+        var index = $("#sidenav li[data-group='" + group + "'][data-name='" + name + "']").index(
+          $(this)
+        )
         if (length === 1 || index === length - 1) $(this).addClass("is-new")
       })
     }
@@ -512,13 +494,7 @@ require([
 
       if (semver.lte(version, selectedVersion)) {
         if (
-          $(
-            "article[data-group='" +
-              group +
-              "'][data-name='" +
-              name +
-              "']:visible"
-          ).length === 0
+          $("article[data-group='" + group + "'][data-name='" + name + "']:visible").length === 0
         ) {
           // enable Article
           $(
@@ -540,9 +516,7 @@ require([
               version +
               "']"
           ).removeClass("hide")
-          $("#sidenav li.nav-header[data-group='" + group + "']").removeClass(
-            "hide"
-          )
+          $("#sidenav li.nav-header[data-group='" + group + "']").removeClass("hide")
         }
       }
     })
@@ -570,9 +544,7 @@ require([
 
   // compare url-parameter
   $.urlParam = function(name) {
-    var results = new RegExp("[\\?&amp;]" + name + "=([^&amp;#]*)").exec(
-      window.location.href
-    )
+    var results = new RegExp("[\\?&amp;]" + name + "=([^&amp;#]*)").exec(window.location.href)
     return results && results[1] ? results[1] : null
   }
 
@@ -582,10 +554,7 @@ require([
 
     if (window.location.hash) {
       var id = window.location.hash
-      $("html,body").animate(
-        { scrollTop: parseInt($(id).offset().top) - 18 },
-        0
-      )
+      $("html,body").animate({ scrollTop: parseInt($(id).offset().top) - 18 }, 0)
     }
   }
 
@@ -593,7 +562,7 @@ require([
    * Initialize search
    */
   var options = {
-    valueNames: ["nav-list-item"],
+    valueNames: ["nav-list-item"]
   }
   var endpointsList = new List("scrollingNav", options)
 
@@ -668,32 +637,22 @@ require([
       var fields = {
         article: sourceEntry,
         compare: compareEntry,
-        versions: articleVersions[group][name],
+        versions: articleVersions[group][name]
       }
 
       // add unique id
       // TODO: replace all group-name-version in template with id.
       fields.article.id =
-        fields.article.group +
-        "-" +
-        fields.article.name +
-        "-" +
-        fields.article.version
+        fields.article.group + "-" + fields.article.name + "-" + fields.article.version
       fields.article.id = fields.article.id.replace(/\./g, "_")
 
       fields.compare.id =
-        fields.compare.group +
-        "-" +
-        fields.compare.name +
-        "-" +
-        fields.compare.version
+        fields.compare.group + "-" + fields.compare.name + "-" + fields.compare.version
       fields.compare.id = fields.compare.id.replace(/\./g, "_")
 
       var entry = sourceEntry
       if (entry.parameter && entry.parameter.fields)
-        fields._hasTypeInParameterFields = _hasTypeInFields(
-          entry.parameter.fields
-        )
+        fields._hasTypeInParameterFields = _hasTypeInFields(entry.parameter.fields)
 
       if (entry.error && entry.error.fields)
         fields._hasTypeInErrorFields = _hasTypeInFields(entry.error.fields)
@@ -705,34 +664,16 @@ require([
         fields._hasTypeInInfoFields = _hasTypeInFields(entry.info.fields)
 
       var entry = compareEntry
-      if (
-        fields._hasTypeInParameterFields !== true &&
-        entry.parameter &&
-        entry.parameter.fields
-      )
-        fields._hasTypeInParameterFields = _hasTypeInFields(
-          entry.parameter.fields
-        )
+      if (fields._hasTypeInParameterFields !== true && entry.parameter && entry.parameter.fields)
+        fields._hasTypeInParameterFields = _hasTypeInFields(entry.parameter.fields)
 
-      if (
-        fields._hasTypeInErrorFields !== true &&
-        entry.error &&
-        entry.error.fields
-      )
+      if (fields._hasTypeInErrorFields !== true && entry.error && entry.error.fields)
         fields._hasTypeInErrorFields = _hasTypeInFields(entry.error.fields)
 
-      if (
-        fields._hasTypeInSuccessFields !== true &&
-        entry.success &&
-        entry.success.fields
-      )
+      if (fields._hasTypeInSuccessFields !== true && entry.success && entry.success.fields)
         fields._hasTypeInSuccessFields = _hasTypeInFields(entry.success.fields)
 
-      if (
-        fields._hasTypeInInfoFields !== true &&
-        entry.info &&
-        entry.info.fields
-      )
+      if (fields._hasTypeInInfoFields !== true && entry.info && entry.info.fields)
         fields._hasTypeInInfoFields = _hasTypeInFields(entry.info.fields)
 
       var content = templateCompareArticle(fields)
@@ -740,9 +681,7 @@ require([
       var $content = $root.next()
 
       // Event on.click re-assign
-      $content
-        .find(".versions li.version a")
-        .on("click", changeVersionCompareTo)
+      $content.find(".versions li.version a").on("click", changeVersionCompareTo)
 
       // select navigation
       $(
@@ -775,8 +714,7 @@ require([
         .find("li.version a")
         .each(function() {
           var selectVersion = $(this).html()
-          if (selectVersion < currentVersion && !$foundElement)
-            $foundElement = $(this)
+          if (selectVersion < currentVersion && !$foundElement) $foundElement = $(this)
         })
 
       if ($foundElement) $foundElement.trigger("click")
@@ -825,12 +763,7 @@ require([
   function addArticleSettings(fields, entry) {
     // add unique id
     // TODO: replace all group-name-version in template with id.
-    fields.id =
-      fields.article.group +
-      "-" +
-      fields.article.name +
-      "-" +
-      fields.article.version
+    fields.id = fields.article.group + "-" + fields.article.name + "-" + fields.article.version
     fields.id = fields.id.replace(/\./g, "_")
 
     if (entry.header && entry.header.fields) {
@@ -840,9 +773,7 @@ require([
 
     if (entry.parameter && entry.parameter.fields) {
       sortFields(entry.parameter.fields)
-      fields._hasTypeInParameterFields = _hasTypeInFields(
-        entry.parameter.fields
-      )
+      fields._hasTypeInParameterFields = _hasTypeInFields(entry.parameter.fields)
     }
 
     if (entry.error && entry.error.fields) {
@@ -874,7 +805,7 @@ require([
     })
     var fields = {
       article: entry,
-      versions: articleVersions[group][name],
+      versions: articleVersions[group][name]
     }
 
     addArticleSettings(fields, entry)
@@ -886,9 +817,7 @@ require([
    * Render original Article and remove the current visible Article.
    */
   function resetArticle(group, name, version) {
-    var $root = $(
-      "article[data-group='" + group + "'][data-name='" + name + "']:visible"
-    )
+    var $root = $("article[data-group='" + group + "'][data-name='" + name + "']:visible")
     var content = renderArticle(group, name, version)
 
     $root.after(content)
@@ -921,8 +850,8 @@ require([
         $(window).scrollspy("refresh")
       },
       google: {
-        families: ["Source Code Pro", "Source Sans Pro:n4,n6,n7"],
-      },
+        families: ["Source Code Pro", "Source Sans Pro:n4,n6,n7"]
+      }
     })
   }
 

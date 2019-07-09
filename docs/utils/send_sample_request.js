@@ -8,12 +8,7 @@ define(["jquery", "lodash"], function($, _) {
       var group = $root.data("group")
       var name = $root.data("name")
       var version = $root.data("version")
-      sendSampleRequest(
-        group,
-        name,
-        version,
-        $(this).data("sample-request-type")
-      )
+      sendSampleRequest(group, name, version, $(this).data("sample-request-type"))
     })
 
     // Button clear
@@ -43,16 +38,14 @@ define(["jquery", "lodash"], function($, _) {
     var header = {}
     $root.find(".sample-request-header:checked").each(function(i, element) {
       var group = $(element).data("sample-request-header-group-id")
-      $root
-        .find('[data-sample-request-header-group="' + group + '"]')
-        .each(function(i, element) {
-          var key = $(element).data("sample-request-header-name")
-          var value = element.value
-          if (!element.optional && element.defaultValue !== "") {
-            value = element.defaultValue
-          }
-          header[key] = value
-        })
+      $root.find('[data-sample-request-header-group="' + group + '"]').each(function(i, element) {
+        var key = $(element).data("sample-request-header-name")
+        var value = element.value
+        if (!element.optional && element.defaultValue !== "") {
+          value = element.defaultValue
+        }
+        header[key] = value
+      })
     })
 
     // create JSON dictionary of parameters
@@ -63,10 +56,7 @@ define(["jquery", "lodash"], function($, _) {
       $root
         .find('[data-sample-request-param-group="' + group + '"]')
         .not(function() {
-          return (
-            $(this).val() == "" &&
-            $(this).is("[data-sample-request-param-optional='true']")
-          )
+          return $(this).val() == "" && $(this).is("[data-sample-request-param-optional='true']")
         })
         .each(function(i, element) {
           var key = $(element).data("sample-request-param-name")
@@ -117,7 +107,7 @@ define(["jquery", "lodash"], function($, _) {
       data: param,
       type: type.toUpperCase(),
       success: displaySuccess,
-      error: displayError,
+      error: displayError
     }
 
     $.ajax(ajaxRequest)
@@ -199,6 +189,6 @@ define(["jquery", "lodash"], function($, _) {
    * Exports.
    */
   return {
-    initDynamic: initDynamic,
+    initDynamic: initDynamic
   }
 })

@@ -1,8 +1,4 @@
-define(["locales", "handlebars", "diffMatchPatch"], function(
-  locale,
-  Handlebars,
-  DiffMatchPatch
-) {
+define(["locales", "handlebars", "diffMatchPatch"], function(locale, Handlebars, DiffMatchPatch) {
   /**
    * Return a text as markdown.
    * Currently only a little helper to replace apidoc-inline Links (#Group:Name).
@@ -74,8 +70,7 @@ define(["locales", "handlebars", "diffMatchPatch"], function(
     if (arguments.length > 0) {
       var type = typeof arguments[1]
       var arg = null
-      if (type === "string" || type === "number" || type === "boolean")
-        arg = arguments[1]
+      if (type === "string" || type === "number" || type === "boolean") arg = arguments[1]
       Handlebars.registerHelper(name, function() {
         return arg
       })
@@ -153,20 +148,13 @@ define(["locales", "handlebars", "diffMatchPatch"], function(
    * @returns {String}
    */
   function _handlebarsNewlineToBreak(text) {
-    return ("" + text).replace(
-      /([^>\r\n]?)(\r\n|\n\r|\r|\n)/g,
-      "$1" + "<br>" + "$2"
-    )
+    return ("" + text).replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, "$1" + "<br>" + "$2")
   }
 
   /**
    *
    */
-  Handlebars.registerHelper("each_compare_list_field", function(
-    source,
-    compare,
-    options
-  ) {
+  Handlebars.registerHelper("each_compare_list_field", function(source, compare, options) {
     var fieldName = options.hash.field
     var newSource = []
     if (source) {
@@ -191,11 +179,7 @@ define(["locales", "handlebars", "diffMatchPatch"], function(
   /**
    *
    */
-  Handlebars.registerHelper("each_compare_keys", function(
-    source,
-    compare,
-    options
-  ) {
+  Handlebars.registerHelper("each_compare_keys", function(source, compare, options) {
     var newSource = []
     if (source) {
       var sourceFields = Object.keys(source)
@@ -223,22 +207,14 @@ define(["locales", "handlebars", "diffMatchPatch"], function(
   /**
    *
    */
-  Handlebars.registerHelper("each_compare_field", function(
-    source,
-    compare,
-    options
-  ) {
+  Handlebars.registerHelper("each_compare_field", function(source, compare, options) {
     return _handlebarsEachCompared("field", source, compare, options)
   })
 
   /**
    *
    */
-  Handlebars.registerHelper("each_compare_title", function(
-    source,
-    compare,
-    options
-  ) {
+  Handlebars.registerHelper("each_compare_title", function(source, compare, options) {
     return _handlebarsEachCompared("title", source, compare, options)
   })
 
@@ -291,7 +267,7 @@ define(["locales", "handlebars", "diffMatchPatch"], function(
                 typeSame: true,
                 source: sourceEntry,
                 compare: compareEntry,
-                index: index,
+                index: index
               }
               dataList.push(data)
               found = true
@@ -303,7 +279,7 @@ define(["locales", "handlebars", "diffMatchPatch"], function(
           var data = {
             typeIns: true,
             source: sourceEntry,
-            index: index,
+            index: index
           }
           dataList.push(data)
           index++
@@ -323,7 +299,7 @@ define(["locales", "handlebars", "diffMatchPatch"], function(
           var data = {
             typeDel: true,
             compare: compareEntry,
-            index: index,
+            index: index
           }
           dataList.push(data)
           index++

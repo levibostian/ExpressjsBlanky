@@ -34,7 +34,7 @@ export const addUser: Endpoint = {
   validate: [
     check("email")
       .exists()
-      .isEmail(),
+      .isEmail()
   ],
   endpoint: async (req, res, next) => {
     const body: {
@@ -45,21 +45,16 @@ export const addUser: Endpoint = {
       const existingUser = await UserModel.findByEmail(body.email)
       if (existingUser) {
         throw new UserEnteredBadDataError(
-          `Someone has already created an account with the email address ${
-            body.email
-          }.`
+          `Someone has already created an account with the email address ${body.email}.`
         )
       }
 
       var user = await UserModel.create(body.email)
       return Promise.reject(
-        new AddUserSuccess(
-          "Successfully created user.",
-          user.publicRepresentation()
-        )
+        new AddUserSuccess("Successfully created user.", user.publicRepresentation())
       )
     }
 
     createUser().catch(next)
-  },
+  }
 }

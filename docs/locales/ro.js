@@ -20,6 +20,6 @@ define({
     "show up to version:": "arată până la versiunea:",
     "Size range:": "Interval permis:",
     Type: "Tip",
-    url: "url",
-  },
+    url: "url"
+  }
 })

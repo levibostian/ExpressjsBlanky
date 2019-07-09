@@ -20,6 +20,6 @@ define({
     "show up to version:": "hiển thị phiên bản:",
     "Size range:": "Kích cỡ:",
     Type: "Kiểu",
-    url: "liên kết",
-  },
+    url: "liên kết"
+  }
 })
