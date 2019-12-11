@@ -1,4 +1,4 @@
-import { validationResult } from "express-validator/check"
+import { validationResult } from "express-validator"
 import { RequestHandler } from "express"
 import { FieldsError } from "@app/responses"
 

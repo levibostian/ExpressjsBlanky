@@ -1,55 +1,48 @@
-sudo: required
 language: node_js
-node_js:
-  - "10" # also change in docker files
 services:
   - docker
+
 env:
   global:        
     - DOCKER_COMPOSE_VERSION=1.24.1
     - STAGING_DEPLOY_USER=core
     - STAGING_DEPLOY_HOST=111.111.111.111
     - PROD_DEPLOY_USER=core
-    - PROD_DEPLOY_HOST=222.222.222.222
-    - AWS_ACCESS_KEY_ID=fofofof
-    - AWS_SECRET_ACCESS_KEY=fofofof
-    - HONEY_BADGER_API_KEY=12345    
+    - PROD_DEPLOY_HOST=222.222.222.222    
+    - DEPLOY_SSH_PORT=22
+    # ------------ SECRETS ------------
     # DANGER_GITHUB_API_TOKEN
-    - secure: "fefefe"
 before_install:
-  # Install docker compose custom version.
-  - sudo rm /usr/local/bin/docker-compose
-  - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
-  - chmod +x docker-compose
-  - sudo mv docker-compose /usr/local/bin
-  - docker-compose version
-  # Setup .aws directory for AWS CLI tool to work
-  - mkdir ~/.aws
-  - printf "%s\n%s\n%s" "[default]" "aws_access_key_id = ${AWS_ACCESS_KEY_ID}" "aws_secret_access_key = ${AWS_SECRET_ACCESS_KEY}" > ~/.aws/credentials
-  - printf "%s\n%s\n%s" "[default]" "region = us-east-1" "output = json" > ~/.aws/config
-  - sudo chmod 444 ~/.aws/c*
+  - curl -o- https://raw.githubusercontent.com/levibostian/ci-bootstrap/master/docker/compose-install.sh | bash   
+  - cp .env.example .env # for development 
 install:
   - npm install
   - bundle install
+  - curl https://raw.githubusercontent.com/madcoda/dotenv-shell/master/dotenv.sh > ~/dotenv; chmod +x ~/dotenv;
+  - ruby bin/secrets.rb decrypt 
+
 cache:
-  bundler: true 
-  directories:
-    - node_modules
-    - vendor/bundle
+  bundler: true
+  npm: true 
+
 jobs:
   include:
-    - stage: danger
-      script: danger --fail-on-errors=true
-    - stage: tests
-      script: ruby bin/ci/tests.rb
-      script: ruby bin/ci/test_docker_container.rb    
+    - stage: commit
+      script: 
+        - rm .env; cp secrets/testing/.env .env; npm run test:setup; npm run test;
+        - ruby ./bin/ci/docker.rb test
+    - stage: pr
+      script:
+        - rm .env; cp secrets/testing/.env .env; npm run test:setup; npm run test;
+        - bundle exec danger --fail-on-errors=true
     - stage: deploy
-      script: ./bin/ci/deploy.rb
+      script: 
+        - ruby ./bin/ci/docker.rb deploy 
 
 stages:
-  - name: tests 
-    if: type IN (pull_request, push) AND tag IS blank
-  - name: danger
+  - name: commit 
+    if: type IN (push) AND tag IS blank
+  - name: pr
     if: type IN (pull_request)
   - name: deploy
     if: tag IS present

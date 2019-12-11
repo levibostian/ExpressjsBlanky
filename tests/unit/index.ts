@@ -1,8 +1,6 @@
-import "@app/util" // Setup .env
-import { isTesting } from "@app/util"
+import "@app/env" // Setup .env
+import { Di } from "@app/di"
 
-beforeEach(async () => {
-  if (!isTesting) {
-    throw new Error("You can only run tests in testing environments.")
-  }
+afterEach(() => {
+  Di.resetOverrides()
 })

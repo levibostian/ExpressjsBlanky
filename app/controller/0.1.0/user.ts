@@ -1,10 +1,10 @@
 import { UserModel, FcmTokenModel, UserPublic } from "@app/model"
 import { Success, UserEnteredBadDataError } from "@app/responses"
 import { Endpoint } from "@app/controller/type"
-import { check } from "express-validator/check"
-import { container, ID } from "@app/di"
+import { check } from "express-validator"
+import { Di, Dependency } from "@app/di"
 import { EmailSender } from "@app/email"
-import constants from "@app/constants"
+import { Env } from "@app/env"
 
 /**
  * @apiDefine AddUserSuccess_010
@@ -31,22 +31,23 @@ class AddUserSuccess extends Success {
  * @apiUse AddUserSuccess_010
  */
 export const loginEmail: Endpoint = {
-  validate: [check("email").isEmail()],
+  validate: [check("email").isEmail(), check("bundle").exists()],
   endpoint: async (req, res, next) => {
     const body: {
       email: string
+      bundle: string
     } = req.body
 
-    const createUser = async () => {
-      const user = await UserModel.findUserOrCreateByEmail(body.email)
-      const loginLink = `${constants.login.loginLinkPrefix}${user.passwordToken!}`
-      const passwordlessLoginLink = `${constants.login.dynamicLinkUrl}/?link=${loginLink}&apn=${
-        constants.androidAppPackageName
-      }&ibi=${constants.iosAppBundleId}`
+    const createUser = async (): Promise<void> => {
+      const createUserResult = await UserModel.findUserOrCreateByEmail(body.email)
+      const userCreated = createUserResult[1]
+      const user = createUserResult[0]
+      const loginLink = encodeURIComponent(`${Env.appHost}/?token=${user.passwordToken!}`)
+      const passwordlessLoginLink = `${Env.dynamicLinkHost}/?link=${loginLink}&apn=${body.bundle}&ibi=${body.bundle}`
 
-      let email = container.get<EmailSender>(ID.EMAIL_SENDER)
-      await email.sendWelcome(user.email, {
-        app_login_link: passwordlessLoginLink
+      const email: EmailSender = Di.inject(Dependency.EmailSender)
+      await email.sendLogin(userCreated, user.email, {
+        appLoginLink: passwordlessLoginLink
       })
 
       return Promise.reject(
@@ -71,8 +72,8 @@ export const loginPasswordlessToken: Endpoint = {
       passwordless_token: string
     } = req.body
 
-    const redeemToken = async () => {
-      var user = await UserModel.findByPasswordlessToken(body.passwordless_token)
+    const redeemToken = async (): Promise<void> => {
+      let user = await UserModel.findByPasswordlessToken(body.passwordless_token)
       if (!user || !user.passwordTokenCreated) {
         return Promise.reject(
           new UserEnteredBadDataError(
@@ -107,15 +108,16 @@ export const updateFcmToken: Endpoint = {
     const body: {
       token: string
     } = req.body
+    const user = req.user! as UserModel
 
-    const updateToken = async () => {
-      const existingTokens = await FcmTokenModel.findByUserId(req.user.id)
+    const updateToken = async (): Promise<void> => {
+      const existingTokens = await FcmTokenModel.findByUserId(user.id)
 
-      if (existingTokens.length >= constants.maxFcmTokensPerUser) {
+      if (existingTokens.length >= Env.fcm.maxTokensPerUser) {
         await existingTokens[0].delete()
       }
 
-      await FcmTokenModel.create(req.user.id, body.token)
+      await FcmTokenModel.create(user.id, body.token)
 
       return Promise.reject(new Success("Updated."))
     }

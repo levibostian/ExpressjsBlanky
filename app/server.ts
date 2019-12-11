@@ -1,7 +1,5 @@
 // Setup all dependencies for dependency injection here. Important to do here as we allow overriding for testing.
 import "./di"
-import "./email"
-import "./jobs"
 
 import express from "express"
 import bodyParser from "body-parser"
@@ -13,16 +11,18 @@ import { ErrorResponseHandlerMiddleware, ConvertCaseMiddleware } from "./middlew
 import { Server } from "http"
 import controllers from "./controller"
 import "./middleware/auth"
-import * as logger from "./logger"
-import { isProduction, isStaging } from "./util"
+import { Logger } from "./logger"
 import { SystemError } from "./responses"
 import { ErrorRequestHandler } from "express-serve-static-core"
-import compression from "compression"
+import { Env } from "./env"
+import { Di, Dependency } from "./di"
 
 export const startServer = (): Server => {
-  let app = express()
+  const app = express()
 
-  logger.initAppBeforeMiddleware(app)
+  const logger: Logger = Di.inject(Dependency.Logger)
+
+  logger.start(app)
 
   app.enable("trust proxy")
   app.use("/", express.static(__dirname + "/static")) // Host files located in the `./static` directory at the root.
@@ -31,14 +31,13 @@ export const startServer = (): Server => {
   app.use(trimBody())
   app.use(passport.initialize())
   app.use(helmet())
-  app.use(compression())
 
   app.use(controllers)
 
   app.use(ConvertCaseMiddleware)
   app.use(ErrorResponseHandlerMiddleware)
 
-  logger.initAppAfterMiddleware(app)
+  logger.stop(app)
 
   process.on("uncaughtException", (err: Error) => {
     logger.error(err)
@@ -51,7 +50,7 @@ export const startServer = (): Server => {
       if (res.headersSent) {
         next(err)
       } else {
-        const message = isProduction || isStaging ? "System error. Please try again." : err.message
+        const message = !Env.development ? "System error. Please try again." : err.message
         res.status(SystemError.code).send(new SystemError(message))
       }
     }
@@ -59,10 +58,10 @@ export const startServer = (): Server => {
 
   app.set("port", 5000)
 
-  let server = app.listen(app.get("port"), () => {
+  const server = app.listen(app.get("port"), () => {
     logger.debug(
-      `Server started. Listening at: ${(<AddressInfo>server.address()).address}:${
-        (<AddressInfo>server.address()).port
+      `Server started. Listening at: ${(server.address() as AddressInfo).address}:${
+        (server.address() as AddressInfo).port
       }`
     )
   })

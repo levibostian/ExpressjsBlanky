@@ -28,7 +28,7 @@ export class UserSequelizeModel extends SequelizeModel {
         }
       },
       {
-        modelName: "user",
+        modelName: "User",
         sequelize: sequelize
       }
     )
@@ -71,7 +71,7 @@ export class UserModel implements Model<UserPublic> {
     public passwordTokenCreated?: Date
   ) {}
 
-  static findUserOrCreateByEmail(emailAddress: string): Promise<UserModel> {
+  static findUserOrCreateByEmail(emailAddress: string): Promise<[UserModel, boolean]> {
     return UserSequelizeModel.findCreateFind({
       where: {
         email: emailAddress.toLowerCase()
@@ -80,7 +80,7 @@ export class UserModel implements Model<UserPublic> {
         passwordToken: uid2(255),
         passwordTokenCreated: new Date()
       }
-    }).then(res => res[0].getUser())
+    }).then(res => [res[0].getUser(), res[1]])
   }
 
   static findUserById(userId: number): Promise<UserModel | null> {

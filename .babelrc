@@ -1,25 +1,21 @@
 {
-  "presets": [["@babel/env", {
-    "targets": {
-      "node": "current"
-    }
-    }], "@babel/preset-typescript"],  
-    "plugins": [
-      "babel-plugin-transform-typescript-metadata",
-      ["@babel/plugin-proposal-decorators", { "legacy": true }],
-      ["@babel/plugin-proposal-class-properties", { "loose": true }],
-      ["module-resolver", {
-        "root": ["."],
-        "alias": {
-          "@app": "./app",
-          "@test": "./tests"
-        }
-        }]
-      ],
-      "env": {
-        "debug": {
-          "sourceMaps": "inline",
-          "retainLines": true
-        }
+  "presets": [
+    ["@babel/env", {
+      "targets": {
+        "node": "current"
       }
-    }
+    }], 
+    "@babel/preset-typescript"
+  ],  
+  "plugins": [
+    ["module-resolver", {
+      "root": ["."],
+      "alias": {
+        "@app": "./app",
+        "@test": "./tests"
+      }
+    }]
+  ],
+  "retainLines": true,
+  "sourceMaps": "inline"
+}

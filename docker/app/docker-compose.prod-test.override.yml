@@ -1,7 +1,0 @@
-# Used by CI servers to test if newly built production image works.
-version: '3.7'
-services:
-  app:
-    image: docker-production-image-test
-    ports: # Since we are not using nginx-proxy, we need to communicate some way.
-      - "5000:5000"

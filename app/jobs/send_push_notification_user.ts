@@ -1,20 +1,18 @@
 import { Job } from "@app/jobs/type"
 import { FcmTokenModel } from "@app/model/fcm_token"
 import admin from "firebase-admin"
-import { injectable } from "inversify"
-import { container, ID, NAME } from "@app/di"
 
-// TODO Uncomment the 3 lines below to configure Firebase Cloud Messaging.
-// admin.initializeApp({
-//   credential: admin.credential.cert(require('../../../config/firebase_key.json'))
-// })
+admin.initializeApp({
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  credential: admin.credential.cert(require("../config/firebase_key.json"))
+})
 
 const sendPushNotificationToDevices = async (
   fcmTokens: string[],
   title: string,
   body: string
 ): Promise<admin.messaging.BatchResponse> => {
-  var message: {
+  const message: {
     notification: {
       title: string
       body: string
@@ -61,7 +59,6 @@ export interface SendPushNotificationParam {
   message: string
 }
 
-@injectable()
 export class SendPushNotificationJobUserJob implements Job<SendPushNotificationParam, void> {
   public name = "SendPushNotificationJobUserJob"
 
@@ -75,8 +72,3 @@ export class SendPushNotificationJobUserJob implements Job<SendPushNotificationP
     ).then()
   }
 }
-
-container
-  .bind(ID.JOB)
-  .to(SendPushNotificationJobUserJob)
-  .whenTargetNamed(NAME.SEND_PUSH_NOTIFICATION)

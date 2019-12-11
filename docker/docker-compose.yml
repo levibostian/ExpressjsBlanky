@@ -1,0 +1,11 @@
+version: '3.7'
+services:
+  app:
+    container_name: "$DOCKER_APP_NAME"
+    restart: unless-stopped
+    command: npx forever -f -m 5 dist/app_startup.js
+    image: "$DOCKER_APP_IMAGE_NAME"          
+    ports:
+      - "5000:5000"
+    env_file:
+      - ../.env

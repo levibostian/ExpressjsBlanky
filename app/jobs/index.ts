@@ -6,12 +6,28 @@ import {
   SendPushNotificationParam
 } from "./send_push_notification_user"
 import { Job } from "./type"
-import * as logger from "@app/logger"
-import { injectable, inject, named } from "inversify"
-import { container, ID, NAME } from "@app/di"
-import constants from "@app/constants"
+import { Logger } from "@app/logger"
+import { Env } from "@app/env"
+import redis, { ClientOpts } from "redis"
+import { promisify } from "util"
 
 export const jobQueues: { [key: string]: JobContainer } = {}
+
+export const assertJobQueue = async (logger: Logger): Promise<void> => {
+  const redisClient = redis.createClient(Env.redis)
+  const pingAsync = promisify(redisClient.ping).bind(redisClient)
+
+  logger.verbose("Asserting redis server connection...")
+  await pingAsync().then(result => {
+    if (result !== "PONG") {
+      throw Error(`Connection to redis server unsuccessful. Response from PING: ${result}`)
+    }
+
+    logger.verbose("Redis server connection success!")
+
+    return Promise.resolve()
+  })
+}
 
 interface JobContainer {
   job: Job<any, any>
@@ -22,8 +38,7 @@ export interface BullQueueInfo {
   name: string
   hostId: string
   type: "bull"
-  host: string
-  port: number
+  redis: ClientOpts
 }
 
 export interface JobQueueManager {
@@ -34,23 +49,20 @@ export interface JobQueueManager {
   queueSendPushNotificationToUser(params: SendPushNotificationParam): Promise<void>
 }
 
-@injectable()
-class AppJobQueueManager implements JobQueueManager {
+/**
+ * API to queue jobs.
+ *
+ * To run a specific job, `await queueSendPushNotificationToUser()`, for example.
+ */
+export class AppJobQueueManager implements JobQueueManager {
   public queues: {
     sendPushNotificationUser: Queue<SendPushNotificationParam>
   }
 
-  constructor(
-    @inject(ID.JOB)
-    @named(NAME.SEND_PUSH_NOTIFICATION)
-    sendPushNotificationUserJob: SendPushNotificationJobUserJob
-  ) {
+  constructor(sendPushNotificationUserJob: SendPushNotificationJobUserJob, logger: Logger) {
     const getQueue = <T>(job: Job<any, any>): Queue<T> => {
       const queue = new BullQueue(job.name, {
-        redis: {
-          port: constants.redis.port,
-          host: constants.redis.host
-        }
+        redis: Env.redis
       })
 
       queue.on("error", err => {
@@ -77,18 +89,17 @@ class AppJobQueueManager implements JobQueueManager {
   }
 
   getQueueInfo(): BullQueueInfo[] {
-    let info: BullQueueInfo[] = []
+    const info: BullQueueInfo[] = []
 
-    for (let key in this.queues) {
-      let queues = this.queues as { [key: string]: Queue<any> }
-      let queue = queues[key]
+    for (const key in this.queues) {
+      const queues = this.queues as { [key: string]: Queue<any> }
+      const queue = queues[key]
 
       info.push({
         name: queue.name,
         hostId: queue.name,
         type: "bull",
-        port: constants.redis.port,
-        host: constants.redis.host
+        redis: Env.redis
       })
     }
 
@@ -99,8 +110,3 @@ class AppJobQueueManager implements JobQueueManager {
     return this.queues.sendPushNotificationUser.add(params).then()
   }
 }
-
-container
-  .bind(ID.JOB_QUEUE_MANAGER)
-  .to(AppJobQueueManager)
-  .inSingletonScope()

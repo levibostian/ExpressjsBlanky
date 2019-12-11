@@ -1,7 +1,5 @@
 {
   "compilerOptions": {
-    "experimentalDecorators": true, // required by: inversify
-    "emitDecoratorMetadata": true, // required by: inversify
     "module": "commonjs",
     "strict": true,
     "esModuleInterop": true,
@@ -9,12 +7,10 @@
     "noEmit": true,
     "noImplicitAny": true,
     "moduleResolution": "node",
-    "sourceMap": true,
-    "outDir": "dist",
     "baseUrl": ".",
     "strictNullChecks": true,
     "paths": {
-      "*": ["node_modules/*", "app/types/*"],
+      "*": ["node_modules/*", "@types/*"],
       "@app/*": ["app/*"],
       "@test/*": ["tests/*"]
     }

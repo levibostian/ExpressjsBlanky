@@ -1,24 +1,21 @@
 import { setup, serverRequest, endpointVersionHeader, authHeader } from "@test/integration/index"
 import uid2 from "uid2"
 import { UserEnteredBadDataError, Success, Unauthorized, FieldsError } from "@app/responses"
-import {
-  UserFakeDataGenerator,
-  FcmTokenFakeDataGenerator
-} from "@test/integration/fake_data_generators"
+import { UserFakeDataGenerator, FcmTokenFakeDataGenerator } from "@test/fake_data"
 import { UserModel, FcmTokenModel } from "@app/model"
 import { EmailSender } from "@app/email"
-import { container, ID } from "@app/di"
+import { Di, Dependency } from "@app/di"
 import { endpointVersion } from "./index"
-import constants from "@app/constants"
 import * as arrayExtensions from "@app/extensions/array"
+import { Env } from "@app/env"
 
 const sendWelcomeMock = jest.fn()
 const emailSenderMock: EmailSender = {
-  sendWelcome: sendWelcomeMock
+  sendLogin: sendWelcomeMock
 }
 
-const overrideDependencies = () => {
-  container.rebind(ID.EMAIL_SENDER).toConstantValue(emailSenderMock)
+const overrideDependencies = (): void => {
+  Di.override(Dependency.EmailSender, emailSenderMock)
 }
 describe(`Receive login email passwordless token. ${endpointVersion}`, () => {
   const endpoint = "/user/login"
@@ -28,7 +25,9 @@ describe(`Receive login email passwordless token. ${endpointVersion}`, () => {
     await serverRequest()
       .post(endpoint)
       .set(endpointVersionHeader(endpointVersion))
-      .expect(FieldsError.code)
+      .then(res => {
+        expect(res.status).toBe(FieldsError.code)
+      })
   })
   it("should error email param not an email address", async () => {
     await setup([], overrideDependencies)
@@ -36,7 +35,9 @@ describe(`Receive login email passwordless token. ${endpointVersion}`, () => {
       .post(endpoint)
       .set(endpointVersionHeader(endpointVersion))
       .send({ email: uid2(20) })
-      .expect(FieldsError.code)
+      .then(res => {
+        expect(res.status).toBe(FieldsError.code)
+      })
   })
   it("should succeed. Create new user.", async () => {
     const testUser = UserFakeDataGenerator.newSignup(1)
@@ -44,15 +45,15 @@ describe(`Receive login email passwordless token. ${endpointVersion}`, () => {
     await serverRequest()
       .post(endpoint)
       .set(endpointVersionHeader(endpointVersion))
-      .send({ email: testUser.email })
+      .send({ email: testUser.email, bundle: "com.foo.foo" })
       .expect(Success.code)
-      .then(() => {
+      .then(res => {
         expect(sendWelcomeMock).toBeCalledTimes(1)
-        expect(sendWelcomeMock.mock.calls[0][1].app_login_link).toEqual(
-          expect.stringContaining(constants.login.dynamicLinkUrl)
+        expect(sendWelcomeMock.mock.calls[0][2].appLoginLink).toEqual(
+          expect.stringContaining(Env.dynamicLinkHost)
         )
-        expect(sendWelcomeMock.mock.calls[0][1].app_login_link).toEqual(
-          expect.stringContaining(constants.login.loginLinkPrefix)
+        expect(sendWelcomeMock.mock.calls[0][2].appLoginLink).toEqual(
+          expect.stringContaining(encodeURIComponent(Env.appHost))
         )
       })
   })
@@ -62,29 +63,31 @@ describe(`Receive login email passwordless token. ${endpointVersion}`, () => {
     await serverRequest()
       .post(endpoint)
       .set(endpointVersionHeader(endpointVersion))
-      .send({ email: testUser.email })
+      .send({ email: testUser.email, bundle: "com.foo.foo" })
       .expect(Success.code)
-      .then(() => {
+      .then(res => {
         expect(sendWelcomeMock).toBeCalledTimes(1)
-        expect(sendWelcomeMock.mock.calls[0][1].app_login_link).toEqual(
-          expect.stringContaining(constants.login.dynamicLinkUrl)
+        expect(sendWelcomeMock.mock.calls[0][2].appLoginLink).toEqual(
+          expect.stringContaining(Env.dynamicLinkHost)
         )
-        expect(sendWelcomeMock.mock.calls[0][1].app_login_link).toEqual(
-          expect.stringContaining(constants.login.loginLinkPrefix)
+        expect(sendWelcomeMock.mock.calls[0][2].appLoginLink).toEqual(
+          expect.stringContaining(encodeURIComponent(Env.appHost))
         )
       })
   })
 })
 
 describe(`Get access token from passwordless token. ${endpointVersion}`, () => {
-  const endpoint: string = "/user/login/token"
+  const endpoint = "/user/login/token"
 
   it("should error missing param", async () => {
     await setup([], overrideDependencies)
     await serverRequest()
       .post(endpoint)
       .set(endpointVersionHeader(endpointVersion))
-      .expect(FieldsError.code)
+      .then(res => {
+        expect(res.status).toBe(FieldsError.code)
+      })
   })
   it("should error passwordless token does not exist.", async () => {
     await setup([], overrideDependencies)
@@ -92,7 +95,9 @@ describe(`Get access token from passwordless token. ${endpointVersion}`, () => {
       .post(endpoint)
       .set(endpointVersionHeader(endpointVersion))
       .send({ passwordless_token: uid2(20) })
-      .expect(UserEnteredBadDataError.code)
+      .then(res => {
+        expect(res.status).toBe(UserEnteredBadDataError.code)
+      })
   })
   it("should error passwordless token expired.", async () => {
     const olderThen24Hours = new Date()
@@ -107,7 +112,9 @@ describe(`Get access token from passwordless token. ${endpointVersion}`, () => {
       .post(endpoint)
       .set(endpointVersionHeader(endpointVersion))
       .send({ passwordless_token: testUser.passwordToken })
-      .expect(UserEnteredBadDataError.code)
+      .then(res => {
+        expect(res.status).toBe(UserEnteredBadDataError.code)
+      })
   })
   it("should succeed get access token.", async () => {
     const testUser = UserFakeDataGenerator.newSignup(1)
@@ -125,14 +132,16 @@ describe(`Get access token from passwordless token. ${endpointVersion}`, () => {
 })
 
 describe(`Update FCM token. ${endpointVersion}`, () => {
-  const endpoint: string = "/user/fcm"
+  const endpoint = "/user/fcm"
 
   it("should error no access token.", async () => {
     await setup()
     await serverRequest()
       .post(endpoint)
       .set(endpointVersionHeader(endpointVersion))
-      .expect(Unauthorized.code)
+      .then(res => {
+        expect(res.status).toBe(Unauthorized.code)
+      })
   })
   it("should error bad access token.", async () => {
     const testUser = UserFakeDataGenerator.completeSignup(1)
@@ -141,7 +150,9 @@ describe(`Update FCM token. ${endpointVersion}`, () => {
       .post(endpoint)
       .set(authHeader(testUser.accessToken!))
       .set(endpointVersionHeader(endpointVersion))
-      .expect(Unauthorized.code)
+      .then(res => {
+        expect(res.status).toBe(Unauthorized.code)
+      })
   })
   it("should error missing param", async () => {
     const testUser = UserFakeDataGenerator.completeSignup(1)
@@ -150,11 +161,13 @@ describe(`Update FCM token. ${endpointVersion}`, () => {
       .post(endpoint)
       .set(authHeader(testUser.accessToken!))
       .set(endpointVersionHeader(endpointVersion))
-      .expect(FieldsError.code)
+      .then(res => {
+        expect(res.status).toBe(FieldsError.code)
+      })
   })
   it("should succeed and create fcm token", async () => {
     const testUser = UserFakeDataGenerator.completeSignup(1)
-    let newToken = uid2(200)
+    const newToken = uid2(200)
     await setup([testUser])
     await serverRequest()
       .post(endpoint)
@@ -173,11 +186,11 @@ describe(`Update FCM token. ${endpointVersion}`, () => {
   it("should succeed and delete old token", async () => {
     const testUser = UserFakeDataGenerator.completeSignup(1)
 
-    var tokens: FcmTokenFakeDataGenerator[] = []
-    for (let index = 0; index < constants.maxFcmTokensPerUser; index++) {
+    const tokens: FcmTokenFakeDataGenerator[] = []
+    for (let index = 0; index < Env.fcm.maxTokensPerUser; index++) {
       tokens.push(FcmTokenFakeDataGenerator.tokenForUserDevice(index + 1, testUser))
     }
-    expect(tokens).toHaveLength(constants.maxFcmTokensPerUser)
+    expect(tokens).toHaveLength(Env.fcm.maxTokensPerUser)
 
     const newToken = uid2(250)
 
@@ -191,7 +204,7 @@ describe(`Update FCM token. ${endpointVersion}`, () => {
       .then(async res => {
         const tokensForUser = await FcmTokenModel.findByUserId(testUser.id)
 
-        expect(tokensForUser).toHaveLength(constants.maxFcmTokensPerUser)
+        expect(tokensForUser).toHaveLength(Env.fcm.maxTokensPerUser)
         expect(arrayExtensions.last(tokensForUser).token).toBe(newToken)
       })
   })

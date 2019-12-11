@@ -1,6 +1,6 @@
 import { UserModel, UserPublic } from "@app/model/user"
 import { Success, UserEnteredBadDataError } from "@app/responses"
-import { check } from "express-validator/check"
+import { check } from "express-validator"
 import { Endpoint } from "@app/controller/type"
 
 /**
@@ -41,7 +41,7 @@ export const addUser: Endpoint = {
       email: string
     } = req.body
 
-    const createUser = async () => {
+    const createUser = async (): Promise<void> => {
       const existingUser = await UserModel.findByEmail(body.email)
       if (existingUser) {
         throw new UserEnteredBadDataError(
@@ -49,7 +49,7 @@ export const addUser: Endpoint = {
         )
       }
 
-      var user = await UserModel.create(body.email)
+      const user = await UserModel.create(body.email)
       return Promise.reject(
         new AddUserSuccess("Successfully created user.", user.publicRepresentation())
       )

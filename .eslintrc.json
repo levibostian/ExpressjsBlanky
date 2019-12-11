@@ -1,13 +1,15 @@
 {
   "parser": "@typescript-eslint/parser",
-  "plugins": [],
-  "extends": ["plugin:@typescript-eslint/recommended"],
+  "plugins": ["jest"],
+  "extends": ["plugin:@typescript-eslint/recommended", "plugin:jest/recommended"],
   "parserOptions": {
     "ecmaVersion": 2018,
     "sourceType": "module"
   },
   "rules": {
     "semi": "off",
+    "no-process-env": "error",
+    "no-await-in-loop": "error",
     "@typescript-eslint/indent": "off",
     "@typescript-eslint/no-namespace": "off",
     "@typescript-eslint/no-non-null-assertion": "off",
@@ -27,7 +29,21 @@
         }
       }
     ],
+    "@typescript-eslint/no-empty-function": "off",
     "@typescript-eslint/no-parameter-properties": "off",
+    "@typescript-eslint/member-delimiter-style": [
+      "error",
+      {
+        "multiline": {
+          "delimiter": "none",
+          "requireLast": true
+        },
+        "singleline": {
+          "delimiter": "semi",
+          "requireLast": false
+        }
+      }
+    ],
     "@typescript-eslint/no-use-before-define": [
       "error",
       {
@@ -44,6 +60,18 @@
       }
     ],
     "@typescript-eslint/no-explicit-any": "error",
-    "@typescript-eslint/ban-types": "off"
-  }
+    "@typescript-eslint/ban-types": "off",
+    "jest/prefer-called-with": "error",
+    "jest/prefer-hooks-on-top": "error",
+    "jest/no-truthy-falsy": "error",
+    "jest/valid-title": "error"
+  },
+  "overrides": [
+    {
+      "files": ["*.spec.ts"],
+      "rules": {
+        "@typescript-eslint/camelcase": "off"
+      }
+    }
+  ]
 }

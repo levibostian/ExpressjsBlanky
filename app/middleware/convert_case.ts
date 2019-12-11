@@ -6,7 +6,7 @@ type ResponseWithBody = typeof Response & {
 }
 
 export const ConvertCaseMiddleware: RequestHandler = (req, res, next) => {
-  let responseWithBody: ResponseWithBody = (res as unknown) as ResponseWithBody
+  const responseWithBody: ResponseWithBody = (res as unknown) as ResponseWithBody
   if (typeof responseWithBody.body === "object" && responseWithBody.body !== null) {
     ;((res as unknown) as ResponseWithBody).body = humps.decamelize(responseWithBody.body!)
   }

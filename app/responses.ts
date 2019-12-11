@@ -1,7 +1,7 @@
 import { FieldError } from "./middleware/validate_params"
 
 export class Success {
-  static code: number = 200
+  public static code = 200
 
   constructor(public message: string) {}
 }
@@ -10,7 +10,7 @@ export class Success {
  * @apiDefine SystemError
  */
 export class SystemError {
-  static code: number = 500
+  public static code = 500
 
   constructor(public message: string) {}
 }
@@ -19,7 +19,7 @@ export class SystemError {
  * @apiDefine UserEnteredBadDataError
  */
 export class UserEnteredBadDataError {
-  static code: number = 400
+  public static code = 400
 
   constructor(public errorMessage: string) {}
 }
@@ -28,7 +28,7 @@ export class UserEnteredBadDataError {
  * @apiDefine ForbiddenError
  */
 export class ForbiddenError {
-  static code: number = 403
+  public static code = 403
 
   constructor(public errorMessage: string) {}
 }
@@ -37,7 +37,7 @@ export class ForbiddenError {
  * @apiDefine FatalApiError
  */
 export class FatalApiError {
-  static code: number = 500
+  public static code = 500
 
   constructor(public errorMessage: string) {}
 }
@@ -46,11 +46,11 @@ export class FatalApiError {
  * @apiDefine Unauthorized
  */
 export class Unauthorized {
-  static code: number = 401
+  public static code = 401
 }
 
 export class FieldsError {
-  static code: number = 422
+  public static code = 422
 
   constructor(public errors: FieldError[], public message: string = errors[0].msg) {
     if (errors.length <= 0) {

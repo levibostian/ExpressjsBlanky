@@ -1,25 +1,20 @@
 import ExpressBrute from "express-brute"
 import RedisStore from "express-brute-redis"
-import { isTesting } from "../util"
 import { RequestHandler } from "express"
-import constants from "../constants"
+import { Env } from "@app/env"
+import { RedisClient } from "redis"
 
-const shouldRun = !isTesting
-
-let bruteforce: ExpressBrute
-if (shouldRun) {
-  const bruteOptions = {
-    freeRetries: 5
-  }
-
-  const redisStore = new RedisStore({
-    host: constants.redis.host,
-    port: constants.redis.port,
-    prefix: "ExpressBrute"
-  })
-
-  bruteforce = new ExpressBrute(redisStore, bruteOptions)
+const bruteOptions = {
+  freeRetries: Env.bruteForce.freeRetries
 }
+
+const redisClient: RedisClient = new RedisClient(Env.redis)
+const redisStore = new RedisStore({
+  client: redisClient,
+  prefix: "ExpressBrute"
+})
+
+const bruteforce = new ExpressBrute(redisStore, bruteOptions)
 
 /**
  * Use like:
@@ -34,11 +29,5 @@ if (shouldRun) {
  */
 export const bruteForcePrevent = (): RequestHandler => {
   // If running tests, we cannot rate limit or if we write too many tests, we will hit our limit especially because brute keeps a history in Redis of attempts for hours.
-  if (shouldRun) {
-    return bruteforce.prevent
-  } else {
-    return (req, res, next) => {
-      next()
-    }
-  }
+  return bruteforce.prevent
 }

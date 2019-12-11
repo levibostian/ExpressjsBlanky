@@ -41,6 +41,9 @@ define(["jquery", "lodash"], function($, _) {
       $root.find('[data-sample-request-header-group="' + group + '"]').each(function(i, element) {
         var key = $(element).data("sample-request-header-name")
         var value = element.value
+        if (typeof element.optional === "undefined") {
+          element.optional = true
+        }
         if (!element.optional && element.defaultValue !== "") {
           value = element.defaultValue
         }
@@ -51,28 +54,60 @@ define(["jquery", "lodash"], function($, _) {
     // create JSON dictionary of parameters
     var param = {}
     var paramType = {}
+    var bodyFormData = {}
+    var bodyFormDataType = {}
+    var bodyJson = ""
     $root.find(".sample-request-param:checked").each(function(i, element) {
       var group = $(element).data("sample-request-param-group-id")
-      $root
-        .find('[data-sample-request-param-group="' + group + '"]')
-        .not(function() {
-          return $(this).val() == "" && $(this).is("[data-sample-request-param-optional='true']")
-        })
-        .each(function(i, element) {
-          var key = $(element).data("sample-request-param-name")
-          var value = element.value
-          if (!element.optional && element.defaultValue !== "") {
-            value = element.defaultValue
-          }
-          param[key] = value
-          paramType[key] = $(element)
-            .next()
-            .text()
-        })
+      var contentType = $(element)
+        .nextAll(".sample-header-content-type-switch")
+        .first()
+        .val()
+      if (contentType == "body-json") {
+        $root
+          .find('[data-sample-request-body-group="' + group + '"]')
+          .not(function() {
+            return $(this).val() == "" && $(this).is("[data-sample-request-param-optional='true']")
+          })
+          .each(function(i, element) {
+            if (isJson(element.value)) {
+              header["Content-Type"] = "application/json"
+              bodyJson = element.value
+            }
+          })
+      } else {
+        $root
+          .find('[data-sample-request-param-group="' + group + '"]')
+          .not(function() {
+            return $(this).val() == "" && $(this).is("[data-sample-request-param-optional='true']")
+          })
+          .each(function(i, element) {
+            var key = $(element).data("sample-request-param-name")
+            var value = element.value
+            if (!element.optional && element.defaultValue !== "") {
+              value = element.defaultValue
+            }
+            if (contentType == "body-form-data") {
+              header["Content-Type"] = "multipart/form-data"
+              bodyFormData[key] = value
+              bodyFormDataType[key] = $(element)
+                .next()
+                .text()
+            } else {
+              param[key] = value
+              paramType[key] = $(element)
+                .next()
+                .text()
+            }
+          })
+      }
     })
 
     // grab user-inputted URL
     var url = $root.find(".sample-request-url").val()
+
+    //Convert {param} form to :param
+    url = url.replace(/{/, ":").replace(/}/, "")
 
     // Insert url parameter
     var pattern = pathToRegexp(url, null)
@@ -87,18 +122,18 @@ define(["jquery", "lodash"], function($, _) {
       }
     } // for
 
+    //add url search parameter
+    if (header["Content-Type"] == "application/json") {
+      url = url + encodeSearchParams(param)
+      param = bodyJson
+    } else if (header["Content-Type"] == "multipart/form-data") {
+      url = url + encodeSearchParams(param)
+      param = bodyFormData
+    }
+
     $root.find(".sample-request-response").fadeTo(250, 1)
     $root.find(".sample-request-response-json").html("Loading...")
     refreshScrollSpy()
-
-    _.each(param, function(val, key) {
-      var t = paramType[key].toLowerCase()
-      if (t === "object" || t === "array") {
-        try {
-          param[key] = JSON.parse(val)
-        } catch (e) {}
-      }
-    })
 
     // send AJAX request, catch success or error callback
     var ajaxRequest = {
@@ -118,9 +153,9 @@ define(["jquery", "lodash"], function($, _) {
         jsonResponse = JSON.parse(jqXHR.responseText)
         jsonResponse = JSON.stringify(jsonResponse, null, 4)
       } catch (e) {
-        jsonResponse = data
+        jsonResponse = jqXHR.responseText
       }
-      $root.find(".sample-request-response-json").html(jsonResponse)
+      $root.find(".sample-request-response-json").text(jsonResponse)
       refreshScrollSpy()
     }
 
@@ -131,17 +166,17 @@ define(["jquery", "lodash"], function($, _) {
         jsonResponse = JSON.parse(jqXHR.responseText)
         jsonResponse = JSON.stringify(jsonResponse, null, 4)
       } catch (e) {
-        jsonResponse = escape(jqXHR.responseText)
+        jsonResponse = jqXHR.responseText
       }
 
-      if (jsonResponse) message += "<br>" + jsonResponse
+      if (jsonResponse) message += "\n" + jsonResponse
 
       // flicker on previous error to make clear that there is a new response
       if ($root.find(".sample-request-response").is(":visible"))
         $root.find(".sample-request-response").fadeTo(1, 0.1)
 
       $root.find(".sample-request-response").fadeTo(250, 1)
-      $root.find(".sample-request-response-json").html(message)
+      $root.find(".sample-request-response-json").text(message)
       refreshScrollSpy()
     }
   }
@@ -183,6 +218,36 @@ define(["jquery", "lodash"], function($, _) {
     var div = document.createElement("div")
     div.appendChild(document.createTextNode(str))
     return div.innerHTML
+  }
+
+  /**
+   * is Json
+   */
+  function isJson(str) {
+    if (typeof str == "string") {
+      try {
+        var obj = JSON.parse(str)
+        if (typeof obj == "object" && obj) {
+          return true
+        } else {
+          return false
+        }
+      } catch (e) {
+        return false
+      }
+    }
+  }
+
+  /**
+   * encode Search Params
+   */
+  function encodeSearchParams(obj) {
+    const params = []
+    Object.keys(obj).forEach(key => {
+      let value = obj[key]
+      params.push([key, encodeURIComponent(value)].join("="))
+    })
+    return params.length === 0 ? "" : "?" + params.join("&")
   }
 
   /**

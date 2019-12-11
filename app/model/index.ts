@@ -1,52 +1,51 @@
 import { Sequelize, Options } from "sequelize"
-import dbConfig, { DatabaseConnection } from "../../config/db"
-import { env, enableLogging, isDevelopment, isTesting } from "@app/util"
+import { Env } from "../env"
 import { UserSequelizeModel, FcmTokenSequelizeModel } from "@app/model"
+import { Logger } from "@app/logger"
 
-let databaseConnection = (dbConfig as { [key: string]: DatabaseConnection })[env]
-let sequelizeConfig: Options = {
-  database: databaseConnection.database,
-  username: databaseConnection.username,
-  password: databaseConnection.password,
-  host: databaseConnection.host,
-  dialect: databaseConnection.dialect,
-  port: databaseConnection.port,
+const sequelizeConfig: Options = {
+  database: Env.database.name,
+  username: Env.database.username,
+  password: Env.database.password,
+  host: Env.database.host,
+  dialect: "postgres",
+  port: 5432,
   define: {
     underscored: false, // convert camelCase column names to underscored.
     freezeTableName: true, // Disable pluralizing the table names created in the database.
     timestamps: true, // Adds createdAt and updatedAt timestamps to the model.
     paranoid: false // when deleting rows, actually delete them. Do not set deleted_at timestamp for row instead.
-  }
-}
-// .logging can only be a function or false. So, set false only when we don't want it.
-if (!enableLogging) {
-  sequelizeConfig.logging = false
+  },
+  logging: Env.development
 }
 export let sequelize: Sequelize | null
+const models = [UserSequelizeModel, FcmTokenSequelizeModel]
 
-export const initDatabase = async (): Promise<void> => {
+export const assertDatabase = async (logger: Logger): Promise<void> => {
   if (sequelize) return
 
   sequelize = new Sequelize(sequelizeConfig)
 
-  UserSequelizeModel.initModel(sequelize)
-  FcmTokenSequelizeModel.initModel(sequelize)
+  models.forEach(model => {
+    model.initModel(sequelize!)
 
-  UserSequelizeModel.setupAssociations()
-  FcmTokenSequelizeModel.setupAssociations()
+    model.setupAssociations()
+  })
 
-  if (isDevelopment || isTesting) {
-    await sequelize.sync({
-      force: true,
-      alter: true
-    })
-  }
-
+  logger.verbose("Asserting database connection...")
   await sequelize.authenticate()
+  logger.verbose("Database connection is setup successful")
 }
 
 export const resetDatabase = async (): Promise<void> => {
-  await sequelize!.drop()
+  const destroys = models.map(model =>
+    model.truncate({
+      cascade: true,
+      restartIdentity: true
+    })
+  )
+
+  await Promise.all(destroys)
 }
 
 export const closeDatabase = async (): Promise<void> => {

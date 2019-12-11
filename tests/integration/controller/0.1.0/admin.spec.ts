@@ -6,21 +6,17 @@ import {
 } from "@test/integration/index"
 import uid2 from "uid2"
 import { UserEnteredBadDataError, Success, Unauthorized, FieldsError } from "@app/responses"
-import { UserFakeDataGenerator } from "@test/integration/fake_data_generators"
-import { EmailSender } from "@app/email"
-import { container, ID } from "@app/di"
+import { UserFakeDataGenerator } from "@test/fake_data"
+import { Di, Dependency } from "@app/di"
 import { endpointVersion } from "./index"
+import { EmailSenderMock } from "@test/mocks/email_sender"
 
 describe(`Create user ${endpointVersion}`, () => {
   const endpoint = "/admin/user"
 
-  const sendWelcomeMock = jest.fn()
-  const emailSenderMock: EmailSender = {
-    sendWelcome: sendWelcomeMock
-  }
-
-  const overrideDependencies = () => {
-    container.rebind(ID.EMAIL_SENDER).toConstantValue(emailSenderMock)
+  const emailSenderMock = new EmailSenderMock()
+  const overrideDependencies = (): void => {
+    Di.override(Dependency.EmailSender, emailSenderMock)
   }
 
   it("should error no access token.", async () => {
@@ -30,7 +26,7 @@ describe(`Create user ${endpointVersion}`, () => {
       .set(endpointVersionHeader(endpointVersion))
       .expect(Unauthorized.code)
       .then(() => {
-        expect(sendWelcomeMock).not.toHaveBeenCalled()
+        expect(emailSenderMock.sendLoginMock).not.toHaveBeenCalled()
       })
   })
   it("should error bad access token.", async () => {
@@ -41,7 +37,7 @@ describe(`Create user ${endpointVersion}`, () => {
       .set(endpointVersionHeader(endpointVersion))
       .expect(Unauthorized.code)
       .then(() => {
-        expect(sendWelcomeMock).not.toHaveBeenCalled()
+        expect(emailSenderMock.sendLoginMock).not.toHaveBeenCalled()
       })
   })
   it("should error no email address param.", async () => {
@@ -52,11 +48,11 @@ describe(`Create user ${endpointVersion}`, () => {
       .set(endpointVersionHeader(endpointVersion))
       .expect(FieldsError.code)
       .then(() => {
-        expect(sendWelcomeMock).not.toHaveBeenCalled()
+        expect(emailSenderMock.sendLoginMock).not.toHaveBeenCalled()
       })
   })
   it("should error user by email already exists", async () => {
-    let user = UserFakeDataGenerator.newSignup(1)
+    const user = UserFakeDataGenerator.newSignup(1)
 
     await setup([user], overrideDependencies)
     await serverRequest()
@@ -66,11 +62,11 @@ describe(`Create user ${endpointVersion}`, () => {
       .send({ email: user.email })
       .expect(UserEnteredBadDataError.code)
       .then(() => {
-        expect(sendWelcomeMock).not.toHaveBeenCalled()
+        expect(emailSenderMock.sendLoginMock).not.toHaveBeenCalled()
       })
   })
   it("should create user successfully", async () => {
-    let user = UserFakeDataGenerator.newSignup(1)
+    const user = UserFakeDataGenerator.newSignup(1)
 
     await setup([], overrideDependencies)
     await serverRequest()
@@ -81,7 +77,7 @@ describe(`Create user ${endpointVersion}`, () => {
       .expect(Success.code)
       .then(async res => {
         expect(res.body.user).toEqual(user.publicRepresentation())
-        expect(sendWelcomeMock).not.toHaveBeenCalled()
+        expect(emailSenderMock.sendLoginMock).not.toHaveBeenCalled()
       })
   })
 })

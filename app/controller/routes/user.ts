@@ -1,6 +1,6 @@
 import express from "express"
 import expressRoutesVersioning from "express-routes-versioning"
-import * as controller_0_1_0 from "@app/controller/0.1.0/user"
+import * as controller010 from "@app/controller/0.1.0/user"
 import passport from "passport"
 import { bruteForcePrevent } from "@app/middleware"
 import { getMiddleware } from "./util"
@@ -18,14 +18,14 @@ router.post(
   "/user/login",
   bruteForcePrevent(), // To prevent sending too many emails.
   routesVersioning({
-    "0.1.0": getMiddleware(controller_0_1_0.loginEmail)
+    "0.1.0": getMiddleware(controller010.loginEmail)
   })
 )
 
 router.post(
   "/user/login/token",
   routesVersioning({
-    "0.1.0": getMiddleware(controller_0_1_0.loginPasswordlessToken)
+    "0.1.0": getMiddleware(controller010.loginPasswordlessToken)
   })
 )
 
@@ -33,7 +33,7 @@ router.post(
   "/user/fcm",
   passport.authenticate("user_bearer_auth", { session: false }),
   routesVersioning({
-    "0.1.0": getMiddleware(controller_0_1_0.updateFcmToken)
+    "0.1.0": getMiddleware(controller010.updateFcmToken)
   })
 )
 
