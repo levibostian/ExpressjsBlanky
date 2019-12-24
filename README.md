@@ -59,6 +59,8 @@ This project uses a list of various services to send push notifications, emails,
 
 The first thing you need to do is create a `.env` file in the root of the project.
 
+_Note: This project relies on the CLI tool, [cici](https://github.com/levibostian/cici/) for helping with the environments. You may want to read up on the README of the project to understand how it's used in the scripts. Especially used on the CI server._
+
 ```
 cp .env.example .env
 ```
@@ -181,7 +183,7 @@ npm run redis
 
 This project is setup to using a CI server to deploy your application for you. In order for the CI server to deploy your app, it must contain your environment variables. Since we don't want to store these files in the git repo for security and privacy reasons, they are stored in Travis as secrets.
 
-Check out the top of the `bin/secrets.rb` file for a list of the production level
+The CI server should successfully use the tool [cici](https://github.com/levibostian/cici/) to decrypt the encrypted files for your deployment. Make sure to encrypt the files locally on your machine before you deploy.
 
 Follow this GitHub workflow to run a deploy.
 

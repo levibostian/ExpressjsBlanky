@@ -1,1 +1,1 @@
-define({  name: "ExpressjsBlanky",  version: "0.1.0",  description: "",  sampleUrl: false,  defaultVersion: "0.0.0",  apidoc: "0.3.0",  generator: {    name: "apidoc",    time: "2019-12-11T23:07:08.224Z",    url: "http://apidocjs.com",    version: "0.19.0"  }})
+define({  name: "ExpressjsBlanky",  version: "0.1.0",  description: "",  sampleUrl: false,  defaultVersion: "0.0.0",  apidoc: "0.3.0",  generator: {    name: "apidoc",    time: "2019-12-24T02:52:44.469Z",    url: "http://apidocjs.com",    version: "0.19.0"  }})

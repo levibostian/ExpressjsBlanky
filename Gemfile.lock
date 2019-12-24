@@ -3,6 +3,8 @@ GEM
   specs:
     addressable (2.4.0)
     backports (3.15.0)
+    cici (0.1.0)
+      colorize (~> 0.8, >= 0.8.1)
     claide (1.0.3)
     claide-plugins (0.9.2)
       cork
@@ -97,6 +99,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  cici (~> 0.1.0)
   danger (~> 6)
   danger-eslint (~> 0.1.5)
   danger-junit (~> 1.0)

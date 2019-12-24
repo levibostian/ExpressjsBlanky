@@ -1,3 +1,6 @@
+secrets
+app/config/firebase_key.json
+
 # manually added:
 coverage.html
 dist/

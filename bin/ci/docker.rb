@@ -10,8 +10,6 @@ def build_docker_image(ci, tag = "latest")
 end
 
 def test_docker_image(ci)
-  ci.sh("rm .env; cp secrets/development/.env .env;")
-
   build_docker_image(ci)
   ci.sh("npm run dev:setup")
   ci.sh("DATABASE_HOST=localhost #{$run_docker_container_command}")
@@ -30,7 +28,7 @@ def deploy(ci)
   deploy_host = is_staging ? ENV["STAGING_DEPLOY_HOST"] : ENV["PROD_DEPLOY_HOST"] 
   ci.config_ssh(deploy_user, deploy_host, {:port => ENV["DEPLOY_SSH_PORT"]})
 
-  ci.sh("rm .env; cp secrets/#{env}/.env .env; . ~/dotenv;")
+  ci.sh("bundle exec cici decrypt #{env} --debug")
 
   build_docker_image(ci)
   ci.sh(docker_login_command)

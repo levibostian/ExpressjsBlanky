@@ -13,13 +13,11 @@ env:
     # ------------ SECRETS ------------
     # DANGER_GITHUB_API_TOKEN
 before_install:
-  - curl -o- https://raw.githubusercontent.com/levibostian/ci-bootstrap/master/docker/compose-install.sh | bash   
-  - cp .env.example .env # for development 
-install:
-  - npm install
+  - curl -o- https://raw.githubusercontent.com/levibostian/ci-bootstrap/master/docker/compose-install.sh | bash     
+install:  
   - bundle install
-  - curl https://raw.githubusercontent.com/madcoda/dotenv-shell/master/dotenv.sh > ~/dotenv; chmod +x ~/dotenv;
-  - ruby bin/secrets.rb decrypt 
+  - bundle exec cici decrypt --verbose # for development/testing  
+  - npm install
 
 cache:
   bundler: true
@@ -29,14 +27,14 @@ jobs:
   include:
     - stage: commit
       script: 
-        - rm .env; cp secrets/testing/.env .env; npm run test:setup; npm run test;
+        - npm run test:setup; npm run test;
         - ruby ./bin/ci/docker.rb test
     - stage: pr
       script:
-        - rm .env; cp secrets/testing/.env .env; npm run test:setup; npm run test;
+        - npm run test:setup; npm run test;
         - bundle exec danger --fail-on-errors=true
     - stage: deploy
-      script: 
+      script:         
         - ruby ./bin/ci/docker.rb deploy 
 
 stages:

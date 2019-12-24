@@ -1,0 +1,12 @@
+# default is development/testing
+default:
+  secrets:
+    - ".env"
+    - "app/config/firebase_key.json"
+sets:
+  production:
+    secrets:
+      - ".env"
+  staging:
+    secrets:
+      - ".env"
