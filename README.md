@@ -199,11 +199,73 @@ _Note:_ You must create a migration for all database operations _including_ the 
 - Open up this new migration file created under `migrations/` directory. Edit it to code that runs the migration. Check out [the docs](http://docs.sequelizejs.com/manual/tutorial/migrations.html) on how to program migration code.
 - The migration will run automatically with the CI server.
 
+# Database backups
+
+Database backups are automatically run on a schedule via cronjobs. The backup files are stored in a DigitalOcean Space (aka: object stored like AWS S3). Checkout the section in these docs on setting up Spaces.
+
+// TODO. Talk about setting up automated backups here.
+
+# Object stored
+
+Cloud object stored (aka: AWS S3) products are super handy ways to store files. In this project, we use cloud object storage to store assets for the apps (images, files), backup files such as logs and database backups, and possibly more.
+
+DigitalOcean Spaces is a great cloud object storage solution because we use DigitalOcean for everything already, and it's backed by a CDN for fast and affordable asset storage.
+
+Spaces is charged \$5 per Space instance created. Each space can dynamically grow in space needed. Because of that, this project tries to use only 1 Space instance in the DigitalOcean account to save on price.
+
+Because we want to use 1 Space instance to store many different types of data, it takes some organization to manage everything. Each type of file that we store has different requirements.
+
+Public asset requirements:
+
+- Public files. Anyone can access these files.
+- Backed by CDN to save bandwidth and increase speed.
+
+Backup files requirements:
+
+- Private files. Only DigitalOcean account can access it.
+- Has an expiration date where an upload file will be deleted in the future. This will save on cost to store as little files as possible.
+
+When you create a new DigitalOcean Space for your API project, this is how it should be setup:
+
+1. Location - Up to you. Because we will have the global CDN enabled, location does not matter as much. NYC3 is a good choice as it's the default.
+2. Enable CDN. Set the TTL as long as you feel comfortable. The DigitalOcean API allows you to purge the CDN whenever you want so if you decide to update your assets, you can always purge the CDN.
+3. Restrict file listing. No use for it and for security reasons, you can disable it.
+
+### Public assets
+
+I am assuming that you do not have many public assets to store. If that's the case, you can upload them and manage them using the DigitalOcean console webapp. Create a directory `public-assets` with subdirectories inside organizing the many assets. Select the files after you upload them and set them to be public. All of this can be managed from the console.
+
+### Private assets
+
+Private files such as database backups are backed by lifecycle policies because we want files to expire automatically to save on cost.
+
+The convention that we follow is to create a directory in your Space called `30day_backups`, for example, which say how long the policy is for easy reference. Lifecycle policies are not managed with the DigitalOcean web app console so it's really easy to not understand there is a lifecycle set and mess something up. But because you are putting your files in a directory called `30day_backups`, you know that those files will only live for 30 days!
+
+Create directories in the Space for these private files. `XXday_backups` (example: `30day_backups`) and inside that make subdirectories like `database` or `logs`.
+
+[Create an API token](https://cloud.digitalocean.com/account/api/tokens) specifically for DigitalOcean Spaces. Keep the token a secret! It has full admin access to the entire Space.
+
+Then, we need to set the lifecycle policy on the Space. One has already been created. See `docs/spaces_lifecycle_policy.xml` and [examples](https://developers.digitalocean.com/documentation/spaces/#create-bucket-lifecycle) to create one. Once it is created, it's time to set the policy on the Space. Note that only 1 policy can be set on the entire Space. You can set as many rules as you want in the policy.
+
+To set the policy, you need to have [s3cmd](https://s3tools.org/download) installed (`brew install s3cmd` works). Most to all of the operations that you want to perform on Spaces are done with the s3cmd CLI tool. s3cmd is defaulted to work with AWS S3. To work with Spaces, you need to add `--host-bucket="%(bucket)s.nyc3.digitaloceanspaces.com" --region=US --host=nyc3.digitaloceanspaces.com` as arguments to s3cmd.
+
+Set lifecycle:
+
+```
+s3cmd --host-bucket="%(bucket)s.nyc3.digitaloceanspaces.com" --region=US --host=nyc3.digitaloceanspaces.com --access_key=$DIGITAL_OCEAN_SPACES_ACCESS_KEY --secret_key=$DIGITAL_OCEAN_SPACES_ACCESS_SECRET setlifecycle docs/spaces_lifecycle_policy.xml s3://name-of-space
+```
+
+Get lifecycle that is set:
+
+```
+s3cmd --host-bucket="%(bucket)s.nyc3.digitaloceanspaces.com" --region=US --host=nyc3.digitaloceanspaces.com --access_key=$DIGITAL_OCEAN_SPACES_ACCESS_KEY --secret_key=$DIGITAL_OCEAN_SPACES_ACCESS_SECRET getlifecycle s3://name-of-space
+```
+
 # Documentation
 
 This API is uses [apidoc](http://apidocjs.com/) for API documentation.
 
-It is pretty easy to use. View the [official docs](http://apidocjs.com/) on the templating language and generate them using `npm run generate:doc`. Docs are generated in the `doc/` directory.
+It is pretty easy to use. View the [official docs](http://apidocjs.com/) on the templating language and generate them using `npm run generate:doc`. Docs are generated in the `api_doc/` directory.
 
 ## Author
 
