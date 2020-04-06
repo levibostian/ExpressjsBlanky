@@ -1,0 +1,23 @@
+diff a/api_docs/locales/locale.js b/api_docs/locales/locale.js	(rejected hunks)
+@@ -18,3 +18,3 @@ define([
+-    const langId = (navigator.language || navigator.userLanguage).toLowerCase().replace('-', '_');
+-    let language = langId.substr(0, 2);
+-    const locales = {};
++  const langId = (navigator.language || navigator.userLanguage).toLowerCase().replace("-", "_")
++  let language = langId.substr(0, 2)
++  const locales = {}
+@@ -32 +29 @@ define([
+-    let locale = (locales[langId] ? locales[langId] : locales[language]);
++  let locale = locales[langId] ? locales[langId] : locales[language]
+@@ -34,6 +31,5 @@ define([
+-    function __(text) {
+-        const index = locale[text];
+-        if (index === undefined)
+-            return text;
+-        return index;
+-    };
++  function __(text) {
++    const index = locale[text]
++    if (index === undefined) return text
++    return index
++  }

@@ -13,7 +13,7 @@
     "db:migrate:create": "npx sequelize migration:create",
     "db:migrate": "npx sequelize db:migrate --debug",
     "db:migrate:undo": "npx sequelize db:migrate:undo",
-    "generate:doc": "npx apidoc -i app/ -o docs/",
+    "generate:doc": "npx apidoc -i app/ -o api_docs/",
     "format": "npx prettier --write \"{app,tests}/**/*.ts\"",
     "lint": "npx concurrently --names \"ts, eslint\" -c \"blue,green\" \"npx tsc --noEmit\" \"npx eslint --fix --ext ts,js .\""
   },
@@ -23,7 +23,7 @@
     }
   },
   "lint-staged": {
-    "*.{ts,js,json,css,md}": [
+    "{app,tests}.{ts,js,json,css,md}": [
       "npm run format",
       "git add"
     ]
