@@ -52,7 +52,7 @@ GEM
       net-http-pipeline
     git (1.5.0)
     highline (1.7.10)
-    json (2.2.0)
+    json (2.3.1)
     kramdown (2.1.0)
     kramdown-parser-gfm (1.1.0)
       kramdown (~> 2.0)
