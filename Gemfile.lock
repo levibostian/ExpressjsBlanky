@@ -53,7 +53,8 @@ GEM
     git (1.5.0)
     highline (1.7.10)
     json (2.3.1)
-    kramdown (2.1.0)
+    kramdown (2.3.0)
+      rexml
     kramdown-parser-gfm (1.1.0)
       kramdown (~> 2.0)
     launchy (2.4.3)
@@ -72,6 +73,7 @@ GEM
     pusher-client (0.6.2)
       json
       websocket (~> 1.0)
+    rexml (3.2.4)
     sawyer (0.8.2)
       addressable (>= 2.3.5)
       faraday (> 0.8, < 2.0)
