@@ -70,7 +70,8 @@
     {
       "files": ["*.spec.ts"],
       "rules": {
-        "@typescript-eslint/camelcase": "off"
+        "@typescript-eslint/naming-convention": "off",
+        "@typescript-eslint/no-explicit-any": "off"
       }
     }
   ]

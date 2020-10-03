@@ -2,11 +2,12 @@
 default:
   secrets:
     - ".env"
-    - "app/config/firebase_key.json"
+
 sets:
+  common: 
+    secrets:
+      - "app/config/firebase_key.json"
+      - "app/config/firebase_projects.json"
   production:
-    secrets:
-      - ".env"
-  staging:
-    secrets:
-      - ".env"
+  testing:
+  development:

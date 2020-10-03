@@ -11,5 +11,6 @@ module.exports = {
   },
   testEnvironment: "node",
   roots: ["app/", "tests/"],
-  resetMocks: true
+  resetMocks: true,
+  setupFilesAfterEnv: ["./tests/setup.ts"]
 }

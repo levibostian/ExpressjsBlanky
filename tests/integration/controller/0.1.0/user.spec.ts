@@ -50,7 +50,7 @@ describe(`Receive login email passwordless token. ${endpointVersion}`, () => {
       .then(res => {
         expect(sendWelcomeMock).toBeCalledTimes(1)
         expect(sendWelcomeMock.mock.calls[0][2].appLoginLink).toEqual(
-          expect.stringContaining(Env.dynamicLinkHost)
+          expect.stringContaining(Env.dynamicLinkHostname)
         )
         expect(sendWelcomeMock.mock.calls[0][2].appLoginLink).toEqual(
           expect.stringContaining(encodeURIComponent(Env.appHost))
@@ -68,7 +68,7 @@ describe(`Receive login email passwordless token. ${endpointVersion}`, () => {
       .then(res => {
         expect(sendWelcomeMock).toBeCalledTimes(1)
         expect(sendWelcomeMock.mock.calls[0][2].appLoginLink).toEqual(
-          expect.stringContaining(Env.dynamicLinkHost)
+          expect.stringContaining(Env.dynamicLinkHostname)
         )
         expect(sendWelcomeMock.mock.calls[0][2].appLoginLink).toEqual(
           expect.stringContaining(encodeURIComponent(Env.appHost))
@@ -187,10 +187,10 @@ describe(`Update FCM token. ${endpointVersion}`, () => {
     const testUser = UserFakeDataGenerator.completeSignup(1)
 
     const tokens: FcmTokenFakeDataGenerator[] = []
-    for (let index = 0; index < Env.fcm.maxTokensPerUser; index++) {
+    for (let index = 0; index < 100; index++) {
       tokens.push(FcmTokenFakeDataGenerator.tokenForUserDevice(index + 1, testUser))
     }
-    expect(tokens).toHaveLength(Env.fcm.maxTokensPerUser)
+    expect(tokens).toHaveLength(100)
 
     const newToken = uid2(250)
 
@@ -204,7 +204,7 @@ describe(`Update FCM token. ${endpointVersion}`, () => {
       .then(async res => {
         const tokensForUser = await FcmTokenModel.findByUserId(testUser.id)
 
-        expect(tokensForUser).toHaveLength(Env.fcm.maxTokensPerUser)
+        expect(tokensForUser).toHaveLength(100)
         expect(arrayExtensions.last(tokensForUser).token).toBe(newToken)
       })
   })

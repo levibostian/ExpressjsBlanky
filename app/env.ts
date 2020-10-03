@@ -2,6 +2,7 @@ import dotenv, { DotenvConfigOptions } from "dotenv"
 import path from "path"
 import { ClientOpts } from "redis"
 import { RedisOptions } from "ioredis"
+import isNil from "lodash.isnil"
 
 const dotEnvConfig: DotenvConfigOptions = {
   path: path.join(__dirname, "../", ".env")
@@ -12,8 +13,12 @@ if (result.error) {
   throw result.error
 }
 
-interface Environment {
-  development: boolean
+export interface Environment {
+  loggers: {
+    enableHoneybadger: boolean
+    enableConsole: boolean
+    enableSql: boolean
+  }
   email: {
     serverKey: string
     fromDomain: string
@@ -22,9 +27,11 @@ interface Environment {
   }
   database: {
     host: string
+    port: number
     name: string
     username: string
     password: string
+    useSSL: boolean
   }
   redis: ClientOpts & RedisOptions
   honeybadger: {
@@ -33,57 +40,71 @@ interface Environment {
   auth: {
     adminToken: string
   }
-  fcm: {
-    maxTokensPerUser: number
+  mobileAppInfo: {
+    bundleId: string
   }
+  dynamicLinkHostname: string
+  firebaseProjectId: string
   appHost: string
-  dynamicLinkHost: string
-  bruteForce: {
-    freeRetries: number
-  }
+  enableBruteforcePrevention: boolean
 }
 
-export const getEnv = (key: string): string => {
+export const requireEnv = (key: string): string => {
   // eslint-disable-next-line no-process-env
   const value: string = process.env[key]!
 
-  if (value === undefined || value === null) throw Error(`Forgot to create ${key} in .env`)
+  if (isNil(value)) throw Error(`Forgot to create ${key} in .env`)
 
   return value
 }
 
-export const Env: Environment = {
+export const isDefined = (key: string): boolean => {
   // eslint-disable-next-line no-process-env
-  development: "DEVELOPMENT" in Object.keys(process.env),
+  const value: string = process.env[key]!
+
+  const isNotDefined = isNil(value)
+
+  return !isNotDefined
+}
+
+/* eslint-disable no-process-env */
+export const Env: Environment = {
+  loggers: {
+    enableHoneybadger: isDefined("HONEY_BADGER_API_KEY"),
+    enableConsole: !isDefined("DISABLE_CONSOLE"),
+    enableSql: !isDefined("DISABLE_SQL_LOGGING")
+  },
   email: {
-    serverKey: getEnv("POSTMARK_SERVER_KEY"),
-    fromDomain: getEnv("EMAIL_FROM_DOMAIN"),
-    fromEmail: getEnv("EMAIL_FROM_EMAIL_ADDRESS"),
-    fromName: getEnv("EMAIL_FROM_NAME")
+    serverKey: requireEnv("POSTMARK_SERVER_KEY"),
+    fromDomain: requireEnv("EMAIL_FROM_DOMAIN"),
+    fromEmail: requireEnv("EMAIL_FROM_EMAIL_ADDRESS"),
+    fromName: requireEnv("EMAIL_FROM_NAME")
   },
   database: {
-    host: getEnv("DATABASE_HOST"),
-    name: getEnv("POSTGRES_DB"),
-    username: getEnv("POSTGRES_USER"),
-    password: getEnv("POSTGRES_PASSWORD")
+    host: requireEnv("DATABASE_HOST"),
+    port: parseInt(requireEnv("DATABASE_PORT")),
+    name: requireEnv("POSTGRES_DB"),
+    username: requireEnv("POSTGRES_USER"),
+    password: requireEnv("POSTGRES_PASSWORD"),
+    useSSL: !isDefined("DISABLE_SSL")
   },
   redis: {
-    host: getEnv("REDIS_HOST"),
-    password: getEnv("REDIS_PASSWORD"),
-    port: 6379
+    host: requireEnv("REDIS_HOST"),
+    password: requireEnv("REDIS_PASSWORD"),
+    port: parseInt(requireEnv("REDIS_PORT"))
   },
   honeybadger: {
-    key: getEnv("HONEY_BADGER_API_KEY")
+    key: requireEnv("HONEY_BADGER_API_KEY")
   },
   auth: {
-    adminToken: getEnv("ADMIN_PASSWORD")
+    adminToken: requireEnv("ADMIN_TOKEN")
   },
-  fcm: {
-    maxTokensPerUser: 100
+  mobileAppInfo: {
+    bundleId: requireEnv("MOBILE_APP_BUNDLE_ID")
   },
-  appHost: getEnv("APP_HOST"),
-  dynamicLinkHost: getEnv("DYNAMIC_LINK_HOST"),
-  bruteForce: {
-    freeRetries: parseInt(getEnv("BRUTEFORCE_FREE_RETRIES"))
-  }
+  dynamicLinkHostname: requireEnv("DYNAMIC_LINK_HOSTNAME"),
+  firebaseProjectId: requireEnv("FIREBASE_PROJECT_ID"),
+  appHost: requireEnv("APP_HOST"),
+  enableBruteforcePrevention: !isDefined("DISABLE_BRUTEFORCE_PREVENTION")
 }
+/* eslint-enable no-process-env */

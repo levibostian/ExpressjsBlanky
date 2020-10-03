@@ -1,6 +1,7 @@
 import uid2 from "uid2"
-import { Sequelize, DataTypes } from "sequelize"
+import { Sequelize, DataTypes, Transaction } from "sequelize"
 import { Model, SequelizeModel } from "./type"
+import { normalizeEmail } from "@app/util"
 
 export class UserSequelizeModel extends SequelizeModel {
   public id!: number
@@ -74,7 +75,7 @@ export class UserModel implements Model<UserPublic> {
   static findUserOrCreateByEmail(emailAddress: string): Promise<[UserModel, boolean]> {
     return UserSequelizeModel.findCreateFind({
       where: {
-        email: emailAddress.toLowerCase()
+        email: normalizeEmail(emailAddress)
       },
       defaults: {
         passwordToken: uid2(255),
@@ -109,7 +110,7 @@ export class UserModel implements Model<UserPublic> {
 
   static create(email: string): Promise<UserModel> {
     return UserSequelizeModel.create({
-      email: email.toLowerCase(),
+      email: normalizeEmail(email),
       passwordToken: uid2(255),
       passwordTokenCreated: new Date()
     }).then(res => res.getUser())
@@ -118,15 +119,15 @@ export class UserModel implements Model<UserPublic> {
   static findByEmail(emailAddress: string): Promise<UserModel | null> {
     return UserSequelizeModel.findOne({
       where: {
-        email: emailAddress.toLowerCase()
+        email: normalizeEmail(emailAddress)
       }
     }).then(res => (res ? res.getUser() : null))
   }
 
-  findOrCreateSelf(): Promise<UserModel> {
+  findOrCreateSelf(transaction: Transaction): Promise<UserModel> {
     return UserSequelizeModel.findCreateFind({
       where: {
-        email: this.email.toLowerCase()
+        email: normalizeEmail(this.email)
       },
       defaults: {
         accessToken: this.accessToken,
@@ -134,7 +135,8 @@ export class UserModel implements Model<UserPublic> {
         passwordTokenCreated: this.passwordTokenCreated,
         createdAt: this.createdAt,
         updatedAt: this.updatedAt
-      }
+      },
+      transaction: transaction
     }).then(res => res[0].getUser())
   }
 

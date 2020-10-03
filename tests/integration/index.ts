@@ -1,32 +1,14 @@
-import "@app/env" // Setup .env
-
 import { FakeDataGenerator } from "../fake_data/types"
 import { createDependencies } from "../fake_data/util"
-import { closeDatabase, resetDatabase, assertDatabase } from "@app/model"
-import { Di, Dependency } from "@app/di"
 import { startServer } from "@app/server"
 import { Server } from "http"
 import request, { Test, SuperTest } from "supertest"
 import { Env } from "@app/env"
-import { Logger } from "@app/logger"
 
 let server: Server
 
-beforeAll(async () => {
-  const logger: Logger = Di.inject(Dependency.Logger)
-
-  await assertDatabase(logger)
-})
-beforeEach(async () => {
-  await resetDatabase()
-})
 afterEach(async () => {
   if (server) server.close()
-
-  Di.resetOverrides()
-})
-afterAll(async () => {
-  await closeDatabase()
 })
 
 interface AuthHeader {
@@ -35,6 +17,7 @@ interface AuthHeader {
 
 interface ApiVersionHeader {
   "accept-version": string
+  app_package: string
 }
 
 export const authHeader = (accessToken: string): AuthHeader => {
@@ -45,8 +28,14 @@ export const adminAuthHeader = (): AuthHeader => {
   return { Authorization: `Bearer ${Env.auth.adminToken}` }
 }
 
-export const endpointVersionHeader = (version: string): ApiVersionHeader => {
-  return { "accept-version": version }
+export const endpointVersionHeader = (
+  version: string,
+  appPackage = "com.example.nameOfApp"
+): ApiVersionHeader => {
+  return {
+    "accept-version": version,
+    app_package: appPackage
+  }
 }
 
 export const serverRequest = (): SuperTest<Test> => {

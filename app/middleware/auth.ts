@@ -1,8 +1,30 @@
 import passport from "passport"
 import { Strategy as BearerStrategy } from "passport-http-bearer"
+import { Strategy as AnonymousStrategy } from "passport-anonymous"
 import { BasicStrategy } from "passport-http"
 import { UserModel } from "@app/model"
 import { Env } from "@app/env"
+import { RequestHandler } from "express"
+
+export enum AuthType {
+  AdminBasic = "admin_basic_auth",
+  AdminBearer = "admin_bearer_auth",
+  UserBearer = "user_bearer_auth",
+  UserBearerOptional = "user_bearer_auth_optional"
+}
+
+export const authMiddleware = (authType: AuthType): RequestHandler => {
+  switch (authType) {
+    case AuthType.UserBearerOptional: {
+      return passport.authenticate([AuthType.UserBearer, "anonymous"], { session: false })
+    }
+    default: {
+      return passport.authenticate(authType, { session: false })
+    }
+  }
+}
+
+passport.use(new AnonymousStrategy())
 
 passport.use(
   "admin_bearer_auth",
@@ -26,6 +48,9 @@ passport.use(
   })
 )
 
+/**
+ * Note: If a user does not exist, that means they do not have access to the content. Only admins can give you access which is currently granted by you buying a Kajabi product.
+ */
 passport.use(
   "user_bearer_auth",
   new BearerStrategy(async (token, done) => {

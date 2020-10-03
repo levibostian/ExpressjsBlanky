@@ -1,9 +1,9 @@
-import { getEnv } from "@app/env"
+import { requireEnv } from "@app/env"
 
 describe(`getEnv`, () => {
   it(`given key that exists, expect to get value`, () => {
     const givenKey = "NODE_ENV"
-    const actual = getEnv(givenKey)
+    const actual = requireEnv(givenKey)
 
     expect(actual).not.toBeNaN()
   })
@@ -12,7 +12,7 @@ describe(`getEnv`, () => {
     const givenKey = "DOES_NOT_EXIST_NOPE_THIS_KEY_WILL_NEV_EXIST"
 
     expect(() => {
-      getEnv(givenKey)
+      requireEnv(givenKey)
     }).toThrow()
   })
 })

@@ -1,3 +1,3 @@
 export * from "./util"
-export * from "./user"
-export * from "./fcm_token"
+export * from "./model/user"
+export * from "./model/fcm_token"

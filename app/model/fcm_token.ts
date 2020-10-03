@@ -1,4 +1,4 @@
-import { Sequelize, DataTypes } from "sequelize"
+import { Sequelize, DataTypes, Transaction } from "sequelize"
 import { Model, SequelizeModel } from "./type"
 import { UserSequelizeModel } from "./user"
 
@@ -66,12 +66,13 @@ export class FcmTokenModel implements Model<FcmTokenPublic> {
     ).then(res => res.getModel())
   }
 
-  findOrCreateSelf(): Promise<FcmTokenModel> {
+  findOrCreateSelf(transaction: Transaction): Promise<FcmTokenModel> {
     return FcmTokenSequelizeModel.findCreateFind({
       where: {
         token: this.token,
         userId: this.userId
-      }
+      },
+      transaction: transaction
     }).then(res => res[0].getModel())
   }
 

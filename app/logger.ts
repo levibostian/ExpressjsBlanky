@@ -42,6 +42,74 @@ export const hidePrivateData = (filter: string[], data?: Extras): object => {
 const hideValuesForKeys: string[] = ["password", "Authorization"]
 
 export class AppLogger implements Logger {
+  private loggers: Logger[] = []
+
+  constructor() {
+    if (Env.loggers.enableHoneybadger) {
+      this.loggers.push(new HoneybadgerLogger())
+    }
+    if (Env.loggers.enableConsole) {
+      this.loggers.push(new ConsoleLogger())
+    }
+  }
+
+  start(app: Application): void {
+    this.loggers.forEach(logger => logger.start(app))
+  }
+
+  stop(app: Application): void {
+    this.loggers.forEach(logger => logger.stop(app))
+  }
+
+  debug(message: string, extras?: Extras): void {
+    this.loggers.forEach(logger => logger.debug(message, extras))
+  }
+
+  verbose(message: string, extras?: Extras): void {
+    this.loggers.forEach(logger => logger.verbose(message, extras))
+  }
+
+  error(error: Error, extra?: Object): void {
+    this.loggers.forEach(logger => logger.error(error, extra))
+  }
+
+  context(data: Extras): void {
+    this.loggers.forEach(logger => logger.context(data))
+  }
+
+  breadcrumb(key: string, extras?: Extras): void {
+    this.loggers.forEach(logger => logger.breadcrumb(key, extras))
+  }
+}
+
+export class ConsoleLogger implements Logger {
+  start(app: Application): void {}
+
+  stop(app: Application): void {}
+
+  debug(message: string, extras?: Extras): void {
+    const extraInfo = extras ? JSON.stringify(extras) : "(none)"
+    console.debug(`DEBUG: ${message} - Extra: ${extraInfo}`)
+  }
+
+  verbose(message: string, extras?: Extras): void {
+    const extraInfo = extras ? JSON.stringify(extras) : "(none)"
+    console.debug(`VERBOSE: ${message} - Extra: ${extraInfo}`)
+  }
+
+  error(error: Error, extra?: Object): void {
+    const extraInfo = extra ? JSON.stringify(extra) : "(none)"
+    console.error(`ERROR: message: ${error.message}, Extra: ${extraInfo}, stack: ${error.stack}`)
+  }
+
+  context(data: Extras): void {}
+
+  breadcrumb(key: string, extras?: Extras): void {
+    this.debug(`BREADCRUMB: ${key}`, extras)
+  }
+}
+
+export class HoneybadgerLogger implements Logger {
   constructor() {
     Honeybadger.configure({
       apiKey: Env.honeybadger.key,
@@ -63,20 +131,11 @@ export class AppLogger implements Logger {
     Honeybadger.resetContext() // Reset context as the error reporting should be done by now
   }
 
-  debug(message: string, extras?: Extras): void {
-    const extraInfo = extras ? JSON.stringify(extras) : "(none)"
-    console.debug(`DEBUG: Extra: ${extraInfo}, message: ${message}`)
-  }
+  debug(message: string, extras?: Extras): void {}
 
-  verbose(message: string, extras?: Extras): void {
-    const extraInfo = extras ? JSON.stringify(extras) : "(none)"
-    console.debug(`VERBOSE: Extra: ${extraInfo}, message: ${message}`)
-  }
+  verbose(message: string, extras?: Extras): void {}
 
   error(error: Error, extra?: Object): void {
-    const extraInfo = extra ? JSON.stringify(extra) : "(none)"
-    console.error(`ERROR: Extra: ${extraInfo}, message: ${error.message}, stack: ${error.stack}`)
-
     Honeybadger.notify(error, {
       message: error.message || "none"
     })

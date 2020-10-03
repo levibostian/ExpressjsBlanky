@@ -1,29 +1,28 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import BullQueue, { Queue } from "bull"
+import Bull, { Queue, QueueOptions } from "bull"
+import { Job } from "./type"
+import { Logger } from "@app/logger"
+import { Env } from "@app/env"
+import { ClientOpts, RedisClient } from "redis"
+import { promisify } from "util"
+import Redis from "ioredis"
+import { Dependency, Di } from "@app/di"
 import {
   SendPushNotificationJobUserJob,
   SendPushNotificationParam
 } from "./send_push_notification_user"
-import { Job } from "./type"
-import { Logger } from "@app/logger"
-import { Env } from "@app/env"
-import redis, { ClientOpts } from "redis"
-import { promisify } from "util"
 
 export const jobQueues: { [key: string]: JobContainer } = {}
 
-export const assertJobQueue = async (logger: Logger): Promise<void> => {
-  const redisClient = redis.createClient(Env.redis)
+export const assertJobQueue = async (): Promise<void> => {
+  const redisClient: RedisClient = Di.inject(Dependency.RedisClient)
   const pingAsync = promisify(redisClient.ping).bind(redisClient)
 
-  logger.verbose("Asserting redis server connection...")
   await pingAsync().then(result => {
     if (result !== "PONG") {
       throw Error(`Connection to redis server unsuccessful. Response from PING: ${result}`)
     }
-
-    logger.verbose("Redis server connection success!")
 
     return Promise.resolve()
   })
@@ -42,28 +41,48 @@ export interface BullQueueInfo {
 }
 
 export interface JobQueueManager {
-  queues: { [key: string]: Queue<any> }
-
+  getQueues(): { [key: string]: Queue<any> }
   getQueueInfo(): BullQueueInfo[]
-
-  queueSendPushNotificationToUser(params: SendPushNotificationParam): Promise<void>
+  closeQueues(): Promise<void>
+  clearQueues(): Promise<void>
+  queueSendPushNotification(params: SendPushNotificationParam): Promise<void>
 }
 
 /**
  * API to queue jobs.
  *
- * To run a specific job, `await queueSendPushNotificationToUser()`, for example.
+ * To run a specific job, `await queueProductUpdated(params)`, for example.
  */
 export class AppJobQueueManager implements JobQueueManager {
   public queues: {
-    sendPushNotificationUser: Queue<SendPushNotificationParam>
+    sendPushNotification: Queue<SendPushNotificationParam>
   }
 
-  constructor(sendPushNotificationUserJob: SendPushNotificationJobUserJob, logger: Logger) {
+  constructor(sendPushNotificationJob: SendPushNotificationJobUserJob, logger: Logger) {
+    logger.verbose("Starting up job queue manager")
+
+    // re-use redis connections for queues
+    // https://github.com/OptimalBits/bull/blob/master/PATTERNS.md#reusing-redis-connections
+    //
+    // Note: You will notice this does not use the Di.inject() pattern to create the Redis client instances. This is because (1) bull is unique in that it requires a certain number of redis clients as stated here https://github.com/OptimalBits/bull/blob/master/PATTERNS.md#reusing-redis-connections, but also because bull uses 'ioredis' instead of 'redis' npm module which can be unique compared to rest of the app.
+    const client = new Redis(Env.redis)
+    const subscriber = new Redis(Env.redis)
+
+    const opts: QueueOptions = {
+      createClient: function(type) {
+        switch (type) {
+          case "client":
+            return client
+          case "subscriber":
+            return subscriber
+          default:
+            return new Redis(Env.redis)
+        }
+      }
+    }
+
     const getQueue = <T>(job: Job<any, any>): Queue<T> => {
-      const queue = new BullQueue(job.name, {
-        redis: Env.redis
-      })
+      const queue = new Bull(job.name, opts)
 
       queue.on("error", err => {
         logger.error(err)
@@ -84,8 +103,14 @@ export class AppJobQueueManager implements JobQueueManager {
     }
 
     this.queues = {
-      sendPushNotificationUser: getQueue(sendPushNotificationUserJob)
+      sendPushNotification: getQueue(sendPushNotificationJob)
     }
+
+    logger.verbose("Done starting up job queue manager")
+  }
+
+  getQueues(): { [key: string]: Queue<any> } {
+    return this.queues
   }
 
   getQueueInfo(): BullQueueInfo[] {
@@ -106,7 +131,32 @@ export class AppJobQueueManager implements JobQueueManager {
     return info
   }
 
-  queueSendPushNotificationToUser(params: SendPushNotificationParam): Promise<void> {
-    return this.queues.sendPushNotificationUser.add(params).then()
+  async clearQueues(): Promise<void> {
+    const queueEmptyTasks: Promise<void>[] = []
+    const queues = this.queues as { [key: string]: Queue<any> }
+    for (const key in this.queues) {
+      const queue = queues[key]
+
+      queueEmptyTasks.push(queue.empty())
+    }
+
+    await Promise.all(queueEmptyTasks)
+  }
+
+  async closeQueues(): Promise<void> {
+    const closeQueueTasks: Promise<void>[] = []
+
+    for (const key in this.queues) {
+      const queues = this.queues as { [key: string]: Queue<any> }
+      const queue = queues[key]
+
+      closeQueueTasks.push(queue.close())
+    }
+
+    await Promise.all(closeQueueTasks)
+  }
+
+  async queueSendPushNotification(params: SendPushNotificationParam): Promise<void> {
+    await this.queues.sendPushNotification.add(params)
   }
 }

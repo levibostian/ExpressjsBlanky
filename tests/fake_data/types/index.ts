@@ -1,3 +1,5 @@
+import { Transaction } from "sequelize/types"
+
 export interface FakeDataGenerator {
-  create(): void
+  create(transaction: Transaction): Promise<void>
 }

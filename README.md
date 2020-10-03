@@ -33,7 +33,6 @@ git config user.email "you@example.com"
 git config user.name "First Last"
 git add .; git commit -m "Initial commit. Created project from levibostian/ExpressjsBlanky boilerplate.";
 npm install
-bundle install
 ```
 
 - Next, follow all of the directions below in the [services](#Services) section to configuring the services this project is setup to work with.
@@ -125,7 +124,6 @@ Do you wish to build and run this Expressjs application locally on your machine 
 To develop with ExpressjsBlanky, you need Docker and [nvm](https://github.com/nvm-sh/nvm) installed. That is it!
 
 ```bash
-bundle install
 nvm use
 npm install
 npm run dev:setup

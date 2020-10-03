@@ -1,28 +1,45 @@
 // Setup environment, first
 import "./env"
 
-import { assertDatabase } from "./model"
-import { assertEmail } from "./email"
-import { assertJobQueue } from "./jobs"
+import { assertServices } from "./healthcheck"
+import { initDatabase } from "./model"
 import { Logger } from "./logger"
 import { Di, Dependency } from "./di"
+import { assertEmail } from "./email"
+import { Firebase } from "./service/firebase"
+import { PushNotificationService } from "./service/push_notifications"
 
-const assertServices = async (): Promise<void> => {
-  // Startup all of our services. Each of them asserts that we have everything configured by attempting to connect.
-  // The app should be able to function, even if a service is down. However, this is to see if it's setup correctly.
-  const logger: Logger = Di.inject(Dependency.Logger)
+const logger: Logger = Di.inject(Dependency.Logger)
+initDatabase(logger)
+  .then(assertServices) // run our healthcheck to cover some of our basics.
+  .then(async () => {
+    /**
+     * Run assertions against services *not* in our healthcheck to make sure they are all setup to work.
+     */
+    logger.verbose("Asserting postmark connection successful...")
+    await assertEmail(logger)
 
-  await assertDatabase(logger)
-  await assertEmail(logger)
-  await assertJobQueue(logger)
-}
+    logger.verbose("Asserting firebase connection successful...")
+    const firebase: Firebase = Di.inject(Dependency.Firebase)
+    await firebase.assertService()
 
-assertServices().then(() => {
-  // I don't want to try and load controllers, models, and other services until I run the service assertions.
-  // This is the reason for *loading* and starting the server below.
+    logger.verbose("Asserting FCM push notifications connection successful...")
+    const pushNotifications: PushNotificationService = Di.inject(Dependency.PushNotificationService)
+    await pushNotifications.assertService()
 
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const server = require("./server")
+    logger.verbose("Asserting non healthcheck services at startup success")
+  })
+  .then(async () => {
+    // I don't want to try and load controllers, models, and other services until I run the service assertions.
+    // This is the reason for *loading* and starting the server below.
 
-  server.startServer()
-})
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const server = require("./server")
+
+    server.startServer()
+
+    await server.serverPostStart()
+  })
+  .catch((error: Error) => {
+    logger.error(error)
+  })

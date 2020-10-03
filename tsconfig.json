@@ -1,20 +1,18 @@
 {
+  "extends": "@tsconfig/node12/tsconfig.json",
   "compilerOptions": {
-    "module": "commonjs",
-    "strict": true,
-    "esModuleInterop": true,
-    "target": "es6",
-    "noEmit": true,
     "noImplicitAny": true,
-    "moduleResolution": "node",
     "baseUrl": ".",
+    "sourceMap": true,
+    "outDir": "dist",
     "strictNullChecks": true,
+    "noFallthroughCasesInSwitch": true,
     "paths": {
       "*": ["node_modules/*", "@types/*"],
       "@app/*": ["app/*"],
       "@test/*": ["tests/*"]
     }
   },
-  "include": ["app/**/*", "tests/**/*"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules"],
+  "include": ["app/**/*", "@types/**/*"]
 }

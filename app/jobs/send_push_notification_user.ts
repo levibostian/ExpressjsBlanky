@@ -1,74 +1,46 @@
 import { Job } from "@app/jobs/type"
 import { FcmTokenModel } from "@app/model/fcm_token"
-import admin from "firebase-admin"
+import { PushNotificationService } from "@app/service/push_notifications"
 
-admin.initializeApp({
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  credential: admin.credential.cert(require("../config/firebase_key.json"))
-})
-
-const sendPushNotificationToDevices = async (
-  fcmTokens: string[],
-  title: string,
-  body: string
-): Promise<admin.messaging.BatchResponse> => {
-  const message: {
-    notification: {
-      title: string
-      body: string
-    }
-    tokens: string[]
-  } = {
-    notification: {
-      title: title,
-      body: body
-    },
-    // android: { // See https://firebase.google.com/docs/cloud-messaging/admin/send-messages#android_specific_fields
-    //   ttl: 3600 * 1000, // 1 hour in milliseconds
-    //   priority: 'normal',
-    //   notification: {
-    //     title: '$GOOG up 1.43% on the day',
-    //     body: '$GOOG gained 11.80 points to close at 835.67, up 1.43% on the day.',
-    //     icon: 'stock_ticker_update',
-    //     color: '#f45342'
-    //   }
-    // },
-    // apns: { // See https://firebase.google.com/docs/cloud-messaging/admin/send-messages#apns_specific_fields
-    //   header: {
-    //     'apns-priority': '10'
-    //   },
-    //   payload: {
-    //     aps: {
-    //       alert: {
-    //         title: '$GOOG up 1.43% on the day',
-    //         body: '$GOOG gained 11.80 points to close at 835.67, up 1.43% on the day.',
-    //       },
-    //       badge: 42,
-    //     }
-    //   }
-    // },
-    tokens: fcmTokens
-  }
-
-  return admin.messaging().sendMulticast(message)
-}
-
-export interface SendPushNotificationParam {
+export interface SendMessagePushNotificationParam {
   userId: number
   title: string
-  message: string
+  body: string
 }
+
+export interface SendDataPushNotificationParam {
+  userId: number
+  data: { [key: string]: string }
+}
+
+const isMessagePushNotification = function(
+  param: SendMessagePushNotificationParam | SendDataPushNotificationParam
+): param is SendMessagePushNotificationParam {
+  return (param as SendMessagePushNotificationParam).body !== undefined
+}
+
+export type SendPushNotificationParam =
+  | SendMessagePushNotificationParam
+  | SendDataPushNotificationParam
 
 export class SendPushNotificationJobUserJob implements Job<SendPushNotificationParam, void> {
   public name = "SendPushNotificationJobUserJob"
 
-  async run(param: SendPushNotificationParam): Promise<void> {
-    const fcmTokens = await FcmTokenModel.findByUserId(param.userId)
+  constructor(private pushNotificationService: PushNotificationService) {}
 
-    return sendPushNotificationToDevices(
-      fcmTokens.map(fcmToken => fcmToken.token),
-      param.title,
-      param.message
-    ).then()
+  async run(param: SendPushNotificationParam): Promise<void> {
+    const fcmTokens = (await FcmTokenModel.findByUserId(param.userId)).map(
+      fcmToken => fcmToken.token
+    )
+
+    if (isMessagePushNotification(param)) {
+      await this.pushNotificationService.sendUserMessageNotification(
+        fcmTokens,
+        param.title,
+        param.body
+      )
+    } else {
+      await this.pushNotificationService.sendUserDataNotification(fcmTokens, param.data)
+    }
   }
 }

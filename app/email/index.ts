@@ -5,9 +5,7 @@ import { Logger } from "@app/logger"
 const postmarkClient = new ServerClient(Env.email.serverKey)
 
 export const assertEmail = async (logger: Logger): Promise<void> => {
-  logger.verbose("Asserting postmark connection successful...")
   await postmarkClient.getServer()
-  logger.verbose("Postmark connection success!")
 }
 
 export interface EmailSender {
