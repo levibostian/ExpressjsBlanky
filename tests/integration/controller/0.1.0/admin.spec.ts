@@ -3,13 +3,18 @@ import {
   serverRequest,
   endpointVersionHeader,
   adminAuthHeader
-} from "@test/integration/index"
+} from "../../../integration/index"
 import uid2 from "uid2"
-import { UserEnteredBadDataError, Success, Unauthorized, FieldsError } from "@app/responses"
-import { UserFakeDataGenerator } from "@test/fake_data"
-import { Di, Dependency } from "@app/di"
+import {
+  UserEnteredBadDataError,
+  Success,
+  Unauthorized,
+  FieldsError
+} from "../../../../app/responses"
+import { UserFakeDataGenerator } from "../../../fake_data"
+import { Di, Dependency } from "../../../../app/di"
 import { endpointVersion } from "./index"
-import { EmailSenderMock } from "@test/mocks/email_sender"
+import { EmailSenderMock } from "../../../mocks/email_sender"
 
 describe(`Create user ${endpointVersion}`, () => {
   const endpoint = "/admin/user"

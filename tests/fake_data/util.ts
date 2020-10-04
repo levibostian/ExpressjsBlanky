@@ -1,6 +1,6 @@
 import { FakeDataGenerator } from "./types"
-import { PromiseAllSequential } from "@app/util"
-import { transaction } from "@app/model"
+import { PromiseAllSequential } from "../../app/util"
+import { transaction } from "../../app/model"
 import uid2 from "uid2"
 
 export const createDependencies = async (dependencies: FakeDataGenerator[]): Promise<void> => {

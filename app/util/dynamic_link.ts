@@ -1,4 +1,4 @@
-import { Env } from "@app/env"
+import { Env } from "../env"
 import { parseQueryString } from "./url"
 
 // Creates app link, `https://app.example.com/foo` what is used to create dynamic link from.

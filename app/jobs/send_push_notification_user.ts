@@ -1,6 +1,6 @@
-import { Job } from "@app/jobs/type"
-import { FcmTokenModel } from "@app/model/fcm_token"
-import { PushNotificationService } from "@app/service/push_notifications"
+import { Job } from "../jobs/type"
+import { FcmTokenModel } from "../model/fcm_token"
+import { PushNotificationService } from "../service/push_notifications"
 
 export interface SendMessagePushNotificationParam {
   userId: number

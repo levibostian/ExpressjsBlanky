@@ -3,7 +3,7 @@
 import ExpressBrute from "express-brute"
 import RedisStore from "express-brute-redis"
 import { RedisClient } from "redis"
-import { Di, Dependency } from "@app/di"
+import { Di, Dependency } from "../di"
 import { RequestHandler } from "express"
 
 const bruteOptions = {

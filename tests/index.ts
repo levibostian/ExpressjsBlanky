@@ -1,6 +1,6 @@
 import "./custom_matchers"
 import { RedisClient } from "redis"
-import { Di, Dependency } from "@app/di"
+import { Di, Dependency } from "../app/di"
 import dayjs from "dayjs"
 
 export const clearKeyValueStorage = async (): Promise<void> => {

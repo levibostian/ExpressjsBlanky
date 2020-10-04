@@ -1,4 +1,4 @@
-import { randomInt } from "@app/util"
+import { randomInt } from "../../../app/util"
 
 describe(`randomInt`, () => {
   it(`expect inclusive on min`, () => {

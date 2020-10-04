@@ -1,4 +1,4 @@
-import { Di, Dependency } from "@app/di"
+import { Di, Dependency } from "../../../app/di"
 
 describe("Env", () => {
   it(`expect graph to be complete`, () => {

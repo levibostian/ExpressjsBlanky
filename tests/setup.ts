@@ -1,10 +1,10 @@
-import "@app/env" // Setup .env
+import "../env" // Setup .env
 
-import { resetDatabase, initDatabase } from "@app/model"
-import { Di, Dependency } from "@app/di"
-import { Logger } from "@app/logger"
-import { JobQueueManager } from "@app/jobs"
-import { shutdownApp } from "@app/app_shutdown"
+import { resetDatabase, initDatabase } from "../app/model"
+import { Di, Dependency } from "../app/di"
+import { Logger } from "../app/logger"
+import { JobQueueManager } from "../app/jobs"
+import { shutdownApp } from "../app/app_shutdown"
 import { clearKeyValueStorage } from "."
 
 beforeAll(async () => {

@@ -1,10 +1,12 @@
-import { Env } from "@app/env"
-import { Logger } from "@app/logger"
+import * as result from "../type/result"
+import { Env } from "../env"
+import { Logger } from "../logger"
 import { Http } from "./http"
+import { createDynamicLink } from "../util"
 
 export interface Firebase {
-  assertService(): Promise<void>
-  getShortDynamicLink(longLink: string): Promise<string>
+  assertService(): Promise<result.Result<void>>
+  getShortDynamicLink(longLink: string): Promise<result.Result<string>>
 }
 
 interface GetShortLinkDynamicLinkSuccessfulResponse {
@@ -21,10 +23,17 @@ export class AppFirebase implements Firebase {
   async assertService(): Promise<void> {
     // We want to test to make sure that we are setup successfully to work with Firebase. Test authentication.
     // To do that, we will create a dynamic link for a random URL and see if it worked. If so, we know it's successful.
-    await this.getShortDynamicLink("https://en.wikipedia.org/wiki/Main_Page")
+    await this.getShortDynamicLink(
+      createDynamicLink(
+        "https://en.wikipedia.org/wiki/Smith_Park_(Middletown,_Connecticut)?foo=bar&bar=foo"
+      )
+    )
   }
 
-  async getShortDynamicLink(longLink: string): Promise<string> {
+  /**
+   * Make sure to call `createDynamicLink()` before you call this.
+   */
+  async getShortDynamicLink(longLink: string): Promise<result.Result<string>> {
     const webApiKey = this.getWebApiKey(Env.firebaseProjectId)
     const linkType = "UNGUESSABLE" // "SHORT" or "UNGUESSABLE". Specifies the randomly generated string at the end. Short is length of min 4 to be easy to type but should not be used for sensitive data since 4 is easy to guess. unguessable is 17 length.
 
@@ -43,17 +52,38 @@ export class AppFirebase implements Firebase {
          "previewLink": "https://xxx.page.link/SiJ80?d=1"
         }
      */
-    const response: GetShortLinkDynamicLinkSuccessfulResponse = await this.http.post(
-      `/v1/shortLinks?key=${webApiKey}`,
-      {
-        longDynamicLink: longLink,
-        suffix: {
-          option: linkType
+    try {
+      const response: GetShortLinkDynamicLinkSuccessfulResponse = await this.http.post(
+        `/v1/shortLinks?key=${webApiKey}`,
+        {
+          longDynamicLink: longLink,
+          suffix: {
+            option: linkType
+          }
         }
-      }
-    )
+      )
 
-    return response.shortLink
+      return response.shortLink
+    } catch (error) {
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        console.log(error.response.data)
+        console.log(error.response.status)
+        console.log(error.response.headers)
+      } else if (error.request) {
+        // The request was made but no response was received
+        // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+        // http.ClientRequest in node.js
+        console.log(error.request)
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        console.log("Error", error.message)
+      }
+      console.log(error.config)
+
+      return error
+    }
   }
 
   private getWebApiKey(projectId: string): string {

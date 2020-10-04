@@ -1,6 +1,6 @@
 import { ServerClient } from "postmark"
 import { Env } from "../env"
-import { Logger } from "@app/logger"
+import { Logger } from "../logger"
 
 const postmarkClient = new ServerClient(Env.email.serverKey)
 

@@ -1,6 +1,6 @@
-import { UserModel, FcmTokenModel } from "@app/model"
-import { EmailSender } from "@app/email"
-import { Env } from "@app/env"
+import { UserModel, FcmTokenModel } from "../model"
+import { EmailSender } from "../email"
+import { Env } from "../env"
 
 export interface UserController {
   sendLoginLink(email: string): Promise<void>

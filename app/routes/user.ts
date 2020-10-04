@@ -1,13 +1,13 @@
 import express from "express"
 import expressRoutesVersioning from "express-routes-versioning"
-import { authMiddleware, AuthType, bruteForcePrevent } from "@app/middleware"
+import { authMiddleware, AuthType, bruteForcePrevent } from "../middleware"
 import { createEndpoint } from "./util"
-import { Success, UserEnteredBadDataError } from "@app/responses"
-import { UserModel, UserPublic } from "@app/model"
+import { Success, UserEnteredBadDataError } from "../responses"
+import { UserModel, UserPublic } from "../model"
 import { check } from "express-validator"
-import { Dependency, Di } from "@app/di"
-import { UserController } from "@app/controller/user"
-import { normalizeEmail } from "@app/util"
+import { Dependency, Di } from "../di"
+import { UserController } from "../controller/user"
+import { normalizeEmail } from "../util"
 
 const router = express.Router()
 const routesVersioning = expressRoutesVersioning()

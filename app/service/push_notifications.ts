@@ -1,5 +1,6 @@
 import admin from "firebase-admin"
-import { Logger } from "@app/logger"
+import { Logger } from "../logger"
+import * as result from "../type/result"
 
 admin.initializeApp({
   // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -32,7 +33,7 @@ export interface PushNotificationPayload {
 }
 
 export interface PushNotificationService {
-  assertService(): Promise<void>
+  assertService(): Promise<result.Result<void>>
   sendUserMessageNotification(deviceTokens: string[], title: string, body: string): Promise<void>
   sendUserDataNotification(deviceTokens: string[], data: { [key: string]: string }): Promise<void>
   sendTopicProjectUpdated(projectId: string): Promise<void>
@@ -42,12 +43,16 @@ export interface PushNotificationService {
 export class FcmPushNotificationService implements PushNotificationService {
   constructor(private logger: Logger) {}
 
-  async assertService(): Promise<void> {
-    const apps = await admin.projectManagement().listAppMetadata()
-    if (apps.length > 0) {
-      return Promise.resolve()
-    } else {
-      return Promise.reject()
+  async assertService(): Promise<result.Result<void>> {
+    try {
+      const apps = await admin.projectManagement().listAppMetadata()
+
+      if (apps.length <= 0) {
+        return new Error("No apps added to project.")
+      }
+    } catch (error) {
+      console.log("Error happened")
+      console.log(error)
     }
   }
 

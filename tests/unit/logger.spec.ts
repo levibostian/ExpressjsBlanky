@@ -1,4 +1,4 @@
-import { hidePrivateData } from "@app/logger"
+import { hidePrivateData } from "../../app/logger"
 
 describe(`hidePrivateData`, () => {
   it(`hide values when values not strings`, async () => {

@@ -1,7 +1,8 @@
 import { Sequelize, Options, Transaction } from "sequelize"
 import { Env } from "../env"
-import { UserSequelizeModel, FcmTokenSequelizeModel } from "@app/model"
-import { Logger } from "@app/logger"
+import { UserSequelizeModel } from "./user"
+import { FcmTokenSequelizeModel } from "./fcm_token"
+import { Logger } from "../logger"
 
 const sequelizeConfig: Options = {
   database: Env.database.name,

@@ -1,7 +1,7 @@
 import { ErrorRequestHandler } from "express"
-import { Logger } from "@app/logger"
-import { SystemError } from "@app/responses"
-import { Di, Dependency } from "@app/di"
+import { Logger } from "../logger"
+import { SystemError } from "../responses"
+import { Di, Dependency } from "../di"
 
 export const DefaultErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
   if (err) {

@@ -1,4 +1,4 @@
-import { UserModel } from "@app/model"
+import { UserModel } from "../../../app//model"
 import uid2 from "uid2"
 import { FakeDataGenerator } from "../types"
 import { Transaction } from "sequelize/types"

@@ -1,5 +1,5 @@
 import { RequestHandler } from "express"
-import { normalizeEmail } from "@app/util"
+import { normalizeEmail } from "../util"
 
 /**
  * Code inspired from: https://github.com/samora/trim-body

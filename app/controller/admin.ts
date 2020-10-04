@@ -1,4 +1,4 @@
-import { UserModel } from "@app/model/user"
+import { UserModel } from "../model"
 
 export interface AdminController {
   createOrGetUser(email: string): Promise<UserModel>

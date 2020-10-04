@@ -1,4 +1,4 @@
-import { parseQueryString, queryStringFromParsed } from "@app/util/url"
+import { parseQueryString, queryStringFromParsed } from "../../../app/util/url"
 
 describe(`parseQueryString`, () => {
   it(`given blank string, expect empty object`, () => {

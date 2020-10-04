@@ -1,5 +1,5 @@
 import isEqual from "lodash.isequal"
-import { transformResponseBody } from "@app/middleware"
+import { transformResponseBody } from "../app/middleware"
 
 declare global {
   namespace jest {

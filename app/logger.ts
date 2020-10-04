@@ -112,7 +112,7 @@ export class ConsoleLogger implements Logger {
 export class HoneybadgerLogger implements Logger {
   constructor() {
     Honeybadger.configure({
-      apiKey: Env.honeybadger.key,
+      apiKey: Env.honeybadger.key!,
       filters: hideValuesForKeys
     })
   }

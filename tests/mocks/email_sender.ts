@@ -1,4 +1,4 @@
-import { EmailSender } from "@app/email"
+import { EmailSender } from "../../app/email"
 
 export class EmailSenderMock implements EmailSender {
   public sendLoginMock = jest.fn()

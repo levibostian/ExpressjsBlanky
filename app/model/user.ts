@@ -1,7 +1,7 @@
 import uid2 from "uid2"
 import { Sequelize, DataTypes, Transaction } from "sequelize"
 import { Model, SequelizeModel } from "./type"
-import { normalizeEmail } from "@app/util"
+import { normalizeEmail } from "../util"
 
 export class UserSequelizeModel extends SequelizeModel {
   public id!: number

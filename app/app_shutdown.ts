@@ -1,8 +1,8 @@
 import { RedisClient } from "redis"
 import { Di, Dependency } from "./di"
-import { closeDatabase } from "@app/model"
 import { JobQueueManager } from "./jobs"
 import { Logger } from "./logger"
+import { closeDatabase } from "./model"
 
 const closeRedis = async (logger: Logger): Promise<void> => {
   // we must close job queue manager before closing redis as the queue manager uses redis

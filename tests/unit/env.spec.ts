@@ -1,4 +1,4 @@
-import { requireEnv } from "@app/env"
+import { requireEnv } from "../../app/env"
 
 describe(`getEnv`, () => {
   it(`given key that exists, expect to get value`, () => {

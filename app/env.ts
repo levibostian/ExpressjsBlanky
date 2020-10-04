@@ -5,7 +5,7 @@ import { RedisOptions } from "ioredis"
 import isNil from "lodash.isnil"
 
 const dotEnvConfig: DotenvConfigOptions = {
-  path: path.join(__dirname, "../", ".env")
+  path: path.join(__dirname, ".env")
 }
 const result = dotenv.config(dotEnvConfig)
 
@@ -35,7 +35,7 @@ export interface Environment {
   }
   redis: ClientOpts & RedisOptions
   honeybadger: {
-    key: string
+    key: string | undefined
   }
   auth: {
     adminToken: string
@@ -94,7 +94,7 @@ export const Env: Environment = {
     port: parseInt(requireEnv("REDIS_PORT"))
   },
   honeybadger: {
-    key: requireEnv("HONEY_BADGER_API_KEY")
+    key: process.env.HONEY_BADGER_API_KEY
   },
   auth: {
     adminToken: requireEnv("ADMIN_TOKEN")

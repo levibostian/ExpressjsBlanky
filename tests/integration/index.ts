@@ -1,9 +1,9 @@
 import { FakeDataGenerator } from "../fake_data/types"
 import { createDependencies } from "../fake_data/util"
-import { startServer } from "@app/server"
+import { startServer } from "../../app/server"
 import { Server } from "http"
 import request, { Test, SuperTest } from "supertest"
-import { Env } from "@app/env"
+import { Env } from "../../app/env"
 
 let server: Server
 

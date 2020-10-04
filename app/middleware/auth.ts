@@ -2,8 +2,8 @@ import passport from "passport"
 import { Strategy as BearerStrategy } from "passport-http-bearer"
 import { Strategy as AnonymousStrategy } from "passport-anonymous"
 import { BasicStrategy } from "passport-http"
-import { UserModel } from "@app/model"
-import { Env } from "@app/env"
+import { UserModel } from "../model"
+import { Env } from "../env"
 import { RequestHandler } from "express"
 
 export enum AuthType {

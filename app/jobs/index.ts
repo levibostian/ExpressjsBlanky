@@ -2,12 +2,12 @@
 
 import Bull, { Queue, QueueOptions } from "bull"
 import { Job } from "./type"
-import { Logger } from "@app/logger"
-import { Env } from "@app/env"
+import { Logger } from "../logger"
+import { Env } from "../env"
 import { ClientOpts, RedisClient } from "redis"
 import { promisify } from "util"
 import Redis from "ioredis"
-import { Dependency, Di } from "@app/di"
+import { Dependency, Di } from "../di"
 import {
   SendPushNotificationJobUserJob,
   SendPushNotificationParam

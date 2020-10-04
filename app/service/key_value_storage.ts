@@ -1,8 +1,8 @@
 import { RedisClient } from "redis"
 import isnil from "lodash.isnil"
 import { promisify } from "util"
-import { jsonReviver } from "@app/extensions/json"
-import { Foo } from "@app/type"
+import { jsonReviver } from "../extensions/json"
+import { Foo } from "../type"
 
 export interface KeyValueStorage {
   getFoo(projectId: string): Promise<Foo | undefined>

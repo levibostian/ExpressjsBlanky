@@ -1,5 +1,7 @@
 {
-  "extends": "./tsconfig.core.json",
-  "noEmit": true,
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true
+  },
   "include": ["app/**/*", "tests/**/*", "@types/**/*"]
 }

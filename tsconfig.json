@@ -8,10 +8,9 @@
     "strictNullChecks": true,
     "noFallthroughCasesInSwitch": true,
     "paths": {
-      "*": ["node_modules/*", "@types/*"],
-      "@app/*": ["app/*"],
-      "@test/*": ["tests/*"]
-    }
+      "*": ["node_modules/*", "@types/*"]
+    },
+    "typeRoots": ["./@types", "./node_modules/@types"]
   },
   "exclude": ["node_modules"],
   "include": ["app/**/*", "@types/**/*"]

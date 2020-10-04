@@ -1,5 +1,5 @@
 import { ErrorRequestHandler } from "express"
-import { ForbiddenError, UserEnteredBadDataError, Success } from "@app/responses"
+import { ForbiddenError, UserEnteredBadDataError, Success } from "../responses"
 
 export const ErrorResponseHandlerMiddleware: ErrorRequestHandler = (
   error: ForbiddenError | UserEnteredBadDataError | Success | Error,

@@ -1,5 +1,5 @@
 import { RequestHandler } from "express"
-import { ValidateParamsMiddleware } from "@app/middleware"
+import { ValidateParamsMiddleware } from "../middleware"
 import ConnectSequence from "connect-sequence"
 
 export interface Endpoint {

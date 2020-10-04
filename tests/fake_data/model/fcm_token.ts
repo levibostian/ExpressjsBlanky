@@ -1,4 +1,4 @@
-import { FcmTokenModel } from "@app/model"
+import { FcmTokenModel } from "../../../app/model"
 import uid2 from "uid2"
 import { FakeDataGenerator } from "../types"
 import { UserFakeDataGenerator } from "./user"

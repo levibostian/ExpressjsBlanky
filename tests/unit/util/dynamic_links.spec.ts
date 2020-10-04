@@ -1,6 +1,10 @@
-import { Env } from "@app/env"
-import { isValidUrlForDynamicLink, createDynamicLink, createAppLink } from "@app/util/dynamic_link"
-import { queryStringFromParsed } from "@app/util/url"
+import { Env } from "../../../app/env"
+import {
+  isValidUrlForDynamicLink,
+  createDynamicLink,
+  createAppLink
+} from "../../../app/util/dynamic_link"
+import { queryStringFromParsed } from "../../../app/util/url"
 
 describe(`isValidUrlForDynamicLink`, () => {
   const validQueryParams = {

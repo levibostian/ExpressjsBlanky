@@ -1,6 +1,6 @@
-import { setup } from "@test/integration/index"
-import { UserFakeDataGenerator, FcmTokenFakeDataGenerator } from "@test/fake_data"
-import { FcmTokenModel } from "@app/model"
+import { setup } from "../../integration/index"
+import { UserFakeDataGenerator, FcmTokenFakeDataGenerator } from "../../fake_data"
+import { FcmTokenModel } from "../../../app/model"
 
 describe(`FcmModel tests`, () => {
   it("should delete fcm token after deleting user", async () => {

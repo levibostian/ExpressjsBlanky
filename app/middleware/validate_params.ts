@@ -1,6 +1,6 @@
 import { validationResult } from "express-validator"
 import { RequestHandler } from "express"
-import { FieldsError } from "@app/responses"
+import { FieldsError } from "../responses"
 
 export interface FieldError {
   location: string
