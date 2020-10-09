@@ -13,7 +13,7 @@ router.get("/", (req, res, next) => {
 let version: string | undefined
 router.get("/version", (req, res, next) => {
   if (!version) {
-    const filePath: string = path.join(__dirname, "../../Versionfile")
+    const filePath: string = path.join(__dirname, "../Versionfile")
     version = fs.readFileSync(filePath, { encoding: "utf-8" }).trim()
   }
 

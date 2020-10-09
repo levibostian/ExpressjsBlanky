@@ -24,4 +24,4 @@ COPY --chown=node:node .sequelizerc package*.json Versionfile ${HOME}/
 RUN npm install --production &&\
     npm install nodemon 
 
-CMD npm run $NODE_ENV
+CMD node dist/app_startup.js

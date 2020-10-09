@@ -9,19 +9,17 @@
     "test": "npx jest --runInBand --detectOpenHandles --forceExit --silent",
     "test:setup": "npm run dev:setup",
     "dev:setup": "./bin/dev_setup.sh",
-    "dev": "npx tsc --watch",
+    "dev": "npm run build:copy && npx tsc --watch",
     "dev:debug": "skaffold debug --port-forward",
     "build": "npm run build:compile && npm run build:copy",
     "build:compile": "rm -rf dist && npx tsc",
-    "build:copy": "npx copyfiles -u 1 app/.env dist/ && npx copyfiles app/config/* -u 2 dist/config/",
+    "build:copy": "npx copyfiles -u 1 app/.env dist/ && npx copyfiles -u 1 app/Versionfile dist/ && npx copyfiles app/config/* -u 2 dist/config/",
     "db:migrate:create": "npx sequelize migration:create",
     "db:migrate": "npx sequelize db:migrate --debug",
     "db:migrate:undo": "npx sequelize db:migrate:undo",
     "generate:doc": "npx apidoc -i app/ -o docs/",
     "format": "npx prettier --write \"{app,tests}/**/*.ts\"",
-    "lint": "npx tsc -b tsconfig.lint.json && npx eslint --fix --ext ts,js .",
-    "production": "node dist/app_startup.js",
-    "development": "npx nodemon dist/app_startup.js"
+    "lint": "npx tsc -b tsconfig.lint.json && npx eslint --fix --ext ts,js ."
   },
   "husky": {
     "hooks": {
@@ -110,6 +108,7 @@
     "lint-staged": "^9.5.0",
     "prettier": "^1.19.1",
     "sequelize-cli": "^5.5.1",
+    "source-map-support": "^0.5.19",
     "supertest": "^4.0.2",
     "ts-jest": "^26.4.1",
     "typescript": "^4.0.3"
