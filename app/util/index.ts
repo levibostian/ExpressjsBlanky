@@ -3,6 +3,12 @@ import isPlainObject from "lodash.isplainobject"
 import isEmail from "validator/lib/isEmail"
 import dayjs from "dayjs"
 
+export const sleep = function(ms: number): Promise<void> {
+  return new Promise(resolve => {
+    setTimeout(resolve, ms)
+  })
+}
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export const trimAllStrings = (obj: { [key: string]: any }): void => {
   const helper = (obj: { [key: string]: any }): void => {

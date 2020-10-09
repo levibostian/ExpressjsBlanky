@@ -2,19 +2,16 @@
   "version": "0.2.0",
   "configurations": [
     {
+      // First, run `npm run dev:debug` in your terminal. Wait until your application is running. Then, start task below.
       "type": "node",
       "request": "attach",
-      "name": "Local development debug",
+      "name": "Attach to running debugger",
       "protocol": "inspector",
       "port": 9229,
       "address": "0.0.0.0",
       "sourceMaps": true,
       "localRoot": "${workspaceFolder}",
-      "timeout": 20000,
-      "stopOnEntry": false,
-      "remoteRoot": "${workspaceFolder}",
-      "preLaunchTask": "local_dev_debug",
-      "restart": true
+      "remoteRoot": "/home/app/"
     },
     {
       "type": "node",

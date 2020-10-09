@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-deployment
+  labels:
+    app: app
+spec:
+  replicas: 1
+  strategy:
+   rollingUpdate:
+     maxSurge: 1
+     maxUnavailable: 0
+   type: RollingUpdate   
+  selector:
+    matchLabels:
+      app: app
+  template:
+    metadata:
+      labels:
+        app: app
+    spec:
+      containers:
+      - name: app
+        image: app-image
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 5000
+        resources:
+          limits: # the limit the container can use 
+            memory: "128Mi"
+            cpu: "150m" # 250 = 1/4 a cpu core
+          requests: # considered the minimum resources required for a container to run properly 
+            memory: "64Mi" # 64mb
+            cpu: "50m" # got value from running `kubectl top pods --all-namespaces` to determine how much pods were using
+        readinessProbe:
+          httpGet:
+            path: /healthcheck
+            port: 5000
+          initialDelaySeconds: 10
+          failureThreshold: 3
+          successThreshold: 1
+          periodSeconds: 5
+          timeoutSeconds: 5
+        livenessProbe:
+          httpGet:
+            path: /healthcheck
+            port: 5000          
+          initialDelaySeconds: 10
+          periodSeconds: 15 # Note: Make sure your app's healthcheck beforeShutdown function delay is set to match this. See server file in app source code. 
+          failureThreshold: 3
+          successThreshold: 1
+          # Setting a very low timeout value (e.g. 1 second) can cause false-positive
+          # checks and service interruption.
+          timeoutSeconds: 5
+      # Allow sufficient amount of time (90 seconds = periodSeconds * failureThreshold) in the liveness probe for your app's registered shutdown handlers to run to completion.
+      terminationGracePeriodSeconds: 45
+      imagePullSecrets:
+      - name: regcred
+      # For development to connect pod to host machine https://github.com/kubernetes/minikube/issues/8439#issuecomment-662244769
+      hostAliases: 
+      - ip: "192.168.64.1" # Use `minikube ssh grep host.minikube.internal /etc/hosts | cut -f1` on local machine to get it. 
+        hostnames:
+        - "host.minikube.internal"
+---        
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-service
+spec:
+  ports:
+  - port: 80
+    targetPort: 5000
+  selector:
+    app: app

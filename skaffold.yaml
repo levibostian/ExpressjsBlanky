@@ -1,0 +1,28 @@
+apiVersion: skaffold/v2beta8
+kind: Config
+build:
+  artifacts:
+    - image: app-image
+      context: .
+      docker:
+        dockerfile: Dockerfile.dev
+        buildArgs:
+          ENV: development
+      sync:
+        infer:
+        - 'dist/**/*.js'
+        - 'app/**/*.ts'
+        - 'dist/**/*.map'
+  local: 
+    push: false
+deploy:
+  kubectl: 
+    manifests:
+      - "k8s/*.yaml"
+
+# As long as you pass `--port-forward` to `skaffold dev/debug`, this maps local port 5000 to the node application
+portForward:
+- resourceType: service
+  resourceName: app-service
+  port: 80
+  localPort: 5000

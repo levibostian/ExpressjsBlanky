@@ -1,0 +1,11 @@
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  # namespace: apps-production
+  name: app-pdb
+spec:
+  maxUnavailable: 1 # desired replicas - 1 is ok.
+  # minAvailable: "40%" # 60% of the desired number of replicas must exist as healthy
+  selector:
+    matchLabels:
+      app: app

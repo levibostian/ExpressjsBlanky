@@ -4,7 +4,7 @@
     {
       "label": "local_dev_debug",
       "command": "npm",
-      "args": ["run", "dev"],
+      "args": ["run", "dev:debug"],
       "type": "shell",
       "group": "build",
       "presentation": {

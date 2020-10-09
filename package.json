@@ -9,17 +9,23 @@
     "test": "npx jest --runInBand --detectOpenHandles --forceExit --silent",
     "test:setup": "npm run dev:setup",
     "dev:setup": "./bin/dev_setup.sh",
-    "dev": "npx ts-node --project tsconfig.json app/app_startup.ts",
+    "dev": "npx tsc --watch",
+    "dev:debug": "skaffold debug --port-forward",
+    "build": "npm run build:compile && npm run build:copy",
+    "build:compile": "rm -rf dist && npx tsc",
+    "build:copy": "npx copyfiles -u 1 app/.env dist/ && npx copyfiles app/config/* -u 2 dist/config/",
     "db:migrate:create": "npx sequelize migration:create",
     "db:migrate": "npx sequelize db:migrate --debug",
     "db:migrate:undo": "npx sequelize db:migrate:undo",
     "generate:doc": "npx apidoc -i app/ -o docs/",
     "format": "npx prettier --write \"{app,tests}/**/*.ts\"",
-    "lint": "npx concurrently --names \"ts, eslint\" -c \"blue,green\" \"npx tsc -b tsconfig.lint.json\" \"npx eslint --fix --ext ts,js .\""
+    "lint": "npx tsc -b tsconfig.lint.json && npx eslint --fix --ext ts,js .",
+    "production": "node dist/app_startup.js",
+    "development": "npx nodemon dist/app_startup.js"
   },
   "husky": {
     "hooks": {
-      "pre-commit": "npm run generate:doc && git add docs && lint-staged && npm run lint"
+      "pre-commit": "lint-staged && npm run lint"
     }
   },
   "lint-staged": {
@@ -64,11 +70,6 @@
     "uid2": "^0.0.3"
   },
   "devDependencies": {
-    "@babel/cli": "^7.7.5",
-    "@babel/core": "^7.7.5",
-    "@babel/node": "^7.7.4",
-    "@babel/preset-env": "^7.7.6",
-    "@babel/preset-typescript": "^7.7.4",
     "@tsconfig/node12": "^1.0.7",
     "@types/bluebird": "^3.5.29",
     "@types/bull": "^3.14.2",
@@ -101,21 +102,16 @@
     "@types/validator": "^12.0.1",
     "@typescript-eslint/eslint-plugin": "^4.3.0",
     "@typescript-eslint/parser": "^4.3.0",
-    "apidoc": "^0.19.0",
-    "babel-plugin-module-resolver": "^3.2.0",
-    "concurrently": "^5.0.1",
+    "copyfiles": "^2.4.0",
     "eslint": "^6.7.2",
     "eslint-plugin-jest": "^23.1.1",
     "husky": "^3.1.0",
-    "jest": "^26.4.2",
     "jest-junit": "^11.0.0",
     "lint-staged": "^9.5.0",
-    "nodemon": "^2.0.1",
     "prettier": "^1.19.1",
     "sequelize-cli": "^5.5.1",
     "supertest": "^4.0.2",
     "ts-jest": "^26.4.1",
-    "ts-node": "^9.0.0",
     "typescript": "^4.0.3"
   }
 }

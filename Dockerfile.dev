@@ -1,0 +1,20 @@
+FROM node:12-alpine
+
+EXPOSE 5000
+
+# USER node
+RUN mkdir /home/app
+WORKDIR /home/app
+
+EXPOSE 5000
+
+ARG ENV=development
+ENV NODE_ENV $ENV
+CMD npm run $NODE_ENV
+
+COPY package* ./
+# examples don't use package-lock.json to minimize updates 
+RUN npm install --no-package-lock 
+RUN npm install nodemon
+COPY dist ./dist
+COPY app ./app
