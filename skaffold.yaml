@@ -8,7 +8,7 @@ build:
         dockerfile: Dockerfile.dev
         buildArgs:
           ENV: development
-      sync:
+      sync: # This is explained better in DEV.md document. 
         infer:
         - 'dist/**/*.js'
         - 'app/**/*.ts'

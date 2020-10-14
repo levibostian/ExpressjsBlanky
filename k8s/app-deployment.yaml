@@ -5,7 +5,6 @@ metadata:
   labels:
     app: app
 spec:
-  replicas: 1
   strategy:
    rollingUpdate:
      maxSurge: 1
