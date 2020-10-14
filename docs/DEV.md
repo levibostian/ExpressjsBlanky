@@ -15,7 +15,7 @@ In order to have a successful development stack, these goals should all be satis
 
 # Getting started
 
-- To get your application running, you need to have some configuration files on your machine. If you are reading this document you should have these files ready for you already. To get these configuration files, you need to run the command `cici decrypt`. This will get the secrets on your computer ready for you to use. 
+- To get your application running, you need to have some configuration files on your machine. If you are reading this document you should have these files ready for you already. To get these configuration files, you need to run the command `cici decrypt`. This will get the secrets on your computer ready for you to use.
 
 - Install nodejs on your machine. This project recommends that you use a tool called `nvm` to install nodejs. Run the install script [here](https://github.com/nvm-sh/nvm#installing-and-updating) to install nvm and then run the command `nvm use` from the root directory of this project. `nvm use` will read the `.nvmrc` file and install that version of node. That way you are using a version of nodejs that this project supports.
 
@@ -131,7 +131,7 @@ Let's talk about automated software testing. Unit and integration tests in parti
 
 > Note: This document will not teach software testing, unfortunately. This document would simply become too long _and_ part of software testing is lots and lots of practice! Use the resources in this section to help guide you on how to run tests and then you can take that to learn more about how to write them. After that, practice. Trust me.
 
-To run tests, it's quite simple. Run `npm run test:setup` and then `npm run test`.
+To run tests, it's quite simple. Run `npm run test`. This 1 script will go through getting your 
 
 > Note: Tests run via [Jest](https://jestjs.io/) running in node. We run our application inside of Docker containers in a Kubernetes cluster but we run tests on their own just on node without containers. The biggest reason for this is because at this time Jest runs slowly in Docker containers.
 
@@ -165,7 +165,7 @@ Below are some notes about how tests are written and setup in this project. That
 
 ## Application troubleshooting
 
-When you run the `dev:setup` command, the following series of events should happen. Follow through this list of events and follow the troubleshooting steps to help you. 
+When you run the `dev:setup` command, the following series of events should happen. Follow through this list of events and follow the troubleshooting steps to help you.
 
 1. When you run the setup command, you should see output like this that ends with `Waiting for deployment to stabalize...`:
 
@@ -190,7 +190,7 @@ WARN[0001] image [app-image] is not used by the deployment
 Waiting for deployments to stabilize...
 ```
 
-If you do not see this output, the setup command failed at some point. You need to view the log file of the setup command. When the setup command starts, it tells you where the full logs are stored: `Full script output located at /tmp/dev_setup.log. In case of an error, check out that file.` Open up this file and check for errors. 
+If you do not see this output, the setup command failed at some point. You need to view the log file of the setup command. When the setup command starts, it tells you where the full logs are stored: `Full script output located at /tmp/dev_setup.log. In case of an error, check out that file.` Open up this file and check for errors.
 
 2. You will see the message `Waiting for deployments to stabilize...` for around 30 seconds. After that time, you should see your server startup successfully:
 
@@ -231,16 +231,17 @@ Watching for changes...
 ```
 
 If you wait more then 30 seconds and are still stuck on `Waiting for deployments to stabilize...` then you need to view the logs of your application container. Run the command `kubectl get pods`. You will see output like this:
+
 ```
-NAMESPACE              NAME                                        READY   STATUS   
-default                app-deployment-X8366-3e99                   0/1     Running  
+NAMESPACE              NAME                                        READY   STATUS
+default                app-deployment-X8366-3e99                   0/1     Running
 ```
 
-Now, run `kubectl logs app-deployment-X8366-3e99` to view the logs of the pod running. View these logs to look for errors with the application starting. 
+Now, run `kubectl logs app-deployment-X8366-3e99` to view the logs of the pod running. View these logs to look for errors with the application starting.
 
-> Note: See [this GitHub issue](https://github.com/GoogleContainerTools/skaffold/issues/4911) to learn more about why you must run `kubectl logs` manually instead of viewing the logs in the output of the setup command. 
+> Note: See [this GitHub issue](https://github.com/GoogleContainerTools/skaffold/issues/4911) to learn more about why you must run `kubectl logs` manually instead of viewing the logs in the output of the setup command.
 
-> Tip: Running skaffold with `verbosity=debug` option helps when debugging why Skaffold is not working well. 
+> Tip: Running skaffold with `verbosity=debug` option helps when debugging why Skaffold is not working well.
 
 ## Postgres database troubleshooting
 
@@ -290,42 +291,44 @@ If you see the database is running and you can connect to it, there is a good ch
 
 # How this works
 
-To give you a better idea of how the development flow is setup, check out this *optional* section to learn more. This section is meant for nerds who want the details to open up the black box. 
+To give you a better idea of how the development flow is setup, check out this _optional_ section to learn more. This section is meant for nerds who want the details to open up the black box.
 
 We need our [development setup to be as close to our production setup as possible](https://12factor.net/dev-prod-parity). A very high level overview of our production environment is:
-1. A remote Postgres database running on a Linux server. 
-2. A remote Redis database running on a Linux server. 
-3. Our application code runs in a Docker container deployed in a Kubernetes cluster. 
+
+1. A remote Postgres database running on a Linux server.
+2. A remote Redis database running on a Linux server.
+3. Our application code runs in a Docker container deployed in a Kubernetes cluster.
 
 The databases are pretty easy to deploy for development. We run the databases in a Docker container locally on your machine that our application connects to via the network. We use Docker because (1) you don't need to install postgres or redis on your computer and (2) you can destroy and re-create your databases quick and easy. In production we do not use Docker. The OS that you are running your database server on doesn't matter that much that I can tell as long as the database configuration, version, and connection method is the same.
 
-To deploy our application, we use a really handy tool [skaffold](https://skaffold.dev/). Skaffold is a really neat tool that will build a Docker image for your application and deploy the built image to a [minikube](https://minikube.sigs.k8s.io/) cluster. We use the same Kubernetes configuration manifests between development and production keeping the two environments closely the same. 
+To deploy our application, we use a really handy tool [skaffold](https://skaffold.dev/). Skaffold is a really neat tool that will build a Docker image for your application and deploy the built image to a [minikube](https://minikube.sigs.k8s.io/) cluster. We use the same Kubernetes configuration manifests between development and production keeping the two environments closely the same.
 
 We try our best to keep our entire code base and configuration of our application identical between production and development. Unfortunately, there are some times when we cannot follow this rule:
-* We have 2 separate Docker `Dockerfile`s. 1 for production, 1 for development. That is because [skaffold does not support Docker builder images](https://github.com/GoogleContainerTools/skaffold/issues/1766#issuecomment-591838285). We use builder images in our production `Dockerfile` to keep our image slim and more secure but when using skaffold in development, we cannot do this. 
 
-* The production image wants to be as small in size and footprint as possible. The development image needs some extra development dependencies for hot-reloading, a shell in the container for debugging, and maybe some extra features. This unfortunately means we need 2 separate images. We try to keep all of the core logic the same between these 2 `Dockerfile`s as much as we can. 
+- We have 2 separate Docker `Dockerfile`s. 1 for production, 1 for development. That is because [skaffold does not support Docker builder images](https://github.com/GoogleContainerTools/skaffold/issues/1766#issuecomment-591838285). We use builder images in our production `Dockerfile` to keep our image slim and more secure but when using skaffold in development, we cannot do this.
+
+- The production image wants to be as small in size and footprint as possible. The development image needs some extra development dependencies for hot-reloading, a shell in the container for debugging, and maybe some extra features. This unfortunately means we need 2 separate images. We try to keep all of the core logic the same between these 2 `Dockerfile`s as much as we can.
 
 ### How hot-reload works
 
-The `skaffold dev` command comes equipped with [hot-reloading](https://skaffold.dev/docs/pipeline-stages/filesync/). This means that when you edit your source code, your nodejs application will restart automatically for you. Skaffold has 2 hot-reload features available to you. (1) A feature they call file sync which will inject changed code into your already running Docker container. This makes development very fast. (2) Any file not is not setup with Skaffold file sync will cause a full Docker image rebuild and deploy when the file changes. You want your source code to use file sync and allow other files to cause the full rebuild. 
+The `skaffold dev` command comes equipped with [hot-reloading](https://skaffold.dev/docs/pipeline-stages/filesync/). This means that when you edit your source code, your nodejs application will restart automatically for you. Skaffold has 2 hot-reload features available to you. (1) A feature they call file sync which will inject changed code into your already running Docker container. This makes development very fast. (2) Any file not is not setup with Skaffold file sync will cause a full Docker image rebuild and deploy when the file changes. You want your source code to use file sync and allow other files to cause the full rebuild.
 
 Skaffold comes with [examples](https://github.com/GoogleContainerTools/skaffold/tree/master/examples/hot-reload) on how to setup hot-reloading for a nodejs application. However, we are using the Typescript lang and not Javascript. This makes our hot-reloading setup a little more complex. To get this to work, we setup the project to work like this:
-* In the skaffold config file, we setup file sync to sync all javascript, typescript, and .map files. You might be wondering, "Why not just setup sync with the typescript files, only?" The answer is that if Skaffold detects that you saved files in your project that are *not* setup with file sync, Skaffold will automatically rebuild and deploy a new Docker image for you. This is what we want to avoid doing. 
 
-When you save a Typescript file, that does not mean that just a `.ts` file got updated. It also means that a new `.js` file and a new `.map` file also got saved. This is because the Typescript compiler transpiles the code into Javascript code (with a source map file, `.map`). The workaround to getting file sync to work with typescript [1](https://github.com/GoogleContainerTools/skaffold/issues/1766#issuecomment-471128839)[2](https://github.com/GoogleContainerTools/skaffold/issues/1766#issuecomment-484273645) is to setup Skaffold file sync with all `.ts`, `.js`, and `.map` files. Even though our application Docker container does not ever read the Typescript files, we need file sync setup to avoid the full Docker rebuild. 
+- In the skaffold config file, we setup file sync to sync all javascript, typescript, and .map files. You might be wondering, "Why not just setup sync with the typescript files, only?" The answer is that if Skaffold detects that you saved files in your project that are _not_ setup with file sync, Skaffold will automatically rebuild and deploy a new Docker image for you. This is what we want to avoid doing.
 
-* We want our development Docker image to be as close to the production one as possible. This means that in development and in production we want to use nodejs to run our application instead of using something like Babel or [ts-node](https://www.npmjs.com/package/ts-node) that can run our `.ts` code directly in node without having to first compile it. 
+When you save a Typescript file, that does not mean that just a `.ts` file got updated. It also means that a new `.js` file and a new `.map` file also got saved. This is because the Typescript compiler transpiles the code into Javascript code (with a source map file, `.map`). The workaround to getting file sync to work with typescript [1](https://github.com/GoogleContainerTools/skaffold/issues/1766#issuecomment-471128839)[2](https://github.com/GoogleContainerTools/skaffold/issues/1766#issuecomment-484273645) is to setup Skaffold file sync with all `.ts`, `.js`, and `.map` files. Even though our application Docker container does not ever read the Typescript files, we need file sync setup to avoid the full Docker rebuild.
 
-This means that to get hot-reload working, we need to do 2 things: (1) compile our Typescript code into Javascript code for our nodejs app to run and (2) automatically restart nodejs when any of our compiled Javascript files change. 
+- We want our development Docker image to be as close to the production one as possible. This means that in development and in production we want to use nodejs to run our application instead of using something like Babel or [ts-node](https://www.npmjs.com/package/ts-node) that can run our `.ts` code directly in node without having to first compile it.
 
-While `skaffold dev` is running, we also have the Typescript compiler running in watch mode in another terminal window. We run the Typescript compiler on your computer, not in a Docker container. It will simply watch for when you save Typescript source code on your machine and then compile your project into the `dist/` directory on your computer. 
+This means that to get hot-reload working, we need to do 2 things: (1) compile our Typescript code into Javascript code for our nodejs app to run and (2) automatically restart nodejs when any of our compiled Javascript files change.
 
-We setup the `dist/` directory with Skaffold file sync. When any changes happen in that directory, Skaffold will inject those changes into our already running Docker container. Cool, we have new Javascript files in that Docker container. Lastly, we use [nodemon](https://www.npmjs.com/package/nodemon) in the development Docker container that detects when any Javascript files got changed in the Docker container and it will restart nodejs for you. 
+While `skaffold dev` is running, we also have the Typescript compiler running in watch mode in another terminal window. We run the Typescript compiler on your computer, not in a Docker container. It will simply watch for when you save Typescript source code on your machine and then compile your project into the `dist/` directory on your computer.
+
+We setup the `dist/` directory with Skaffold file sync. When any changes happen in that directory, Skaffold will inject those changes into our already running Docker container. Cool, we have new Javascript files in that Docker container. Lastly, we use [nodemon](https://www.npmjs.com/package/nodemon) in the development Docker container that detects when any Javascript files got changed in the Docker container and it will restart nodejs for you.
 
 ### Connecting to application in Docker container
 
-Applications running inside of Docker containers in a Kubernetes cluster are not able to be reached by default. This is a feature of Kubernetes, not Skaffold. We need to send HTTP requests to our application in order to use it, right?! You can use [Kubernetes port forwarding](https://kubernetes.io/docs/tasks/access-application-cluster/port-forward-access-application-cluster/) to do that. Skaffold comes with a cool feature [that does port forwarding for you](https://skaffold.dev/docs/pipeline-stages/port-forwarding/). All we need to do is add to the skaffold config file and it will setup Kubernetes port forwarding for us when the application starts. This makes it possible to send requests to `localhost:5000` on our local machine and it sends those requests to the Docker container running in kubernetes. 
+Applications running inside of Docker containers in a Kubernetes cluster are not able to be reached by default. This is a feature of Kubernetes, not Skaffold. We need to send HTTP requests to our application in order to use it, right?! You can use [Kubernetes port forwarding](https://kubernetes.io/docs/tasks/access-application-cluster/port-forward-access-application-cluster/) to do that. Skaffold comes with a cool feature [that does port forwarding for you](https://skaffold.dev/docs/pipeline-stages/port-forwarding/). All we need to do is add to the skaffold config file and it will setup Kubernetes port forwarding for us when the application starts. This makes it possible to send requests to `localhost:5000` on our local machine and it sends those requests to the Docker container running in kubernetes.
 
-> Note: If port forwarding does not work for some reason, we should also be able to use a Kubernetes ingress if you enable ingress on minikube. 
-
+> Note: If port forwarding does not work for some reason, we should also be able to use a Kubernetes ingress if you enable ingress on minikube.

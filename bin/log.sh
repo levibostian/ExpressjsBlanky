@@ -7,6 +7,8 @@ YELLOW='\033[1;33m'
 GREEN='\033[0;32m'
 WHITE='\033[0m'
 
+OUTPUT="/tmp/app_dev.log"
+
 function logSuccess() {
     printf "${GREEN}$1\n"
     printf "\n[SUCCESS] $1\n" >> $OUTPUT
