@@ -13,6 +13,7 @@ import { Di, Dependency } from "../../../../app/di"
 import { endpointVersion } from "./index"
 import * as arrayExtensions from "../../../../app/extensions/array"
 import { Env } from "../../../../app/env"
+import { projects } from "../../../../app/projects"
 
 const sendWelcomeMock = jest.fn()
 const emailSenderMock: EmailSender = {
@@ -55,7 +56,7 @@ describe(`Receive login email passwordless token. ${endpointVersion}`, () => {
       .then(res => {
         expect(sendWelcomeMock).toBeCalledTimes(1)
         expect(sendWelcomeMock.mock.calls[0][2].appLoginLink).toEqual(
-          expect.stringContaining(Env.dynamicLinkHostname)
+          expect.stringContaining(projects[0].config.dynamic_link_hostname)
         )
         expect(sendWelcomeMock.mock.calls[0][2].appLoginLink).toEqual(
           expect.stringContaining(encodeURIComponent(Env.appHost))
@@ -73,7 +74,7 @@ describe(`Receive login email passwordless token. ${endpointVersion}`, () => {
       .then(res => {
         expect(sendWelcomeMock).toBeCalledTimes(1)
         expect(sendWelcomeMock.mock.calls[0][2].appLoginLink).toEqual(
-          expect.stringContaining(Env.dynamicLinkHostname)
+          expect.stringContaining(projects[0].config.dynamic_link_hostname)
         )
         expect(sendWelcomeMock.mock.calls[0][2].appLoginLink).toEqual(
           expect.stringContaining(encodeURIComponent(Env.appHost))

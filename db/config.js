@@ -2,7 +2,7 @@
 const path = require("path")
 const { exit } = require("process")
 
-const dotEnvFilePath = path.resolve(process.cwd(), "app/.env")
+const dotEnvFilePath = path.resolve(process.cwd(), ".env")
 require("dotenv").config({ path: dotEnvFilePath })
 
 const useSSl = !Object.keys(process.env).includes("DISABLE_SSL")

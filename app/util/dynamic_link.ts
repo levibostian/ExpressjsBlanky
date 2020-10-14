@@ -1,3 +1,4 @@
+import { Project } from "../type/project"
 import { Env } from "../env"
 import { parseQueryString } from "./url"
 
@@ -7,7 +8,7 @@ export const createAppLink = (queryParamString: string): string => {
     queryParamString = `?${queryParamString}`
   }
 
-  const appLink = `${Env.appHost}/${queryParamString}&&mobile_link=true` // Create app link. add extra query params that we can use later on to get short links if needed.
+  const appLink = `${Env.appHost}/${queryParamString}&mobile_link=true` // Create app link. add extra query params that we can use later on to get short links if needed.
 
   return appLink
 }
@@ -26,12 +27,12 @@ export const createAppLink = (queryParamString: string): string => {
  *
  * See: https://firebase.google.com/docs/dynamic-links/create-manually
  */
-export const createDynamicLink = (queryParamString: string): string => {
+export const createDynamicLink = (queryParamString: string, project: Project): string => {
   const appLink = createAppLink(queryParamString)
 
   const link = encodeURIComponent(appLink) // encode app link
 
-  return `${Env.dynamicLinkHostname}/?link=${link}&apn=${Env.mobileAppInfo.bundleId}&ibi=${Env.mobileAppInfo.bundleId}` // Create Dynamic Link
+  return `${project.config.dynamic_link_hostname}/?link=${link}&apn=${project.config.mobile_app_bundle}&ibi=${project.config.mobile_app_bundle}` // Create Dynamic Link
 }
 
 /**
@@ -39,10 +40,10 @@ export const createDynamicLink = (queryParamString: string): string => {
  *
  * The format is pretty simple. Just a token needs to be known for the client app to pull out the token.
  */
-export const getLoginDynamicLink = (userPasswordlessToken: string): string => {
+export const getLoginDynamicLink = (userPasswordlessToken: string, project: Project): string => {
   const loginLink = `passwordless_token=${userPasswordlessToken}`
 
-  return createDynamicLink(loginLink)
+  return createDynamicLink(loginLink, project)
 }
 
 // takes in URL, https://app.example.com?foo=true type of string and tells you if it's valid where it can make a dynamic link from it.

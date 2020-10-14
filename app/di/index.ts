@@ -9,6 +9,7 @@ import { AppFirebase } from "../service/firebase"
 import { AppAdminController } from "../controller/admin"
 import { AppUserController } from "../controller/user"
 import { FcmPushNotificationService } from "../service/push_notifications"
+import { AppFiles } from "../service"
 
 export enum Dependency {
   Logger = "Logger",
@@ -19,17 +20,32 @@ export enum Dependency {
   RedisClient = "RedisClient",
   Firebase = "Firebase",
   AdminController = "AdminController",
-  UserController = "UserController"
+  UserController = "UserController",
+  Files = "Files"
 }
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 class DiContainer {
   private overrides: { [key in Dependency]?: any } = {}
+  private singletons: Map<Dependency, any> = new Map()
 
-  private singletons: { [key in Dependency]?: any } = {}
+  constructor() {
+    this.singletons.set(
+      Dependency.PushNotificationService,
+      new FcmPushNotificationService(this.inject(Dependency.Logger))
+    )
+    this.singletons.set(
+      Dependency.JobQueueManager,
+      new AppJobQueueManager(
+        new SendPushNotificationJobUserJob(this.inject(Dependency.PushNotificationService)),
+        this.inject(Dependency.Logger)
+      )
+    )
+    this.singletons.set(Dependency.RedisClient, new RedisClient(Env.redis))
+  }
 
   async close(): Promise<void> {
-    this.singletons = {}
+    this.singletons = new Map()
     this.resetOverrides()
   }
 
@@ -53,14 +69,7 @@ class DiContainer {
       case Dependency.EmailSender:
         return (new AppEmailSender() as unknown) as T
       case Dependency.JobQueueManager:
-        if (!this.singletons[Dependency.JobQueueManager]) {
-          this.singletons[Dependency.JobQueueManager] = (new AppJobQueueManager(
-            new SendPushNotificationJobUserJob(this.inject(Dependency.PushNotificationService)),
-            this.inject(Dependency.Logger)
-          ) as unknown) as T
-        }
-
-        return this.singletons[Dependency.JobQueueManager]
+        return this.singletons.get(Dependency.JobQueueManager)
       case Dependency.KeyValueStorage:
         return (new RedisKeyValueStorage(this.inject(Dependency.RedisClient)) as unknown) as T
       case Dependency.AdminController:
@@ -68,13 +77,11 @@ class DiContainer {
       case Dependency.UserController:
         return (new AppUserController(this.inject(Dependency.EmailSender)) as unknown) as T
       case Dependency.PushNotificationService:
-        return (new FcmPushNotificationService(this.inject(Dependency.Logger)) as unknown) as T
+        return this.singletons.get(Dependency.PushNotificationService)
       case Dependency.RedisClient:
-        if (!this.singletons[Dependency.RedisClient]) {
-          this.singletons[Dependency.RedisClient] = (new RedisClient(Env.redis) as unknown) as T
-        }
-
-        return this.singletons[Dependency.RedisClient]
+        return this.singletons.get(Dependency.RedisClient)
+      case Dependency.Files:
+        return (new AppFiles() as unknown) as T
       case Dependency.Firebase:
         return (new AppFirebase(this.inject(Dependency.Logger)) as unknown) as T
     }

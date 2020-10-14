@@ -12,6 +12,11 @@ function logSuccess() {
     printf "\n[SUCCESS] $1\n" >> $OUTPUT
 }
 
+function logError() {
+    printf "${RED}$1\n"
+    printf "\n[ERROR] $1\n" >> $OUTPUT
+}
+
 function logVerbose() {
     printf "${YELLOW}$1\n"
     printf "\n[VERBOSE] $1\n" >> $OUTPUT

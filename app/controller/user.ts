@@ -1,9 +1,10 @@
 import { UserModel, FcmTokenModel } from "../model"
 import { EmailSender } from "../email"
-import { Env } from "../env"
+import { Project } from "../type/project"
+import { createDynamicLink } from "../util"
 
 export interface UserController {
-  sendLoginLink(email: string): Promise<void>
+  sendLoginLink(email: string, project: Project): Promise<void>
   exchangePasswordlessToken(token: string): Promise<UserModel | null>
   addFcmToken(userId: number, token: string): Promise<void>
 }
@@ -11,12 +12,11 @@ export interface UserController {
 export class AppUserController implements UserController {
   constructor(private emailSender: EmailSender) {}
 
-  async sendLoginLink(email: string): Promise<void> {
+  async sendLoginLink(email: string, project: Project): Promise<void> {
     const createUserResult = await UserModel.findUserOrCreateByEmail(email)
     const userCreated = createUserResult[1]
     const user = createUserResult[0]
-    const loginLink = encodeURIComponent(`${Env.appHost}/?token=${user.passwordToken!}`)
-    const passwordlessLoginLink = `${Env.dynamicLinkHostname}/?link=${loginLink}&apn=${Env.mobileAppInfo.bundleId}&ibi=${Env.mobileAppInfo.bundleId}`
+    const passwordlessLoginLink = createDynamicLink(`token=${user.passwordToken!}`, project)
 
     await this.emailSender.sendLogin(userCreated, user.email, {
       appLoginLink: passwordlessLoginLink

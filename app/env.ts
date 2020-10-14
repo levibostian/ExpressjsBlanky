@@ -1,11 +1,13 @@
 import dotenv, { DotenvConfigOptions } from "dotenv"
-import path from "path"
 import { ClientOpts } from "redis"
 import { RedisOptions } from "ioredis"
 import isNil from "lodash.isnil"
 
+// eslint-disable-next-line no-process-env
+const filesPathPrefix = process.env.FILES_PATH_PREFIX || __dirname
+
 const dotEnvConfig: DotenvConfigOptions = {
-  path: path.join(__dirname, ".env")
+  path: `${filesPathPrefix}/.env`
 }
 const result = dotenv.config(dotEnvConfig)
 
@@ -40,13 +42,9 @@ export interface Environment {
   auth: {
     adminToken: string
   }
-  mobileAppInfo: {
-    bundleId: string
-  }
-  dynamicLinkHostname: string
-  firebaseProjectId: string
   appHost: string
   enableBruteforcePrevention: boolean
+  filesPathPrefix: string
 }
 
 export const requireEnv = (key: string): string => {
@@ -99,12 +97,8 @@ export const Env: Environment = {
   auth: {
     adminToken: requireEnv("ADMIN_TOKEN")
   },
-  mobileAppInfo: {
-    bundleId: requireEnv("MOBILE_APP_BUNDLE_ID")
-  },
-  dynamicLinkHostname: requireEnv("DYNAMIC_LINK_HOSTNAME"),
-  firebaseProjectId: requireEnv("FIREBASE_PROJECT_ID"),
   appHost: requireEnv("APP_HOST"),
-  enableBruteforcePrevention: !isDefined("DISABLE_BRUTEFORCE_PREVENTION")
+  enableBruteforcePrevention: !isDefined("DISABLE_BRUTEFORCE_PREVENTION"),
+  filesPathPrefix: process.env.FILES_PATH_PREFIX || __dirname
 }
 /* eslint-enable no-process-env */

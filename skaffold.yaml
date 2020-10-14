@@ -16,6 +16,8 @@ build:
   local: 
     push: false
 deploy:
+  kustomize: 
+    paths: ["."]
   kubectl: 
     manifests:
       - "k8s/*.yaml"

@@ -1,6 +1,5 @@
 secrets
-app/config/firebase_key.json
-app/config/firebase_projects.json
+app/config/projects.json
 
 # manually added:
 coverage.html

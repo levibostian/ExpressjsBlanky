@@ -1,3 +1,4 @@
+import { Project } from "../type/project"
 import { Job } from "../jobs/type"
 import { FcmTokenModel } from "../model/fcm_token"
 import { PushNotificationService } from "../service/push_notifications"
@@ -6,11 +7,13 @@ export interface SendMessagePushNotificationParam {
   userId: number
   title: string
   body: string
+  project: Project
 }
 
 export interface SendDataPushNotificationParam {
   userId: number
   data: { [key: string]: string }
+  project: Project
 }
 
 const isMessagePushNotification = function(
@@ -37,10 +40,15 @@ export class SendPushNotificationJobUserJob implements Job<SendPushNotificationP
       await this.pushNotificationService.sendUserMessageNotification(
         fcmTokens,
         param.title,
-        param.body
+        param.body,
+        param.project
       )
     } else {
-      await this.pushNotificationService.sendUserDataNotification(fcmTokens, param.data)
+      await this.pushNotificationService.sendUserDataNotification(
+        fcmTokens,
+        param.data,
+        param.project
+      )
     }
   }
 }

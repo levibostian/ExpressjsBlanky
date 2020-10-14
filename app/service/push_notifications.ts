@@ -1,11 +1,7 @@
 import admin from "firebase-admin"
 import { Logger } from "../logger"
-import * as result from "../type/result"
-
-admin.initializeApp({
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  credential: admin.credential.cert(require("../config/firebase_key.json"))
-})
+import { Project } from "../type/project"
+import { projects } from "../projects"
 
 export class ApnOptionsBuilder {
   private performBackgroundFetch = false
@@ -33,33 +29,57 @@ export interface PushNotificationPayload {
 }
 
 export interface PushNotificationService {
-  assertService(): Promise<result.Result<void>>
-  sendUserMessageNotification(deviceTokens: string[], title: string, body: string): Promise<void>
-  sendUserDataNotification(deviceTokens: string[], data: { [key: string]: string }): Promise<void>
-  sendTopicProjectUpdated(projectId: string): Promise<void>
-  sendToTopic(topicName: string, payload: PushNotificationPayload): Promise<void> // meant to be used privately
+  startup(): Promise<void>
+  sendUserMessageNotification(
+    deviceTokens: string[],
+    title: string,
+    body: string,
+    project: Project
+  ): Promise<void>
+  sendUserDataNotification(
+    deviceTokens: string[],
+    data: { [key: string]: string },
+    project: Project
+  ): Promise<void>
+  sendTopicProjectUpdated(project: Project): Promise<void>
+  sendToTopic(topicName: string, payload: PushNotificationPayload, project: Project): Promise<void> // meant to be used privately
 }
 
 export class FcmPushNotificationService implements PushNotificationService {
+  private firebaseApps: Map<Project, admin.app.App> = new Map()
+
   constructor(private logger: Logger) {}
 
-  async assertService(): Promise<result.Result<void>> {
-    try {
-      const apps = await admin.projectManagement().listAppMetadata()
+  async startup(): Promise<void> {
+    projects.forEach(project => {
+      this.firebaseApps.set(
+        project,
+        admin.initializeApp(
+          {
+            credential: admin.credential.cert(project.config.firebase_project)
+          },
+          project.name
+        )
+      )
+    })
+
+    for await (const entry of this.firebaseApps) {
+      const project = entry[0]
+      const firebaseApp = entry[1]
+
+      const apps = await firebaseApp.projectManagement().listAppMetadata()
 
       if (apps.length <= 0) {
-        return new Error("No apps added to project.")
+        throw new Error(`No apps added to project, ${project.name}.`)
       }
-    } catch (error) {
-      console.log("Error happened")
-      console.log(error)
     }
   }
 
   async sendUserMessageNotification(
     deviceTokens: string[],
     title: string,
-    body: string
+    body: string,
+    project: Project
   ): Promise<void> {
     /**
      * You can add iOS or Android specific fields to the notification request. Below we are using only fields that work on both to keep it simple.
@@ -80,12 +100,16 @@ export class FcmPushNotificationService implements PushNotificationService {
       tokens: deviceTokens
     }
 
-    await admin.messaging().sendMulticast(message)
+    await this.firebaseApps
+      .get(project)!
+      .messaging()
+      .sendMulticast(message)
   }
 
   async sendUserDataNotification(
     deviceTokens: string[],
-    data: { [key: string]: string }
+    data: { [key: string]: string },
+    project: Project
   ): Promise<void> {
     const message: {
       data: { [key: string]: string }
@@ -95,24 +119,32 @@ export class FcmPushNotificationService implements PushNotificationService {
       tokens: deviceTokens
     }
 
-    await admin.messaging().sendMulticast(message)
+    await this.firebaseApps
+      .get(project)!
+      .messaging()
+      .sendMulticast(message)
   }
 
   async sendMessageToDevices(deviceTokens: string[], title: string, body: string): Promise<void> {}
 
-  async sendTopicProjectUpdated(projectId: string): Promise<void> {
-    const topicName = `project_updated_${projectId}`
-    await this.sendTopicMessage(topicName, {
+  async sendTopicProjectUpdated(project: Project): Promise<void> {
+    const topicName = `project_updated_${project.name}`
+    await this.sendTopicMessage(topicName, project, {
       apns: new ApnOptionsBuilder().setPerformBackgroundFetch(true)
     })
   }
 
-  async sendToTopic(topicName: string, payload: PushNotificationPayload): Promise<void> {
-    await this.sendTopicMessage(topicName, payload)
+  async sendToTopic(
+    topicName: string,
+    payload: PushNotificationPayload,
+    project: Project
+  ): Promise<void> {
+    await this.sendTopicMessage(topicName, project, payload)
   }
 
   private async sendTopicMessage(
     topicName: string,
+    project: Project,
     payload?: PushNotificationPayload
   ): Promise<void> {
     const message = FcmPushNotificationMessageBuilder.buildTopicMessage(topicName, payload || {})
@@ -121,7 +153,10 @@ export class FcmPushNotificationService implements PushNotificationService {
       pushNotification: message
     })
 
-    await admin.messaging().send(message)
+    await this.firebaseApps
+      .get(project)!
+      .messaging()
+      .send(message)
   }
 }
 

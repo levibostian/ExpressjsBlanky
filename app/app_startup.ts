@@ -9,31 +9,47 @@ import { Firebase } from "./service/firebase"
 import { PushNotificationService } from "./service/push_notifications"
 import { assertJobQueue } from "./jobs"
 import { sleep } from "./util"
+import { projects, setupProjects } from "./projects"
+import { Files } from "./service"
+import { Env } from "./env"
 
 const logger: Logger = Di.inject(Dependency.Logger)
-initDatabase(logger)
+const files: Files = Di.inject(Dependency.Files)
+new Promise(async (res, rej) => {
+  logger.verbose("============== STARTING UP SERVER ==============")
+  res()
+})
   .then(async () => {
-    /**
-     * Run assertions against services *not* in our healthcheck to make sure they are all setup to work.
-     */
-    logger.verbose("Asserting postmark connection...")
+    logger.verbose(`X------ PROJECTS`)
+    setupProjects(`${Env.filesPathPrefix}/config/projects.json`, files)
+    logger.verbose(`X------ PROJECTS SUCCESS`)
+    logger.verbose(`        Projects loaded: ${projects.map(proj => proj.name)}`)
+
+    logger.verbose(`-X----- INITIALIZE DATABASE`)
+    await initDatabase(logger)
+    logger.verbose(`-X----- INITIALIZE DATABASE SUCCESS`)
+
+    logger.verbose(`--X--- POSTMARK CONNECTION`)
     await assertEmail(logger)
+    logger.verbose(`--X--- POSTMARK CONNECTION SUCCESS`)
 
-    logger.verbose("Asserting firebase connection...")
+    logger.verbose(`---X--- FIREBASE CONNECTION`)
     const firebase: Firebase = Di.inject(Dependency.Firebase)
-    await firebase.assertService()
+    await firebase.startup()
+    logger.verbose(`---X--- FIREBASE CONNECTION SUCCESS`)
 
-    logger.verbose("Asserting FCM push notifications connection...")
+    logger.verbose(`----X-- PUSH NOTIFICATIONS`)
     const pushNotifications: PushNotificationService = Di.inject(Dependency.PushNotificationService)
-    await pushNotifications.assertService()
+    await pushNotifications.startup()
+    logger.verbose(`----X-- PUSH NOTIFICATIONS SUCCESS`)
 
-    logger.verbose("Checking database connection...")
+    logger.verbose(`-----X- DATABASE CONNECTION`)
     await databaseHealthcheck()
+    logger.verbose(`-----X- DATABASE CONNECTION SUCCESS`)
 
-    logger.verbose("Checking job queue connection...")
-    await assertJobQueue() // checks redis, too.
-
-    logger.verbose("Asserting non healthcheck services at startup success")
+    logger.verbose(`------X REDIS CONNECTION`)
+    await assertJobQueue()
+    logger.verbose(`------X REDIS CONNECTION SUCCESS`)
   })
   .then(async () => {
     // I don't want to try and load controllers, models, and other services until I run the service assertions.
@@ -50,5 +66,5 @@ initDatabase(logger)
     console.log(error)
     logger.error(error)
 
-    await sleep(300000) // 5 minutes
+    await sleep(300000) // 5 minutes. This
   })

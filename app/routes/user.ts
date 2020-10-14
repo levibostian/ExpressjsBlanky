@@ -52,7 +52,7 @@ router.post(
 
         const userController: UserController = Di.inject(Dependency.UserController)
 
-        await userController.sendLoginLink(body.email)
+        await userController.sendLoginLink(body.email, req.project)
 
         return Promise.reject(new LoginUserSuccess("Check your email to login."))
       }

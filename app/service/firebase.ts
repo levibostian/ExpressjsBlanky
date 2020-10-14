@@ -1,12 +1,13 @@
 import * as result from "../type/result"
-import { Env } from "../env"
 import { Logger } from "../logger"
 import { Http } from "./http"
 import { createDynamicLink } from "../util"
+import { Project } from "../type/project"
+import { projects } from "../projects"
 
 export interface Firebase {
-  assertService(): Promise<result.Result<void>>
-  getShortDynamicLink(longLink: string): Promise<result.Result<string>>
+  startup(): Promise<result.Result<void>>
+  getShortDynamicLink(longLink: string, project: Project): Promise<result.Result<string>>
 }
 
 interface GetShortLinkDynamicLinkSuccessfulResponse {
@@ -15,26 +16,35 @@ interface GetShortLinkDynamicLinkSuccessfulResponse {
 
 export class AppFirebase implements Firebase {
   private http: Http
+  private firebaseApps: Map<Project, string> = new Map()
 
   constructor(private logger: Logger) {
     this.http = new Http("https://firebasedynamiclinks.googleapis.com")
   }
 
-  async assertService(): Promise<void> {
-    // We want to test to make sure that we are setup successfully to work with Firebase. Test authentication.
-    // To do that, we will create a dynamic link for a random URL and see if it worked. If so, we know it's successful.
-    await this.getShortDynamicLink(
-      createDynamicLink(
-        "https://en.wikipedia.org/wiki/Smith_Park_(Middletown,_Connecticut)?foo=bar&bar=foo"
+  async startup(): Promise<void> {
+    projects.forEach(project => {
+      this.firebaseApps.set(project, project.config.firebase_web_api_key)
+    })
+
+    for await (const project of projects) {
+      // We want to test to make sure that we are setup successfully to work with Firebase. Test authentication.
+      // To do that, we will create a dynamic link for a random URL and see if it worked. If so, we know it's successful.
+      await this.getShortDynamicLink(
+        createDynamicLink(
+          "https://en.wikipedia.org/wiki/Smith_Park_(Middletown,_Connecticut)?foo=bar&bar=foo",
+          project
+        ),
+        project
       )
-    )
+    }
   }
 
   /**
    * Make sure to call `createDynamicLink()` before you call this.
    */
-  async getShortDynamicLink(longLink: string): Promise<result.Result<string>> {
-    const webApiKey = this.getWebApiKey(Env.firebaseProjectId)
+  async getShortDynamicLink(longLink: string, project: Project): Promise<result.Result<string>> {
+    const webApiKey = this.firebaseApps.get(project)!
     const linkType = "UNGUESSABLE" // "SHORT" or "UNGUESSABLE". Specifies the randomly generated string at the end. Short is length of min 4 to be easy to type but should not be used for sensitive data since 4 is easy to guess. unguessable is 17 length.
 
     this.logger.breadcrumb("creating short dynamic link", {
@@ -85,10 +95,5 @@ export class AppFirebase implements Firebase {
 
       return error
     }
-  }
-
-  private getWebApiKey(projectId: string): string {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    return require("../config/firebase_projects.json")[projectId].web_api_key
   }
 }

@@ -10,7 +10,8 @@ import {
   LogRequestMiddleware,
   NormalizeRequestBody,
   TransformResponseBodyMiddleware,
-  DefaultErrorHandler
+  DefaultErrorHandler,
+  AssertProjectMiddleware
 } from "./middleware"
 import http, { Server } from "http"
 import controllers from "./routes"
@@ -37,6 +38,7 @@ export const startServer = (): Server => {
   app.use(bodyParser.urlencoded({ extended: false, limit: "100kb" }))
   app.use(bodyParser.json({ limit: "100kb" }))
   app.use(NormalizeRequestBody)
+  app.use(AssertProjectMiddleware)
   app.use(passport.initialize())
   app.use(helmet())
   app.use(LogRequestMiddleware(logger))
@@ -100,8 +102,9 @@ export const startServer = (): Server => {
     onSignal: serverCleanup
   })
 
-  server.listen(5000)
-  logger.verbose("Running server on :5000")
+  const port = 5000
+  server.listen(port)
+  logger.verbose(`============== RUNNING SERVER :${port} ==============`)
 
   return server
 }

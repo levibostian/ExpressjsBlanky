@@ -1,0 +1,19 @@
+{
+    "expressjsblanky": {
+        "firebase_project": {
+            "type": "service_account",
+            "project_id": "expressjsblanky",
+            "private_key_id": "XXXXXXXXXXXXXXXXXXXXXXX",
+            "private_key": "-----BEGIN PRIVATE KEY-----\nXXXXXXXXX\n-----END PRIVATE KEY-----\n",
+            "client_email": "firebase-adminsdk@expressjsblanky.iam.gserviceaccount.com",
+            "client_id": "XXXXXXXXXXXXXXXXXXXXXXX",
+            "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+            "token_uri": "https://oauth2.googleapis.com/token",
+            "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+            "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-%40expressjsblanky.iam.gserviceaccount.com"
+        },
+        "firebase_web_api_key": "XXXXXXXXXXXXXXXXXXXXXXX", // Found in Firebase project settings. "Web API"
+        "dynamic_link_hostname": "https://link.example.com", // dynamic link hostname for Firebase project. 
+        "mobile_app_bundle": "com.example.foo" // the package name/bundle id for your mobile app. it's assumed your Android and iOS apps are the same value. 
+    }
+}

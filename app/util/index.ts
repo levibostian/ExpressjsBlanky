@@ -1,4 +1,3 @@
-export * from "./dynamic_link"
 import isPlainObject from "lodash.isplainobject"
 import isEmail from "validator/lib/isEmail"
 import dayjs from "dayjs"
@@ -113,3 +112,5 @@ export const formatAllDates = (obj: { [key: string]: any }): Object => {
   })
 }
 /* eslint-enable @typescript-eslint/no-explicit-any */
+
+export * from "./dynamic_link"

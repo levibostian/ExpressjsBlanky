@@ -13,13 +13,13 @@
     "dev:debug": "skaffold debug --port-forward",
     "build": "npm run build:compile && npm run build:copy",
     "build:compile": "rm -rf dist && npx tsc",
-    "build:copy": "npx copyfiles -u 1 app/.env dist/ && npx copyfiles -u 1 app/Versionfile dist/ && npx copyfiles app/config/* -u 2 dist/config/",
+    "build:copy": "npx copyfiles -u 1 app/Versionfile dist/",
     "db:migrate:create": "npx sequelize migration:create",
     "db:migrate": "npx sequelize db:migrate --debug",
     "db:migrate:undo": "npx sequelize db:migrate:undo",
     "generate:doc": "npx apidoc -i app/ -o docs/",
     "format": "npx prettier --write \"{app,tests}/**/*.ts\"",
-    "lint": "npx tsc -b tsconfig.lint.json && npx eslint --fix --ext ts,js ."
+    "lint": "npx eslint --fix --ext ts,js . && npx tsc -b tsconfig.lint.json"
   },
   "husky": {
     "hooks": {
@@ -76,7 +76,7 @@
     "@types/connect-trim-body": "0.0.0",
     "@types/cors": "^2.8.7",
     "@types/dotenv": "^8.2.0",
-    "@types/express": "^4.17.2",
+    "@types/express": "^4.17.8",
     "@types/express-brute": "0.0.37",
     "@types/express-mung": "^0.5.2",
     "@types/express-routes-versioning": "^1.0.1",

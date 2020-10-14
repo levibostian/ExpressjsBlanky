@@ -52,6 +52,19 @@ spec:
           # Setting a very low timeout value (e.g. 1 second) can cause false-positive
           # checks and service interruption.
           timeoutSeconds: 5
+        env:
+        - name: FILES_PATH_PREFIX
+          valueFrom:
+            configMapKeyRef:
+              name: app-configmap
+              key: FILES_PATH_PREFIX
+        volumeMounts:
+        - name: app-config-secret
+          mountPath: "/etc/app/config"
+          readOnly: true
+        - name: dotenv-secret
+          mountPath: "/etc/app/"
+          readOnly: true
       # Allow sufficient amount of time (90 seconds = periodSeconds * failureThreshold) in the liveness probe for your app's registered shutdown handlers to run to completion.
       terminationGracePeriodSeconds: 45
       imagePullSecrets:
@@ -61,6 +74,13 @@ spec:
       - ip: "192.168.64.1" # Use `minikube ssh grep host.minikube.internal /etc/hosts | cut -f1` on local machine to get it. 
         hostnames:
         - "host.minikube.internal"
+      volumes:
+      - name: app-config-secret
+        secret:
+          secretName: app-config
+      - name: dotenv-secret
+        secret:
+          secretName: dotenv
 ---        
 apiVersion: v1
 kind: Service
