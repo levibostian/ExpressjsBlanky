@@ -3,16 +3,13 @@
   "version": "0.1.0",
   "scripts": {
     "test:comment": "# https://github.com/visionmedia/supertest/issues/520 for reason why we use both --forceExit and --detectOpenHandles, ",
-    "test:integration": "npx jest --testPathPattern=\".+tests/integration/.+.spec.ts\" --runInBand --detectOpenHandles --forceExit",
+    "test:integration": "DISABLE_BRUTEFORCE_PREVENTION=true npx jest --testPathPattern=\".+tests/integration/.+.spec.ts\" --runInBand --detectOpenHandles --forceExit",
     "test:unit": "npx jest --testPathPattern=\".+tests/unit/.+.spec.ts\" --runInBand --detectOpenHandles --forceExit",
-    "script": "babel-node --extensions \".ts,.tsx\"",
-    "test": "./bin/tests.sh",
+    "test": "DISABLE_BRUTEFORCE_PREVENTION=true npx --no-install jest --runInBand --detectOpenHandles --forceExit",
     "dev:setup": "./bin/dev_setup.sh",
     "dev": "npm run build:copy && npx tsc --watch",
     "dev:debug": "skaffold debug --port-forward",
-    "build": "npm run build:compile && npm run build:copy",
-    "build:compile": "rm -rf dist && npx tsc",
-    "build:copy": "npx copyfiles -u 1 app/Versionfile dist/",
+    "build": "rm -rf dist && npx tsc",
     "db:migrate:create": "npx sequelize migration:create",
     "db:migrate": "npx sequelize db:migrate --debug",
     "db:migrate:undo": "npx sequelize db:migrate:undo",
@@ -31,6 +28,45 @@
     ]
   },
   "author": "Levi Bostian <levi@curiosityio.com>",
+  "subsets": {
+    "test": {
+      "exclude": [
+        "nodemon",
+        "eslint",
+        "eslint-plugin-jest",
+        "husky",
+        "lint-staged",
+        "prettier"
+      ]
+    },
+    "dev_container": {
+      "exclude": [
+        "jest",
+        "jest-junit",
+        "eslint",
+        "eslint-plugin-jest",
+        "husky",
+        "lint-staged",
+        "prettier",
+        "ts-jest",
+        "supertest"
+      ]
+    },
+    "build": {
+      "exclude": [
+        "nodemon",
+        "jest",
+        "jest-junit",
+        "eslint",
+        "eslint-plugin-jest",
+        "husky",
+        "lint-staged",
+        "prettier",
+        "ts-jest",
+        "supertest"
+      ]
+    }
+  },
   "dependencies": {
     "@godaddy/terminus": "^4.3.1",
     "axios": "^0.19.0",
@@ -51,7 +87,6 @@
     "helmet": "^3.21.2",
     "honeybadger": "^1.3.0",
     "humps": "^2.0.1",
-    "jest": "^26.5.3",
     "lodash.isequal": "^4.5.0",
     "lodash.isnil": "^4.0.0",
     "lodash.isplainobject": "^4.0.6",
@@ -100,12 +135,13 @@
     "@types/validator": "^12.0.1",
     "@typescript-eslint/eslint-plugin": "^4.3.0",
     "@typescript-eslint/parser": "^4.3.0",
-    "copyfiles": "^2.4.0",
     "eslint": "^6.7.2",
     "eslint-plugin-jest": "^23.1.1",
     "husky": "^3.1.0",
+    "jest": "^26.6.0",
     "jest-junit": "^11.0.0",
     "lint-staged": "^9.5.0",
+    "nodemon": "^2.0.6",
     "prettier": "^1.19.1",
     "sequelize-cli": "^5.5.1",
     "source-map-support": "^0.5.19",

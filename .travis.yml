@@ -17,7 +17,6 @@ before_install:
 install:  
   - bundle install
   - bundle exec cici decrypt --verbose # for development/testing  
-  - npm install
 
 cache:
   bundler: true
@@ -27,15 +26,19 @@ jobs:
   include:
     - stage: commit
       script: 
-        - npm run test:setup; npm run test;
-        - ruby ./bin/ci/docker.rb test
+        - set -e 
+        - npx install-subset install test
+        - npm run test:setup
+        - npm run test
     - stage: pr
       script:
-        - npm run test:setup; npm run test;
-        - bundle exec danger --fail-on-errors=true
-    - stage: deploy
-      script:         
-        - ruby ./bin/ci/docker.rb deploy 
+        - set -e
+        - npx install-subset install test
+        - npm run test:setup
+        - npm run test
+    # - stage: deploy
+    #   script:         
+    #     - ruby ./bin/ci/docker.rb deploy 
 
 stages:
   - name: commit 

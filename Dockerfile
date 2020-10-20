@@ -4,7 +4,7 @@ WORKDIR /build
 COPY package*.json tsconfig.json /build/
 COPY app /build/app/
 COPY @types /build/@types/
-RUN npm ci
+RUN npx install-subset install build
 RUN npm run build
 
 FROM node:12-alpine 
@@ -21,7 +21,6 @@ ENV NODE_ENV $ENV
 COPY --from=builder --chown=node:node /build/dist ${HOME}/dist
 COPY --chown=node:node package*.json ${HOME}/
 
-RUN npm install --production &&\
-    npm install nodemon 
+RUN npm install --production
 
 CMD node dist/app_startup.js
