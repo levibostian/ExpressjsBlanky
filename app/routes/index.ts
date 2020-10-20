@@ -2,7 +2,6 @@ import express from "express"
 import userRouter from "./user"
 import adminRouter from "./admin"
 import path from "path"
-import fs from "fs"
 
 const router = express.Router()
 
@@ -13,8 +12,12 @@ router.get("/", (req, res, next) => {
 let version: string | undefined
 router.get("/version", (req, res, next) => {
   if (!version) {
-    const filePath: string = path.join(__dirname, "../Versionfile")
-    version = fs.readFileSync(filePath, { encoding: "utf-8" }).trim()
+    const filePath: {
+      version: string
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+    } = require(path.join(__dirname, "../../package.json"))
+
+    version = filePath.version
   }
 
   return res.send({

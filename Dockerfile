@@ -19,7 +19,7 @@ ARG ENV=production
 ENV NODE_ENV $ENV
 
 COPY --from=builder --chown=node:node /build/dist ${HOME}/dist
-COPY --chown=node:node .sequelizerc package*.json Versionfile ${HOME}/
+COPY --chown=node:node package*.json ${HOME}/
 
 RUN npm install --production &&\
     npm install nodemon 
