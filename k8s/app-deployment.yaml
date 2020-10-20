@@ -68,11 +68,6 @@ spec:
       terminationGracePeriodSeconds: 45
       imagePullSecrets:
       - name: regcred
-      # For development to connect pod to host machine https://github.com/kubernetes/minikube/issues/8439#issuecomment-662244769
-      hostAliases: 
-      - ip: "192.168.64.1" # Use `minikube ssh grep host.minikube.internal /etc/hosts | cut -f1` on local machine to get it. 
-        hostnames:
-        - "host.minikube.internal"
       volumes:
       - name: app-config-secret
         secret:

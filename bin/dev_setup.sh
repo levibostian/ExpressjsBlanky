@@ -16,6 +16,7 @@ cp /dev/null $OUTPUT
 require_kubectl
 require_minikube
 require_skaffold
+require_database_dotenv
 
 cat << EOF
 ##################################################################
