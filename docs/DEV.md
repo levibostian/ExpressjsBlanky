@@ -131,7 +131,7 @@ Let's talk about automated software testing. Unit and integration tests in parti
 
 > Note: This document will not teach software testing, unfortunately. This document would simply become too long _and_ part of software testing is lots and lots of practice! Use the resources in this section to help guide you on how to run tests and then you can take that to learn more about how to write them. After that, practice. Trust me.
 
-To run tests, it's quite simple. Run `npm run test`. This 1 script will go through getting your 
+To run tests, it's quite simple. Run `npm run test`. This 1 script will go through getting your
 
 > Note: Tests run via [Jest](https://jestjs.io/) running in node. We run our application inside of Docker containers in a Kubernetes cluster but we run tests on their own just on node without containers. The biggest reason for this is because at this time Jest runs slowly in Docker containers.
 

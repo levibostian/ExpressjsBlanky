@@ -15,7 +15,8 @@ logVerbose "Full script output located at $OUTPUT. In case of an error, check ou
 
 function runTests() {
     log "Running tests..."
-    npx jest --runInBand --detectOpenHandles --forceExit --silent
+    # override .env values if needed. We want to disable bruteforce blocking
+    DISABLE_BRUTEFORCE_PREVENTION=true npx jest --runInBand --detectOpenHandles --forceExit --silent
 }
 
 function installJest() {
