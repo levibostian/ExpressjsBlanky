@@ -7,7 +7,7 @@ import { normalizeEmail } from "../util"
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const normalizeBody = (body: any): void => {
   if (Object.prototype.toString.call(body) === "[object Object]") {
-    Object.keys(body).forEach(function(key) {
+    Object.keys(body).forEach(function (key) {
       const value = body[key]
 
       if (typeof value === "string") {

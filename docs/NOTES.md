@@ -36,7 +36,7 @@ This works good for config files that are the same for each Kubernetes pod. When
 
 `Promise.reject` and `.catch()` exist so that you can handle when Errors happen in your code. In this application, we want to avoid using these. Rejected Promises should be reserved for when things go very bad. When the state of our application is in a place where it can no longer perform.
 
-> Note: It's in special places like `app/app_startup.ts` that we want to use `catch()` and have failures because if there is an error that happens in app startup, we want the app to crash and not continue.
+> Note: It's in special places like `app/start.ts` that we want to use `catch()` and have failures because if there is an error that happens in app startup, we want the app to crash and not continue.
 
 In our application, there are many tasks like performing HTTP requests and performing database queries where something could go wrong and we need to react to it. If `.catch()` is only used when something goes very wrong, is unexpected, and can no longer perform then that would be a bad time to use it.
 

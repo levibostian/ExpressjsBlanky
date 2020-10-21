@@ -30,6 +30,8 @@ class DiContainer {
   private singletons: Map<Dependency, any> = new Map()
 
   constructor() {
+    this.singletons.set(Dependency.RedisClient, new RedisClient(Env.redis))
+
     this.singletons.set(
       Dependency.PushNotificationService,
       new FcmPushNotificationService(this.inject(Dependency.Logger))
@@ -41,7 +43,6 @@ class DiContainer {
         this.inject(Dependency.Logger)
       )
     )
-    this.singletons.set(Dependency.RedisClient, new RedisClient(Env.redis))
   }
 
   async close(): Promise<void> {

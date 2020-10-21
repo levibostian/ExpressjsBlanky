@@ -2,12 +2,10 @@ import dotenv, { DotenvConfigOptions } from "dotenv"
 import { ClientOpts } from "redis"
 import { RedisOptions } from "ioredis"
 import isNil from "lodash.isnil"
-
-// eslint-disable-next-line no-process-env
-const filesPathPrefix = process.env.FILES_PATH_PREFIX || __dirname
+import path from "path"
 
 const dotEnvConfig: DotenvConfigOptions = {
-  path: `${filesPathPrefix}/.env`
+  path: path.join(__dirname, "../.env")
 }
 const result = dotenv.config(dotEnvConfig)
 
@@ -44,7 +42,6 @@ export interface Environment {
   }
   appHost: string
   enableBruteforcePrevention: boolean
-  filesPathPrefix: string
 }
 
 export const requireEnv = (key: string): string => {
@@ -98,7 +95,6 @@ export const Env: Environment = {
     adminToken: requireEnv("ADMIN_TOKEN")
   },
   appHost: requireEnv("APP_HOST"),
-  enableBruteforcePrevention: !isDefined("DISABLE_BRUTEFORCE_PREVENTION"),
-  filesPathPrefix: process.env.FILES_PATH_PREFIX || __dirname
+  enableBruteforcePrevention: !isDefined("DISABLE_BRUTEFORCE_PREVENTION")
 }
 /* eslint-enable no-process-env */

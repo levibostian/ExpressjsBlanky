@@ -1,7 +1,6 @@
 import uid2 from "uid2"
 import { Sequelize, DataTypes, Transaction } from "sequelize"
 import { Model, SequelizeModel } from "./type"
-import { normalizeEmail } from "../util"
 
 export class UserSequelizeModel extends SequelizeModel {
   public id!: number
@@ -75,13 +74,13 @@ export class UserModel implements Model<UserPublic> {
   static findUserOrCreateByEmail(emailAddress: string): Promise<[UserModel, boolean]> {
     return UserSequelizeModel.findCreateFind({
       where: {
-        email: normalizeEmail(emailAddress)
+        email: emailAddress
       },
       defaults: {
         passwordToken: uid2(255),
         passwordTokenCreated: new Date()
       }
-    }).then(res => [res[0].getUser(), res[1]])
+    }).then((res) => [res[0].getUser(), res[1]])
   }
 
   static findUserById(userId: number): Promise<UserModel | null> {
@@ -89,7 +88,7 @@ export class UserModel implements Model<UserPublic> {
       where: {
         id: userId
       }
-    }).then(res => (res ? res.getUser() : null))
+    }).then((res) => (res ? res.getUser() : null))
   }
 
   static findUserByAccessToken(accessToken: string): Promise<UserModel | null> {
@@ -97,7 +96,7 @@ export class UserModel implements Model<UserPublic> {
       where: {
         accessToken: accessToken
       }
-    }).then(res => (res ? res.getUser() : null))
+    }).then((res) => (res ? res.getUser() : null))
   }
 
   static findByPasswordlessToken(token: string): Promise<UserModel | null> {
@@ -105,29 +104,29 @@ export class UserModel implements Model<UserPublic> {
       where: {
         passwordToken: token
       }
-    }).then(res => (res ? res.getUser() : null))
+    }).then((res) => (res ? res.getUser() : null))
   }
 
   static create(email: string): Promise<UserModel> {
     return UserSequelizeModel.create({
-      email: normalizeEmail(email),
+      email: email,
       passwordToken: uid2(255),
       passwordTokenCreated: new Date()
-    }).then(res => res.getUser())
+    }).then((res) => res.getUser())
   }
 
   static findByEmail(emailAddress: string): Promise<UserModel | null> {
     return UserSequelizeModel.findOne({
       where: {
-        email: normalizeEmail(emailAddress)
+        email: emailAddress
       }
-    }).then(res => (res ? res.getUser() : null))
+    }).then((res) => (res ? res.getUser() : null))
   }
 
   findOrCreateSelf(transaction: Transaction): Promise<UserModel> {
     return UserSequelizeModel.findCreateFind({
       where: {
-        email: normalizeEmail(this.email)
+        email: this.email
       },
       defaults: {
         accessToken: this.accessToken,
@@ -137,7 +136,7 @@ export class UserModel implements Model<UserPublic> {
         updatedAt: this.updatedAt
       },
       transaction: transaction
-    }).then(res => res[0].getUser())
+    }).then((res) => res[0].getUser())
   }
 
   private update(update: Object): Promise<UserModel> {
@@ -146,7 +145,7 @@ export class UserModel implements Model<UserPublic> {
         id: this.id
       },
       returning: true
-    }).then(res => res[1][0].getUser())
+    }).then((res) => res[1][0].getUser())
   }
 
   async delete(): Promise<void> {

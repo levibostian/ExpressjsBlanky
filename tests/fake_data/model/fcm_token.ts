@@ -2,11 +2,10 @@ import { FcmTokenModel } from "../../../app/model"
 import uid2 from "uid2"
 import { FakeDataGenerator } from "../types"
 import { UserFakeDataGenerator } from "./user"
-import { createDependencies } from "../util"
 import { Transaction } from "sequelize/types"
 
 export class FcmTokenFakeDataGenerator extends FcmTokenModel implements FakeDataGenerator {
-  private dependencies: FakeDataGenerator[] = []
+  public dependencies: FakeDataGenerator[] = []
 
   static tokenForUserDevice(id: number, user: UserFakeDataGenerator): FcmTokenFakeDataGenerator {
     const token = uid2(200)
@@ -17,9 +16,7 @@ export class FcmTokenFakeDataGenerator extends FcmTokenModel implements FakeData
     return fakeModel
   }
 
-  async create(transaction: Transaction): Promise<void> {
-    await createDependencies(this.dependencies)
-
-    await this.findOrCreateSelf(transaction)
+  create(transaction: Transaction): Promise<unknown> {
+    return this.findOrCreateSelf(transaction)
   }
 }

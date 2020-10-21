@@ -47,7 +47,7 @@ export const startServer = (): Server => {
   const corsWhitelist = ["http://localhost:8080", Env.appHost]
   app.use(
     cors({
-      origin: function(origin, callback) {
+      origin: function (origin, callback) {
         // Allow no origin (server to server or mobile app communication) or if origin found in white list.
         if (!origin || corsWhitelist.indexOf(origin) !== -1) {
           callback(null, true)
@@ -90,7 +90,7 @@ export const startServer = (): Server => {
     // Kubernetes ingress controllers keep connections live until the readiness/liveness probe is returning false. Therefore, we need to set a delay of readiness probe periodSeconds + a couple seconds (to prevent race conditions). That way the pod will begin shutting down after the readiness probe fails and the ingress controller is not trying to send connections to the pod while shutting down.
     const numberOfSeconds = 17
 
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       setTimeout(resolve, numberOfSeconds * 1000)
     })
   }

@@ -4,7 +4,7 @@ import { Project, ProjectConfig } from "./type/project"
 export let projects: Project[]
 
 export const getProject = (name: string): Project | undefined => {
-  return projects.find(project => project.name == name)
+  return projects.find((project) => project.name == name)
 }
 
 export const setupProjects = (configFilePath: string, files: Files): void => {

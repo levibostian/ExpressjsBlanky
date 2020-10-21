@@ -7,7 +7,6 @@ import { UserModel, UserPublic } from "../model"
 import { check } from "express-validator"
 import { Dependency, Di } from "../di"
 import { UserController } from "../controller/user"
-import { normalizeEmail } from "../util"
 
 const router = express.Router()
 const routesVersioning = expressRoutesVersioning()
@@ -39,12 +38,7 @@ router.post(
   bruteForcePrevent(), // To prevent sending too many emails.
   routesVersioning({
     "1.0.0": createEndpoint({
-      validate: [
-        check("email")
-          .exists()
-          .isEmail()
-          .customSanitizer(email => normalizeEmail(email))
-      ],
+      validate: [check("email").exists().isEmail()],
       request: async (req, res, next) => {
         const body: {
           email: string
@@ -54,7 +48,7 @@ router.post(
 
         await userController.sendLoginLink(body.email, req.project)
 
-        return Promise.reject(new LoginUserSuccess("Check your email to login."))
+        next(new LoginUserSuccess("Check your email to login."))
       }
     })
   })
@@ -80,16 +74,14 @@ router.post(
 
         const user = await userController.exchangePasswordlessToken(body.passwordless_token)
         if (!user) {
-          return Promise.reject(
+          return next(
             new UserEnteredBadDataError(
               "Sorry! Please enter your email into the app and try to login again. The link is expired."
             )
           )
         }
 
-        return Promise.reject(
-          new LoginAccessTokenSuccess("Successfully logged in.", user.privateRepresentation())
-        )
+        next(new LoginAccessTokenSuccess("Successfully logged in.", user.privateRepresentation()))
       }
     })
   })
@@ -111,7 +103,7 @@ router.post(
 
         await userController.addFcmToken(user.id, body.token)
 
-        return Promise.reject(new Success("Updated."))
+        next(new Success("Updated."))
       }
     })
   })

@@ -8,6 +8,7 @@ set -e
 
 . bin/log.sh
 . bin/require.sh
+. bin/db_setup.sh
 
 OUTPUT="/tmp/app_dev.log"
 
@@ -34,7 +35,8 @@ EOF
 logSuccess "Note: Server will be available at localhost:5000 once it is up!"
 logVerbose "Full script output located at $OUTPUT. In case of an error, check out that file."
 
-./bin/db_setup.sh
+ask_to_clear_db
+start_dbs
 
 # Now that our databases are up and ready for connections, let's startup our application. 
 logVerbose "Starting up development server..."

@@ -19,7 +19,7 @@ export const assertJobQueue = async (): Promise<void> => {
   const redisClient: RedisClient = Di.inject(Dependency.RedisClient)
   const pingAsync = promisify(redisClient.ping).bind(redisClient)
 
-  await pingAsync().then(result => {
+  await pingAsync().then((result) => {
     if (result !== "PONG") {
       throw Error(`Connection to redis server unsuccessful. Response from PING: ${result}`)
     }
@@ -69,7 +69,7 @@ export class AppJobQueueManager implements JobQueueManager {
     const subscriber = new Redis(Env.redis)
 
     const opts: QueueOptions = {
-      createClient: function(type) {
+      createClient: function (type) {
         switch (type) {
           case "client":
             return client
@@ -84,7 +84,7 @@ export class AppJobQueueManager implements JobQueueManager {
     const getQueue = <T>(job: Job<any, any>): Queue<T> => {
       const queue = new Bull(job.name, opts)
 
-      queue.on("error", err => {
+      queue.on("error", (err) => {
         logger.error(err)
       })
       queue.on("failed", (job, err) => {
@@ -93,7 +93,7 @@ export class AppJobQueueManager implements JobQueueManager {
       queue.on("completed", (job, result) => {
         logger.debug(`Job complete. Id: ${job.id}`, job)
       })
-      queue.process(jobData => {
+      queue.process((jobData) => {
         logger.debug(`Job id: ${jobData.id} running.`)
 
         return job.run(jobData.data)

@@ -4,19 +4,10 @@ services:
 
 env:
   global:        
-    - DOCKER_COMPOSE_VERSION=1.24.1
-    - STAGING_DEPLOY_USER=core
-    - STAGING_DEPLOY_HOST=111.111.111.111
-    - PROD_DEPLOY_USER=core
-    - PROD_DEPLOY_HOST=222.222.222.222    
-    - DEPLOY_SSH_PORT=22
-    # ------------ SECRETS ------------
-    # DANGER_GITHUB_API_TOKEN
-before_install:
-  - curl -o- https://raw.githubusercontent.com/levibostian/ci-bootstrap/master/docker/compose-install.sh | bash     
+    - FOO=bar
 install:  
-  - bundle install
-  - bundle exec cici decrypt --verbose # for development/testing  
+  - gem install cici
+  - cici decrypt --verbose # for development/testing  
 
 cache:
   bundler: true
@@ -28,13 +19,11 @@ jobs:
       script: 
         - set -e 
         - npx install-subset install test
-        - npm run test:setup
         - npm run test
     - stage: pr
       script:
         - set -e
         - npx install-subset install test
-        - npm run test:setup
         - npm run test
     # - stage: deploy
     #   script:         

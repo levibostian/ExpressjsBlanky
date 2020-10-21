@@ -23,4 +23,4 @@ COPY --chown=node:node package*.json ${HOME}/
 
 RUN npm install --production
 
-CMD node dist/app_startup.js
+CMD node dist/start.js

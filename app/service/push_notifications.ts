@@ -51,7 +51,7 @@ export class FcmPushNotificationService implements PushNotificationService {
   constructor(private logger: Logger) {}
 
   async startup(): Promise<void> {
-    projects.forEach(project => {
+    projects.forEach((project) => {
       this.firebaseApps.set(
         project,
         admin.initializeApp(
@@ -100,10 +100,7 @@ export class FcmPushNotificationService implements PushNotificationService {
       tokens: deviceTokens
     }
 
-    await this.firebaseApps
-      .get(project)!
-      .messaging()
-      .sendMulticast(message)
+    await this.firebaseApps.get(project)!.messaging().sendMulticast(message)
   }
 
   async sendUserDataNotification(
@@ -119,10 +116,7 @@ export class FcmPushNotificationService implements PushNotificationService {
       tokens: deviceTokens
     }
 
-    await this.firebaseApps
-      .get(project)!
-      .messaging()
-      .sendMulticast(message)
+    await this.firebaseApps.get(project)!.messaging().sendMulticast(message)
   }
 
   async sendMessageToDevices(deviceTokens: string[], title: string, body: string): Promise<void> {}
@@ -153,10 +147,7 @@ export class FcmPushNotificationService implements PushNotificationService {
       pushNotification: message
     })
 
-    await this.firebaseApps
-      .get(project)!
-      .messaging()
-      .send(message)
+    await this.firebaseApps.get(project)!.messaging().send(message)
   }
 }
 

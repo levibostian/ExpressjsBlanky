@@ -53,7 +53,7 @@ Waiting for deployments to stabilize...
  - deployment/app-deployment: waiting for rollout to finish: 0 of 1 updated replicas are available...
  - deployment/app-deployment is ready.
 Port forwarding service/app-service in namespace default, remote port 80 -> address 127.0.0.1 port 5000
-[app] [nodemon] starting `node --enable-source-maps dist/app_startup.js`
+[app] [nodemon] starting `node --enable-source-maps dist/start.js`
 [app] VERBOSE: Authenticating database connection. - Extra: (none)
 [app] VERBOSE: Database connection is setup successful - Extra: (none)
 [app] VERBOSE: Checking job queue connection... - Extra: (none)
@@ -203,7 +203,7 @@ Watching for changes...
 [app] [nodemon] to restart at any time, enter `rs`
 [app] [nodemon] watching path(s): *.*
 [app] [nodemon] watching extensions: js,mjs,json
-[app] [nodemon] starting `node --enable-source-maps dist/app_startup.js`
+[app] [nodemon] starting `node --enable-source-maps dist/start.js`
 [app] VERBOSE: Starting up job queue manager - Extra: (none)
 [app] VERBOSE: Done starting up job queue manager - Extra: (none)
 [app] VERBOSE: ============== STARTING UP SERVER ============== - Extra: (none)

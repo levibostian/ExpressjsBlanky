@@ -7,7 +7,7 @@ describe(`FcmModel tests`, () => {
     const user = UserFakeDataGenerator.completeSignup(1)
     const fcmToken = FcmTokenFakeDataGenerator.tokenForUserDevice(1, user)
 
-    await setup([user, fcmToken])
+    await setup([fcmToken, user])
 
     const fcmTokenBeforeUserDelete = await FcmTokenModel.findByUserId(user.id)
     expect(fcmTokenBeforeUserDelete).toHaveLength(1)

@@ -5,18 +5,13 @@ import {
   adminAuthHeader
 } from "../../../integration/index"
 import uid2 from "uid2"
-import {
-  UserEnteredBadDataError,
-  Success,
-  Unauthorized,
-  FieldsError
-} from "../../../../app/responses"
+import { Success, Unauthorized, FieldsError } from "../../../../app/responses"
 import { UserFakeDataGenerator } from "../../../fake_data"
 import { Di, Dependency } from "../../../../app/di"
 import { endpointVersion } from "./index"
 import { EmailSenderMock } from "../../../mocks/email_sender"
 
-describe(`Create user ${endpointVersion}`, () => {
+describe(`Create user`, () => {
   const endpoint = "/admin/user"
 
   const emailSenderMock = new EmailSenderMock()
@@ -56,7 +51,7 @@ describe(`Create user ${endpointVersion}`, () => {
         expect(emailSenderMock.sendLoginMock).not.toHaveBeenCalled()
       })
   })
-  it("should error user by email already exists", async () => {
+  it("should succeed when email already exists", async () => {
     const user = UserFakeDataGenerator.newSignup(1)
 
     await setup([user], overrideDependencies)
@@ -65,7 +60,7 @@ describe(`Create user ${endpointVersion}`, () => {
       .set(adminAuthHeader())
       .set(endpointVersionHeader(endpointVersion))
       .send({ email: user.email })
-      .expect(UserEnteredBadDataError.code)
+      .expect(Success.code)
       .then(() => {
         expect(emailSenderMock.sendLoginMock).not.toHaveBeenCalled()
       })
@@ -80,7 +75,7 @@ describe(`Create user ${endpointVersion}`, () => {
       .set(endpointVersionHeader(endpointVersion))
       .send({ email: user.email })
       .expect(Success.code)
-      .then(async res => {
+      .then(async (res) => {
         expect(res.body.user).toEqual(user.publicRepresentation())
         expect(emailSenderMock.sendLoginMock).not.toHaveBeenCalled()
       })

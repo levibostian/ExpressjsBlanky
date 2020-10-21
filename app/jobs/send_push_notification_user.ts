@@ -16,7 +16,7 @@ export interface SendDataPushNotificationParam {
   project: Project
 }
 
-const isMessagePushNotification = function(
+const isMessagePushNotification = function (
   param: SendMessagePushNotificationParam | SendDataPushNotificationParam
 ): param is SendMessagePushNotificationParam {
   return (param as SendMessagePushNotificationParam).body !== undefined
@@ -33,7 +33,7 @@ export class SendPushNotificationJobUserJob implements Job<SendPushNotificationP
 
   async run(param: SendPushNotificationParam): Promise<void> {
     const fcmTokens = (await FcmTokenModel.findByUserId(param.userId)).map(
-      fcmToken => fcmToken.token
+      (fcmToken) => fcmToken.token
     )
 
     if (isMessagePushNotification(param)) {

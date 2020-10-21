@@ -1,13 +1,24 @@
 import { FakeDataGenerator } from "./types"
-import { PromiseAllSequential } from "../../app/util"
 import { transaction } from "../../app/model"
 import uid2 from "uid2"
+import { Transaction } from "sequelize"
 
 export const createDependencies = async (dependencies: FakeDataGenerator[]): Promise<void> => {
-  await transaction(transaction => {
-    const createQueries = dependencies.map(dep => dep.create(transaction))
+  const getCreateQueries = async (
+    dependencies: FakeDataGenerator[],
+    transaction: Transaction
+  ): Promise<void> => {
+    for await (const dependency of dependencies) {
+      if (dependency.dependencies.length > 0) {
+        await getCreateQueries(dependency.dependencies, transaction)
+      }
 
-    return PromiseAllSequential(createQueries)
+      await dependency.create(transaction)
+    }
+  }
+
+  await transaction(async (transaction) => {
+    await getCreateQueries(dependencies, transaction)
   })
 }
 

@@ -20,4 +20,4 @@ COPY app ./app
 # nodemon to make auto restart node when compiled sources change.
 # --enable-source-maps to display .ts files in stacktrace instead of un-helpful transpiled .js files
 #    You can also use 'source-map-support' npm package if this built-in node arg doesn't work.
-CMD npx nodemon --enable-source-maps dist/app_startup.js
+CMD npx nodemon --enable-source-maps dist/start.js

@@ -1,6 +1,7 @@
 import express from "express"
 import expressRoutesVersioning from "express-routes-versioning"
 import Arena from "bull-arena"
+import Bull from "bull"
 import { Di, Dependency } from "../di"
 import { JobQueueManager } from "../jobs"
 import { createEndpoint } from "./util"
@@ -8,7 +9,6 @@ import { Env } from "../env"
 import { Success } from "../responses"
 import { UserPublic } from "../model"
 import { check } from "express-validator"
-import { normalizeEmail } from "../util"
 import { AdminController } from "../controller/admin"
 import { authMiddleware, AuthType } from "../middleware"
 
@@ -47,12 +47,7 @@ router.post(
   authMiddleware(AuthType.AdminBearer),
   routesVersioning({
     "1.0.0": createEndpoint({
-      validate: [
-        check("email")
-          .exists()
-          .isEmail()
-          .customSanitizer(email => normalizeEmail(email))
-      ],
+      validate: [check("email").exists().isEmail()],
       request: async (req, res, next) => {
         const body: {
           email: string
@@ -62,7 +57,7 @@ router.post(
 
         const user = await controller.createOrGetUser(body.email)
 
-        return Promise.reject(new AddUserSuccess("Successfully created user.", user))
+        next(new AddUserSuccess("Successfully created user.", user.publicRepresentation()))
       }
     })
   })
@@ -72,6 +67,7 @@ const jobQueueManager: JobQueueManager = Di.inject(Dependency.JobQueueManager)
 
 const arena = Arena(
   {
+    Bull,
     queues: jobQueueManager.getQueueInfo()
   },
   {

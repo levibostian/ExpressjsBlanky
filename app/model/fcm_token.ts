@@ -46,7 +46,7 @@ export class FcmTokenModel implements Model<FcmTokenPublic> {
         userId: userId
       },
       order: [["id", "ASC"]]
-    }).then(results => results.map(fcmSequelizeModel => fcmSequelizeModel.getModel()))
+    }).then((results) => results.map((fcmSequelizeModel) => fcmSequelizeModel.getModel()))
   }
 
   static create(userId: number, token: string): Promise<FcmTokenModel> {
@@ -63,7 +63,7 @@ export class FcmTokenModel implements Model<FcmTokenPublic> {
           }
         ]
       }
-    ).then(res => res.getModel())
+    ).then((res) => res.getModel())
   }
 
   findOrCreateSelf(transaction: Transaction): Promise<FcmTokenModel> {
@@ -73,7 +73,7 @@ export class FcmTokenModel implements Model<FcmTokenPublic> {
         userId: this.userId
       },
       transaction: transaction
-    }).then(res => res[0].getModel())
+    }).then((res) => res[0].getModel())
   }
 
   async delete(): Promise<void> {

@@ -23,7 +23,7 @@ export class RedisKeyValueStorage implements KeyValueStorage {
   private async get<T>(key: string): Promise<T | undefined> {
     const getAsync = promisify(this.redis.get).bind(this.redis)
 
-    const value: string = await getAsync(key)
+    const value = await getAsync(key)
 
     if (isnil(value)) {
       return undefined

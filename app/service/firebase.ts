@@ -23,7 +23,7 @@ export class AppFirebase implements Firebase {
   }
 
   async startup(): Promise<void> {
-    projects.forEach(project => {
+    projects.forEach((project) => {
       this.firebaseApps.set(project, project.config.firebase_web_api_key)
     })
 

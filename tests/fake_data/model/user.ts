@@ -4,6 +4,8 @@ import { FakeDataGenerator } from "../types"
 import { Transaction } from "sequelize/types"
 
 export class UserFakeDataGenerator extends UserModel implements FakeDataGenerator {
+  public dependencies: FakeDataGenerator[] = []
+
   static newSignup(id: number): UserFakeDataGenerator {
     const email = `${uid2(10)}@example.com`
     const passwordToken = uid2(255)
@@ -45,7 +47,7 @@ export class UserFakeDataGenerator extends UserModel implements FakeDataGenerato
     )
   }
 
-  async create(transaction: Transaction): Promise<void> {
-    await this.findOrCreateSelf(transaction)
+  create(transaction: Transaction): Promise<unknown> {
+    return this.findOrCreateSelf(transaction)
   }
 }

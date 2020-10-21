@@ -1,6 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: app-configmap
-data:
-  FILES_PATH_PREFIX: /etc/app

@@ -54,31 +54,31 @@ export class AppLogger implements Logger {
   }
 
   start(app: Application): void {
-    this.loggers.forEach(logger => logger.start(app))
+    this.loggers.forEach((logger) => logger.start(app))
   }
 
   stop(app: Application): void {
-    this.loggers.forEach(logger => logger.stop(app))
+    this.loggers.forEach((logger) => logger.stop(app))
   }
 
   debug(message: string, extras?: Extras): void {
-    this.loggers.forEach(logger => logger.debug(message, extras))
+    this.loggers.forEach((logger) => logger.debug(message, extras))
   }
 
   verbose(message: string, extras?: Extras): void {
-    this.loggers.forEach(logger => logger.verbose(message, extras))
+    this.loggers.forEach((logger) => logger.verbose(message, extras))
   }
 
   error(error: Error, extra?: Object): void {
-    this.loggers.forEach(logger => logger.error(error, extra))
+    this.loggers.forEach((logger) => logger.error(error, extra))
   }
 
   context(data: Extras): void {
-    this.loggers.forEach(logger => logger.context(data))
+    this.loggers.forEach((logger) => logger.context(data))
   }
 
   breadcrumb(key: string, extras?: Extras): void {
-    this.loggers.forEach(logger => logger.breadcrumb(key, extras))
+    this.loggers.forEach((logger) => logger.breadcrumb(key, extras))
   }
 }
 

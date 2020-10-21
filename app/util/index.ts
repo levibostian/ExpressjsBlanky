@@ -2,8 +2,8 @@ import isPlainObject from "lodash.isplainobject"
 import isEmail from "validator/lib/isEmail"
 import dayjs from "dayjs"
 
-export const sleep = function(ms: number): Promise<void> {
-  return new Promise(resolve => {
+export const sleep = function (ms: number): Promise<void> {
+  return new Promise((resolve) => {
     setTimeout(resolve, ms)
   })
 }
@@ -11,7 +11,7 @@ export const sleep = function(ms: number): Promise<void> {
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export const trimAllStrings = (obj: { [key: string]: any }): void => {
   const helper = (obj: { [key: string]: any }): void => {
-    Object.keys(obj).forEach(function(key) {
+    Object.keys(obj).forEach(function (key) {
       if (typeof obj[key] === "string") {
         obj[key] = obj[key].trim()
       }
@@ -77,7 +77,7 @@ export const mapAllProperties = (
   const obj = _obj
 
   const helper = (obj: { [key: string]: any }): void => {
-    Object.keys(obj).forEach(function(key) {
+    Object.keys(obj).forEach(function (key) {
       const value = obj[key]
 
       // Nested object
@@ -102,7 +102,7 @@ export const mapAllProperties = (
 }
 
 export const formatAllDates = (obj: { [key: string]: any }): Object => {
-  return mapAllProperties(obj, value => {
+  return mapAllProperties(obj, (value) => {
     if (value instanceof Date) {
       // Thanks, https://stackoverflow.com/a/643827/1486374
       return dayjs(value).format("YYYY-MM-DDTHH:mm:ssZ")

@@ -44,14 +44,14 @@ describe("createDynamicLink", () => {
     const givenQueryString = "foo=1&bar=true"
 
     expect(createDynamicLink(givenQueryString, projects[0])).toMatchInlineSnapshot(
-      `"${projects[0].config.dynamic_link_hostname}/?link=https%3A%2F%2Fapp.foo.com%2F%3Ffoo%3D1%26bar%3Dtrue%26mobile_link%3Dtrue&apn=com.foo.xxx&ibi=com.foo.xxx"`
+      `"https://expressjsblanky.page.link/?link=https%3A%2F%2Fapp.foo.com%2F%3Ffoo%3D1%26bar%3Dtrue%26mobile_link%3Dtrue&apn=com.example.foo&ibi=com.example.foo"`
     )
   })
   it(`given query param string with ? prefix, expect get url`, async () => {
     const givenQueryString = "?foo=1&bar=true"
 
     expect(createDynamicLink(givenQueryString, projects[0])).toMatchInlineSnapshot(
-      `"${projects[0].config.dynamic_link_hostname}/?link=https%3A%2F%2Fapp.foo.com%2F%3Ffoo%3D1%26bar%3Dtrue%26mobile_link%3Dtrue&apn=com.foo.xxx&ibi=com.foo.xxx"`
+      `"https://expressjsblanky.page.link/?link=https%3A%2F%2Fapp.foo.com%2F%3Ffoo%3D1%26bar%3Dtrue%26mobile_link%3Dtrue&apn=com.example.foo&ibi=com.example.foo"`
     )
   })
   it(`given dynamic link, expect util also says its valid`, async () => {

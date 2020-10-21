@@ -34,7 +34,7 @@ export const initDatabase = async (logger: Logger): Promise<void> => {
 
   sequelize = new Sequelize(sequelizeConfig)
 
-  models.forEach(model => {
+  models.forEach((model) => {
     model.initModel(sequelize!)
 
     model.setupAssociations()
@@ -63,8 +63,9 @@ export const transaction = <T>(autoCallback: (t: Transaction) => PromiseLike<T>)
 }
 
 export const resetDatabase = async (): Promise<void> => {
-  const destroys = models.map(model =>
-    model.truncate({
+  const destroys = models.map((model) =>
+    // eslint-disable-next-line
+    (model as any).truncate({
       cascade: true,
       restartIdentity: true
     })

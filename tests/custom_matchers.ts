@@ -1,14 +1,9 @@
 import isEqual from "lodash.isequal"
 import { transformResponseBody } from "../app/middleware"
 
-declare global {
-  namespace jest {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    interface Matchers<R, T> {
-      toEqualServerResponse(a: object): R
-    }
-  }
-}
+/**
+ * Note: Do not forget to define types! Add to @types/custom.d.ts
+ */
 expect.extend({
   /**
    * When you have an integration test with `res.body` you are trying to test against an Object, comparing both objects as a stringified version of each other is better because the response from the server is usually in a JSON string version while the object you are comparing the response body with may not be a string which results in failed tests that may have the exact same data in each object, but one property might be a Date object while another might be a string representation of that Date, for example.

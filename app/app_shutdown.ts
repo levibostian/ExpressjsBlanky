@@ -22,7 +22,7 @@ const closeRedis = async (logger: Logger): Promise<void> => {
       res()
     })
   })
-  await new Promise(resolve => setImmediate(resolve))
+  await new Promise((resolve) => setImmediate(resolve))
   // End closing redis client
 }
 

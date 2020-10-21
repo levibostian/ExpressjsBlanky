@@ -12,7 +12,7 @@ export class Http {
       baseURL: baseUrl,
       timeout: timeoutMillis || 1000, // in millis
       // If response code is not in range, an error will be thrown.
-      validateStatus: function(status) {
+      validateStatus: function (status) {
         return status >= 200 && status < 300 // default
       }
     })
@@ -23,7 +23,7 @@ export class Http {
       .get(path, {
         headers: options?.headers
       })
-      .catch(err => {
+      .catch((err) => {
         return Promise.reject(err)
       })
 
@@ -39,7 +39,7 @@ export class Http {
       .post(path, body, {
         headers: options?.headers
       })
-      .catch(err => {
+      .catch((err) => {
         return Promise.reject(err)
       })
 

@@ -23,7 +23,7 @@ const emailSenderMock: EmailSender = {
 const overrideDependencies = (): void => {
   Di.override(Dependency.EmailSender, emailSenderMock)
 }
-describe(`Receive login email passwordless token. ${endpointVersion}`, () => {
+describe(`Receive login email passwordless token.`, () => {
   const endpoint = "/user/login"
 
   it("should error missing email param", async () => {
@@ -31,7 +31,7 @@ describe(`Receive login email passwordless token. ${endpointVersion}`, () => {
     await serverRequest()
       .post(endpoint)
       .set(endpointVersionHeader(endpointVersion))
-      .then(res => {
+      .then((res) => {
         expect(res.status).toBe(FieldsError.code)
       })
   })
@@ -41,7 +41,7 @@ describe(`Receive login email passwordless token. ${endpointVersion}`, () => {
       .post(endpoint)
       .set(endpointVersionHeader(endpointVersion))
       .send({ email: uid2(20) })
-      .then(res => {
+      .then((res) => {
         expect(res.status).toBe(FieldsError.code)
       })
   })
@@ -53,7 +53,7 @@ describe(`Receive login email passwordless token. ${endpointVersion}`, () => {
       .set(endpointVersionHeader(endpointVersion))
       .send({ email: testUser.email, bundle: "com.foo.foo" })
       .expect(Success.code)
-      .then(res => {
+      .then((res) => {
         expect(sendWelcomeMock).toBeCalledTimes(1)
         expect(sendWelcomeMock.mock.calls[0][2].appLoginLink).toEqual(
           expect.stringContaining(projects[0].config.dynamic_link_hostname)
@@ -71,7 +71,7 @@ describe(`Receive login email passwordless token. ${endpointVersion}`, () => {
       .set(endpointVersionHeader(endpointVersion))
       .send({ email: testUser.email, bundle: "com.foo.foo" })
       .expect(Success.code)
-      .then(res => {
+      .then((res) => {
         expect(sendWelcomeMock).toBeCalledTimes(1)
         expect(sendWelcomeMock.mock.calls[0][2].appLoginLink).toEqual(
           expect.stringContaining(projects[0].config.dynamic_link_hostname)
@@ -83,7 +83,7 @@ describe(`Receive login email passwordless token. ${endpointVersion}`, () => {
   })
 })
 
-describe(`Get access token from passwordless token. ${endpointVersion}`, () => {
+describe(`Get access token from passwordless token`, () => {
   const endpoint = "/user/login/token"
 
   it("should error missing param", async () => {
@@ -91,7 +91,7 @@ describe(`Get access token from passwordless token. ${endpointVersion}`, () => {
     await serverRequest()
       .post(endpoint)
       .set(endpointVersionHeader(endpointVersion))
-      .then(res => {
+      .then((res) => {
         expect(res.status).toBe(FieldsError.code)
       })
   })
@@ -101,7 +101,7 @@ describe(`Get access token from passwordless token. ${endpointVersion}`, () => {
       .post(endpoint)
       .set(endpointVersionHeader(endpointVersion))
       .send({ passwordless_token: uid2(20) })
-      .then(res => {
+      .then((res) => {
         expect(res.status).toBe(UserEnteredBadDataError.code)
       })
   })
@@ -118,7 +118,7 @@ describe(`Get access token from passwordless token. ${endpointVersion}`, () => {
       .post(endpoint)
       .set(endpointVersionHeader(endpointVersion))
       .send({ passwordless_token: testUser.passwordToken })
-      .then(res => {
+      .then((res) => {
         expect(res.status).toBe(UserEnteredBadDataError.code)
       })
   })
@@ -130,14 +130,14 @@ describe(`Get access token from passwordless token. ${endpointVersion}`, () => {
       .set(endpointVersionHeader(endpointVersion))
       .send({ passwordless_token: testUser.passwordToken })
       .expect(Success.code)
-      .then(async res => {
+      .then(async (res) => {
         const testUserAfterCall = await UserModel.findUserById(testUser.id)
-        expect(res.body.user).toEqual(testUserAfterCall!.privateRepresentation())
+        expect(res.body.user).toEqualServerResponse(testUserAfterCall!.privateRepresentation())
       })
   })
 })
 
-describe(`Update FCM token. ${endpointVersion}`, () => {
+describe(`Update FCM token.`, () => {
   const endpoint = "/user/fcm"
 
   it("should error no access token.", async () => {
@@ -145,7 +145,7 @@ describe(`Update FCM token. ${endpointVersion}`, () => {
     await serverRequest()
       .post(endpoint)
       .set(endpointVersionHeader(endpointVersion))
-      .then(res => {
+      .then((res) => {
         expect(res.status).toBe(Unauthorized.code)
       })
   })
@@ -156,7 +156,7 @@ describe(`Update FCM token. ${endpointVersion}`, () => {
       .post(endpoint)
       .set(authHeader(testUser.accessToken!))
       .set(endpointVersionHeader(endpointVersion))
-      .then(res => {
+      .then((res) => {
         expect(res.status).toBe(Unauthorized.code)
       })
   })
@@ -167,7 +167,7 @@ describe(`Update FCM token. ${endpointVersion}`, () => {
       .post(endpoint)
       .set(authHeader(testUser.accessToken!))
       .set(endpointVersionHeader(endpointVersion))
-      .then(res => {
+      .then((res) => {
         expect(res.status).toBe(FieldsError.code)
       })
   })
@@ -181,7 +181,7 @@ describe(`Update FCM token. ${endpointVersion}`, () => {
       .set(authHeader(testUser.accessToken!))
       .send({ token: newToken })
       .expect(Success.code)
-      .then(async res => {
+      .then(async (res) => {
         const createdTokens = await FcmTokenModel.findByUserId(testUser.id)
 
         expect(createdTokens).toHaveLength(1)
@@ -207,7 +207,7 @@ describe(`Update FCM token. ${endpointVersion}`, () => {
       .set(authHeader(testUser.accessToken!))
       .send({ token: newToken })
       .expect(Success.code)
-      .then(async res => {
+      .then(async (res) => {
         const tokensForUser = await FcmTokenModel.findByUserId(testUser.id)
 
         expect(tokensForUser).toHaveLength(100)
