@@ -29,8 +29,8 @@ new Promise(async (res, rej) => {
     await server.serverPostStart()
   })
   .catch(async (error: Error) => {
-    console.log(error)
+    logger.verbose("!!!!!!!!!!!! SERVER STARTUP FAILED !!!!!!!!!!!!")
     logger.error(error)
 
-    await sleep(300000) // 5 minutes. This
+    await sleep(300000) // 5 minutes. This is so we can debug, locally. If we fail instantly, k8s will restart the container instantly but if we sleep for a while k8s will only restart after the readiness probe fails.
   })

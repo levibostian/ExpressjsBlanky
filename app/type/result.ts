@@ -10,3 +10,9 @@ export function isError<T>(result: Result<T>): result is Error {
 export function isSuccess<T>(result: Result<T>): result is T {
   return !isError(result)
 }
+
+export function throwIfError(result: Result<unknown>): void {
+  if (isError(result)) {
+    throw result
+  }
+}

@@ -1,4 +1,4 @@
-import * as result from "../type/result"
+import * as HttpResponse from "../type/http_response"
 import { Logger } from "../logger"
 import { Http } from "./http"
 import { createDynamicLink } from "../util"
@@ -6,8 +6,8 @@ import { Project } from "../type/project"
 import { projects } from "../projects"
 
 export interface Firebase {
-  startup(): Promise<result.Result<void>>
-  getShortDynamicLink(longLink: string, project: Project): Promise<result.Result<string>>
+  startup(): Promise<void>
+  getShortDynamicLink(longLink: string, project: Project): Promise<HttpResponse.Type<string>>
 }
 
 interface GetShortLinkDynamicLinkSuccessfulResponse {
@@ -19,7 +19,7 @@ export class AppFirebase implements Firebase {
   private firebaseApps: Map<Project, string> = new Map()
 
   constructor(private logger: Logger) {
-    this.http = new Http("https://firebasedynamiclinks.googleapis.com")
+    this.http = new Http("https://firebasedynamiclinks.googleapis.com", logger)
   }
 
   async startup(): Promise<void> {
@@ -30,20 +30,25 @@ export class AppFirebase implements Firebase {
     for await (const project of projects) {
       // We want to test to make sure that we are setup successfully to work with Firebase. Test authentication.
       // To do that, we will create a dynamic link for a random URL and see if it worked. If so, we know it's successful.
-      await this.getShortDynamicLink(
+      const response = await this.getShortDynamicLink(
         createDynamicLink(
           "https://en.wikipedia.org/wiki/Smith_Park_(Middletown,_Connecticut)?foo=bar&bar=foo",
           project
         ),
         project
       )
+
+      HttpResponse.throwIfUnsuccessful(response)
     }
   }
 
   /**
    * Make sure to call `createDynamicLink()` before you call this.
    */
-  async getShortDynamicLink(longLink: string, project: Project): Promise<result.Result<string>> {
+  async getShortDynamicLink(
+    longLink: string,
+    project: Project
+  ): Promise<HttpResponse.Type<string>> {
     const webApiKey = this.firebaseApps.get(project)!
     const linkType = "UNGUESSABLE" // "SHORT" or "UNGUESSABLE". Specifies the randomly generated string at the end. Short is length of min 4 to be easy to type but should not be used for sensitive data since 4 is easy to guess. unguessable is 17 length.
 
@@ -62,38 +67,19 @@ export class AppFirebase implements Firebase {
          "previewLink": "https://xxx.page.link/SiJ80?d=1"
         }
      */
-    try {
-      const response: GetShortLinkDynamicLinkSuccessfulResponse = await this.http.post(
-        `/v1/shortLinks?key=${webApiKey}`,
-        {
-          longDynamicLink: longLink,
-          suffix: {
-            option: linkType
-          }
+    const response = await this.http.post<GetShortLinkDynamicLinkSuccessfulResponse>(
+      `/v1/shortLinks?key=${webApiKey}`,
+      {
+        longDynamicLink: longLink,
+        suffix: {
+          option: linkType
         }
-      )
-
-      return response.shortLink
-    } catch (error) {
-      if (error.response) {
-        // The request was made and the server responded with a status code
-        // that falls out of the range of 2xx
-        console.log(error.response.data)
-        console.log(error.response.status)
-        console.log(error.response.headers)
-      } else if (error.request) {
-        console.log("Request was made, but no response received")
-        // The request was made but no response was received
-        // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-        // http.ClientRequest in node.js
-        // console.log(error.request)
-      } else {
-        // Something happened in setting up the request that triggered an Error
-        console.log("Error", error.message)
       }
-      console.log(error.config)
-
-      return error
+    )
+    if (HttpResponse.isError(response)) {
+      return response
+    } else {
+      return response.shortLink
     }
   }
 }

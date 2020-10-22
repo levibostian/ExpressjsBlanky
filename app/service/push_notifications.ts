@@ -2,6 +2,7 @@ import admin from "firebase-admin"
 import { Logger } from "../logger"
 import { Project } from "../type/project"
 import { projects } from "../projects"
+import * as Result from "../type/result"
 
 export class ApnOptionsBuilder {
   private performBackgroundFetch = false
@@ -35,14 +36,14 @@ export interface PushNotificationService {
     title: string,
     body: string,
     project: Project
-  ): Promise<void>
+  ): Promise<Result.Type<void>>
   sendUserDataNotification(
     deviceTokens: string[],
     data: { [key: string]: string },
     project: Project
-  ): Promise<void>
-  sendTopicProjectUpdated(project: Project): Promise<void>
-  sendToTopic(topicName: string, payload: PushNotificationPayload, project: Project): Promise<void> // meant to be used privately
+  ): Promise<Result.Type<void>>
+  sendTopicProjectUpdated(project: Project): Promise<Result.Type<void>>
+  // sendToTopic(topicName: string, payload: PushNotificationPayload, project: Project): Promise<Result.Type<void>> // meant to be used privately
 }
 
 export class FcmPushNotificationService implements PushNotificationService {
@@ -80,7 +81,7 @@ export class FcmPushNotificationService implements PushNotificationService {
     title: string,
     body: string,
     project: Project
-  ): Promise<void> {
+  ): Promise<Result.Type<void>> {
     /**
      * You can add iOS or Android specific fields to the notification request. Below we are using only fields that work on both to keep it simple.
      *
@@ -100,14 +101,18 @@ export class FcmPushNotificationService implements PushNotificationService {
       tokens: deviceTokens
     }
 
-    await this.firebaseApps.get(project)!.messaging().sendMulticast(message)
+    try {
+      await this.firebaseApps.get(project)!.messaging().sendMulticast(message)
+    } catch (error) {
+      return error
+    }
   }
 
   async sendUserDataNotification(
     deviceTokens: string[],
     data: { [key: string]: string },
     project: Project
-  ): Promise<void> {
+  ): Promise<Result.Type<void>> {
     const message: {
       data: { [key: string]: string }
       tokens: string[]
@@ -116,38 +121,47 @@ export class FcmPushNotificationService implements PushNotificationService {
       tokens: deviceTokens
     }
 
-    await this.firebaseApps.get(project)!.messaging().sendMulticast(message)
+    try {
+      await this.firebaseApps.get(project)!.messaging().sendMulticast(message)
+    } catch (error) {
+      return error
+    }
   }
 
   async sendMessageToDevices(deviceTokens: string[], title: string, body: string): Promise<void> {}
 
-  async sendTopicProjectUpdated(project: Project): Promise<void> {
+  async sendTopicProjectUpdated(project: Project): Promise<Result.Type<void>> {
     const topicName = `project_updated_${project.name}`
-    await this.sendTopicMessage(topicName, project, {
+
+    return this.sendTopicMessage(topicName, project, {
       apns: new ApnOptionsBuilder().setPerformBackgroundFetch(true)
     })
   }
 
-  async sendToTopic(
+  sendToTopic(
     topicName: string,
     payload: PushNotificationPayload,
     project: Project
-  ): Promise<void> {
-    await this.sendTopicMessage(topicName, project, payload)
+  ): Promise<Result.Type<void>> {
+    return this.sendTopicMessage(topicName, project, payload)
   }
 
   private async sendTopicMessage(
     topicName: string,
     project: Project,
     payload?: PushNotificationPayload
-  ): Promise<void> {
+  ): Promise<Result.Type<void>> {
     const message = FcmPushNotificationMessageBuilder.buildTopicMessage(topicName, payload || {})
     this.logger.verbose(`sending push notification topic`, {
       topic: topicName,
       pushNotification: message
     })
 
-    await this.firebaseApps.get(project)!.messaging().send(message)
+    try {
+      await this.firebaseApps.get(project)!.messaging().send(message)
+    } catch (error) {
+      return error
+    }
   }
 }
 
