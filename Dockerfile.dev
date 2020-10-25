@@ -1,21 +1,21 @@
-FROM node:12-alpine
+# We want this image to be as close to the production image as possible. We copied all the contents of production and put 
+# it inside of this file and then added some pieces we needed. 
+FROM node:12-alpine 
 
 EXPOSE 5000
 
-# USER node
-RUN mkdir /home/app
-WORKDIR /home/app
+ENV HOME=/home/app/
+RUN mkdir -p ${HOME}
+WORKDIR ${HOME}
 
-EXPOSE 5000
+ENV NODE_ENV=development
 
-ARG ENV=development
-ENV NODE_ENV $ENV
+COPY --chown=node:node package*.json ${HOME}/
+COPY --chown=node:node dist ${HOME}/dist
+COPY --chown=node:node app ${HOME}/app
 
-COPY package* ./
-RUN npm install -g install-subset
-RUN subset install --npm dev_container
-COPY dist ./dist
-COPY app ./app
+RUN npm install -g install-subset &&\
+    subset install --npm dev_container
 
 # nodemon to make auto restart node when compiled sources change.
 # --enable-source-maps to display .ts files in stacktrace instead of un-helpful transpiled .js files

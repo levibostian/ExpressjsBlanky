@@ -82,7 +82,7 @@ Luckily, the ingress controller takes care of most of this for us. But it's impo
 
 ### Install Ingress controller
 
-Follow [this official guide](https://kubernetes.github.io/ingress-nginx/deploy/), let's go through the steps to install. It's recommended to follow the install instructions for your k8s cluster provider (example DigitalOcean) instead of using the generic Helm installation.
+Follow [this official guide](https://kubernetes.github.io/ingress-nginx/deploy/). It's recommended to follow the install instructions for your k8s cluster provider (example DigitalOcean) instead of using the generic Helm installation.
 
 > Note: If you are using DigitalOcean as your k8s provider, you need to do some extra steps for setup. Go to the section [Misc](#Misc) in this document to find out instructions on how to do that.
 

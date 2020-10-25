@@ -19,6 +19,7 @@ env:
     # DOCKER_PASSWORD - GitHub token you generated to give access to packages. 
     # GITHUB_TOKEN - personal access token where github username has push access to the repo to make comments and releases. 
     # CODECOV_TOKEN - codecov.io token for repository. Used for test coverage.
+    # HONEY_BADGER_API_KEY - API key to honeybadger project. Used to upload source maps.
 
 jobs:
   include:
@@ -34,11 +35,7 @@ jobs:
     - stage: deploy
       script:         
         - set -e 
-        - echo "$DOCKER_PASSWORD" | docker login "$DOCKER_REGISTRY" --username "$DOCKER_USERNAME" --password-stdin
-        - curl -Lo skaffold https://storage.googleapis.com/skaffold/releases/latest/skaffold-linux-amd64 && sudo install skaffold /usr/local/bin/
-        - snap install kubectl --classic
-        - curl -s https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh | bash && sudo install kustomize /usr/local/bin/
-        - npm i @semantic-release/git @semantic-release/npm @semantic-release/github @semantic-release/changelog @semantic-release/exec && npx semantic-release
+        - ./bin/deploy.sh
 
 stages:
   - name: tests
