@@ -2,6 +2,7 @@ secrets
 app/config/projects.json
 
 # manually added:
+coverage/
 coverage.html
 dist/
 .babel.json

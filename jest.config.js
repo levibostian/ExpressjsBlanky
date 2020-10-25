@@ -6,5 +6,7 @@ module.exports = {
   testEnvironment: "node",
   roots: ["app/", "tests/"],
   resetMocks: true,
-  setupFilesAfterEnv: ["./tests/setup.ts"]
+  setupFilesAfterEnv: ["./tests/setup.ts"],
+  coverageDirectory: "./coverage/",
+  collectCoverage: true
 }

@@ -60,7 +60,7 @@ export class Http {
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  /* eslint-disable @typescript-eslint/no-explicit-any */
   private processErrorResponse(
     error: any,
     path: string,
@@ -87,4 +87,5 @@ export class Http {
       return new HttpResponse.HttpNoResponseError()
     }
   }
+  /* eslint-enable @typescript-eslint/no-explicit-any */
 }

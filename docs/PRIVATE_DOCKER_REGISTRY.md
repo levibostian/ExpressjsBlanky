@@ -1,56 +1,37 @@
 # Private Docker registry
 
-When it comes to private Docker registries, there are a few options. Docker Hub, DigitalOcean, Google Cloud, AWS are all some. This project uses GitHub to store private Docker images. Why?
+When it comes to private Docker registries, there are a few options. Docker Hub, GitHub, DigitalOcean, Google Cloud, AWS are all some. This project uses GitHub to store private Docker images. Why?
 
 1. It is easy to setup. All you need is a token generated and you can `docker login` to login. Some services like AWS require that you do much more to login.
 2. We are already using GitHub to store our source code. Limiting the number of tools and services we use is a goal.
 
 # Create the registry
 
-See [this doc](./PRIVATE_DOCKER_REGISTRY.md) to learn how to create this registry.
+As long as you have a GitHub account, you have a registry! If you have an organization, you may need to [enable the registry feature](https://docs.github.com/en/free-pro-team@latest/packages/getting-started-with-github-container-registry/enabling-github-container-registry-for-your-organization).
 
 # Login to `docker`
 
-### Push built image to Docker registry
+We need to authenticate with GitHub to get the registry to work. To do this, you need to [generate a new token](https://github.com/settings/tokens/new).
 
-> Note: This project is currently not setup to build and deploy to the GitHub registry automatically. The setup below is small and simple, but that's because there is more work to do on this project and then there will be more setup.
-
-For now, build and push the built Docker image on your local computer to the GitHub registry.
-
-[Generate a new token](https://github.com/settings/tokens/new) _when logged into your new GitHub bot account_. Name the token something that describes who is using it and why. `ci-docker-push` is a good name. Give the token the following permissions:
+For the name, I recommend the name `docker push`. Give the following permissions:
 
 - read-packages
 - write-packages
 - delete-packages
 
-To login with Docker. `docker login docker.pkg.github.com --username <new-github-username>`
+> Note: You can create this GitHub token under your personal GitHub account or create it under a separate account that you use as a bit account (recommended).
 
-### Pull built image from Docker registry
+# Docker tag, Docker push
 
-Our k8s cluster will pull the image from the Docker registry when it does a deployment.
+This project is configured to automatically build, tag, and push your private Docker image for you. It uses the tool [skaffold](https://skaffold.dev/docs/workflows/ci-cd/) to do that.
 
-To authenticate `docker` to your GitHub image registry, you need to generate a token in your GitHub account. If you have not done so already, create a separate GitHub account besides your own. This account will be used as a bot to perform automated tasks. This is because the token you create will be able to view _all_ of your private repos and can push Docker images to your account for any repo. You probably do not want this to be done on your own personal GitHub account!
+You need to configure skaffold to push to the correct location. Open up the `skaffold.yaml` file and edit this line:
 
-- All of the GitHub repos for this project, add as a collaborator this new account you made. Make sure you have at least read/write permissions.
-
-- [Generate a new token](https://github.com/settings/tokens/new) _when logged into your new GitHub bot account_. Name the token something that describes who is using it and why. `k8s-cluster-pull` is a good name. Give the token the following permissions:
-  - read-packages
-
-After you create the registry, you need to setup your k8s manifests to pull from this private registry. Create a k8s secret that stores docker login info to pull the private images:
-
-```
-kubectl create secret docker-registry regcred --docker-server=docker.pkg.github.com --docker-username=<your-github-username-for-bot> --docker-password=<your-token-you-made> --docker-email=<your-github-email> --namespace=<name-of-namespace>
+```yaml
+profiles:
+- name: ci-deploy
+    artifacts:
+      - image: ghcr.io/github-username/repo-name # <---
 ```
 
-> Note: Yes, you must create this secret in all of the namespaces that you need to pull from this repo.
-
-Then, in your deployment config files, set this:
-
-```
-spec:
-  containers:
-  - name: private-reg-container
-    image: docker.pkg.github.com/github-repo-username/github-repo-name/app:0.1.0
-  imagePullSecrets:
-  - name: regcred
-```
+You will want to edit `github-username` and `repo-name`. Enter in the username/org name and repo name of the GitHub repo for your codebase.

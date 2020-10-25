@@ -22,6 +22,20 @@ deploy:
     manifests:
       - "k8s/*.yaml"
 
+profiles:
+- name: ci-deploy
+  activation:
+    - env: CI=true
+  build:
+    tagPolicy:
+      envTemplate:
+        template: "{{.IMAGE_TAG}}"
+    artifacts:
+      - image: ghcr.io/github-username/repo-name
+        context: .
+        docker:
+          dockerfile: Dockerfile
+
 # As long as you pass `--port-forward` to `skaffold dev/debug`, this maps local port 5000 to the node application
 portForward:
 - resourceType: service

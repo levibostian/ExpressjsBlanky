@@ -1,0 +1,19 @@
+{
+    "tagFormat": "${version}",
+    "plugins": [
+        "@semantic-release/commit-analyzer", 
+        ["@semantic-release/npm", {
+            "npmPublish": false,
+            "tarballDir": false
+        }],
+        "@semantic-release/release-notes-generator", 
+        ["@semantic-release/changelog", {
+            "changelogFile": "CHANGELOG.md"
+        }],
+        "@semantic-release/github",
+        "@semantic-release/git",
+        ["@semantic-release/exec", {
+            "publishCmd": "IMAGE_TAG=$(node -p \"require('./package.json').version\"); skaffold run"
+        }]
+    ]
+}

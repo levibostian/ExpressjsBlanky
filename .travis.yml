@@ -2,37 +2,48 @@ language: node_js
 services:
   - docker
 
-env:
-  global:        
-    - FOO=bar
-install:  
+before_install:
   - gem install cici
+
+before_script:
   - cici decrypt --verbose # for development/testing  
 
 cache:
-  bundler: true
   npm: true 
+
+env:
+  global:
+    - DOCKER_REGISTRY=ghcr.io # github registry
+    - DOCKER_USERNAME=username-here
+    # --------- The below entries need to be created as secrets -------------
+    # DOCKER_PASSWORD - GitHub token you generated to give access to packages. 
+    # GITHUB_TOKEN - personal access token where github username has push access to the repo to make comments and releases. 
+    # CODECOV_TOKEN - codecov.io token for repository. Used for test coverage.
 
 jobs:
   include:
-    - stage: commit
+    - stage: lint
       script: 
         - set -e 
-        - npx install-subset install test
-        - npm run test
-    - stage: pr
+        - npm i @commitlint/travis-cli @commitlint/config-conventional && npx commitlint-travis
+    - stage: tests
       script:
         - set -e
         - npx install-subset install test
-        - npm run test
-    # - stage: deploy
-    #   script:         
-    #     - ruby ./bin/ci/docker.rb deploy 
+        - npm run test && npx codecov
+    - stage: deploy
+      script:         
+        - set -e 
+        - echo "$DOCKER_PASSWORD" | docker login "$DOCKER_REGISTRY" --username "$DOCKER_USERNAME" --password-stdin
+        - curl -Lo skaffold https://storage.googleapis.com/skaffold/releases/latest/skaffold-linux-amd64 && sudo install skaffold /usr/local/bin/
+        - snap install kubectl --classic
+        - curl -s https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh | bash && sudo install kustomize /usr/local/bin/
+        - npm i @semantic-release/git @semantic-release/npm @semantic-release/github @semantic-release/changelog @semantic-release/exec && npx semantic-release
 
 stages:
-  - name: commit 
-    if: type IN (push) AND tag IS blank
-  - name: pr
-    if: type IN (pull_request)
+  - name: tests
+    if: type IN (push, pull_request) AND tag IS blank    
+  - name: lint
+    if: type IN (push, pull_request) AND tag IS blank    
   - name: deploy
-    if: tag IS present
+    if: type IN (push) AND branch IN (master, beta)
