@@ -11,7 +11,7 @@
       "address": "0.0.0.0",
       "sourceMaps": true,
       "localRoot": "${workspaceFolder}",
-      "remoteRoot": "/home/app/"
+      "remoteRoot": "/app/"
     },
     {
       "type": "node",

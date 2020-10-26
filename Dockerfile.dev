@@ -4,15 +4,14 @@ FROM node:12-alpine
 
 EXPOSE 5000
 
-ENV HOME=/home/app/
-RUN mkdir -p ${HOME}
-WORKDIR ${HOME}
+WORKDIR /app
 
 ENV NODE_ENV=development
 
-COPY --chown=node:node package*.json ${HOME}/
-COPY --chown=node:node dist ${HOME}/dist
-COPY --chown=node:node app ${HOME}/app
+COPY package*.json /app/
+COPY dist /app
+# app is only copied in because of skaffold. we are going to ignore it anyway.
+COPY app /tmp 
 
 RUN npm install -g install-subset &&\
     subset install --npm dev_container
@@ -20,4 +19,4 @@ RUN npm install -g install-subset &&\
 # nodemon to make auto restart node when compiled sources change.
 # --enable-source-maps to display .ts files in stacktrace instead of un-helpful transpiled .js files
 #    You can also use 'source-map-support' npm package if this built-in node arg doesn't work.
-CMD npx nodemon --enable-source-maps dist/start.js
+CMD npx nodemon --enable-source-maps start.js

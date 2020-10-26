@@ -53,11 +53,11 @@ spec:
           timeoutSeconds: 5
         volumeMounts:
         - name: {{ .Chart.Name }}-volume-projects
-          mountPath: "/home/app/dist/config/projects.json"
+          mountPath: "/app/config/projects.json"
           subPath: projects.json
           readOnly: true
         - name: {{ .Chart.Name }}-volume-dotenv
-          mountPath: "/home/app/.env"
+          mountPath: "/app/.env"
           subPath: .env
           readOnly: true
       # Allow sufficient amount of time (90 seconds = periodSeconds * failureThreshold) in the liveness probe for your app's registered shutdown handlers to run to completion.
