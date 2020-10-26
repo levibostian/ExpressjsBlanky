@@ -6,7 +6,9 @@ ENV HOME=/home/app/
 RUN mkdir -p ${HOME}
 WORKDIR ${HOME}
 
-ENV NODE_ENV=production
+# Override in skaffold.yaml with environemnt variable
+ARG ENV=testing 
+ENV NODE_ENV $ENV
 
 COPY --chown=node:node dist ${HOME}/dist
 COPY --chown=node:node package*.json ${HOME}/

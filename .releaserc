@@ -10,10 +10,10 @@
         ["@semantic-release/changelog", {
             "changelogFile": "CHANGELOG.md"
         }],
-        "@semantic-release/github",
-        "@semantic-release/git",
         ["@semantic-release/exec", {
-            "publishCmd": "PROJECTS=$(cat app/config/projects.json | base64) DOTENV=$(cat .env | base64) IMAGE_TAG=$(node -p \"require('./package.json').version\"); skaffold run"
-        }]
+            "publishCmd": "./bin/deploy_run.sh ${nextRelease.version}"
+        }],
+        "@semantic-release/github",
+        "@semantic-release/git"
     ]
 }

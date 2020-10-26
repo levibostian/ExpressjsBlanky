@@ -20,7 +20,7 @@ deploy:
   helm:
     releases:
     - name: app-release # !!!
-      namespace: "{{.K8S_NAMESPACE}}" 
+      namespace: "app-name-{{.DEPLOY_ENV}}" # !!! only edit `app-name` to your app name
       chartPath: 'charts/'
       setValueTemplates:
         secrets:
@@ -44,6 +44,8 @@ profiles:
         context: .
         docker:
           dockerfile: Dockerfile
+          buildArgs:
+            ENV: "{{.DEPLOY_ENV}}"
 
 # As long as you pass `--port-forward` to `skaffold dev/debug`, this maps local port 5000 to the node application
 portForward:
