@@ -16,9 +16,17 @@ Key:
 
 - (N) - Recommended reading for people who are new to this project. These documents help you understand this project better and help you get started using it.
 - (H) - How-to documents. Explain to you how to do something in the project.
+- (S) - Docs to read to setup this project and get it deployed for the first time. 
 
 # Documents
 
 - [Getting started developing for this application](DEV.md) - (N, H)
 - [Debugging your application with a debugger](DEBUG.md) - (H)
 - [Various notes about this project](NOTES.md) - (N)
+- [Setup your Kubernetes cluster for running your application](K8S.md) - (H, S)
+- [Setup a private Docker registry](PRIVATE_DOCKER_REGISTRY.md) - (H, S)
+- [Learn more about the security of this application](SECURITY.md) 
+- [Setup a server to host your databases](SERVER.md) - (H, S)
+- [Setup this project for your team to be ready to write code for it](SETUP.md) - (H, S)
+- [Learn the opinionated workflow to develop and deploy your software](WORKFLOW.md) - (N)
+- [Learn about environments, what they are, and how to manage them](ENV.md) - (H, S, N)

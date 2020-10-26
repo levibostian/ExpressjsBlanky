@@ -11,9 +11,17 @@
             "changelogFile": "CHANGELOG.md"
         }],
         ["@semantic-release/exec", {
-            "publishCmd": "./bin/deploy_run.sh ${nextRelease.version}"
+            "publishCmd": "./bin/make_release.sh ${nextRelease.version}"
         }],
-        "@semantic-release/github",
+        ["@semantic-release/github", {
+            "assets": [
+               {
+                  "path": "/tmp/helm-package/helm-package.tgz", 
+                  "name": "helm-package-${nextRelease.version}.tgz",
+                  "label": "Helm package ${nextRelease.version}"
+                }
+            ]
+          }],
         "@semantic-release/git"
     ]
 }

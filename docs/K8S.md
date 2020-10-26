@@ -141,6 +141,14 @@ Now, go back into your ingress rules and change to using `letsencrypt-production
 
 > Note: If you run `kubectl describe certificate safety-app-tls --namespace=namespace-name` and it does _not_ say `Certificate issued successfully`, then you have an issue somewhere. Follow [this guide](https://cert-manager.io/docs/faq/acme/) to help you debug what is wrong. I had to debug once and found out that I had limited my resources for a namespace too much which would not allow me to launch a new pod. I changed my resources to make room since SSL auto renew would need pods made in the future.
 
+# Helm
+
+We use the tool [Helm](https://helm.sh) to install our application into our k8s cluster. You don't need to learn about Helm to use it in this project as everything is already setup for you. All of the k8s files are stored in `charts/templates/`. 
+
+What you need to do is... 
+1. Open up `charts/Chart.yaml` and edit `app-name-here` to the name of your application. 
+2. Edit `charts/values.yaml` to values that you want for your application. You can enable/disable SSL, setup ingress rules, etc. 
+
 # Autoscaling
 
 Autoscaling comes in 2 forms. Autoscaling the number of pods for a deployment and autoscaling the nodes in the cluster. We are going to talk about both here. That way we can setup the cluster for full scaling automation.
