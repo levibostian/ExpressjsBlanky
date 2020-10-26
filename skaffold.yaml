@@ -1,13 +1,13 @@
+# !!! - These are lines that  you need to edit to align with your project
+
 apiVersion: skaffold/v2beta8
 kind: Config
 build:
   artifacts:
-    - image: app-image
+    - image: ghcr.io/github-username/repo-name # !!!
       context: .
       docker:
         dockerfile: Dockerfile.dev
-        buildArgs:
-          ENV: development
       sync: # This is explained better in DEV.md document. 
         infer:
         - 'dist/**/*.js'
@@ -15,12 +15,21 @@ build:
         - 'dist/**/*.map'
   local: 
     push: false
+
 deploy:
-  kustomize: 
-    paths: ["."]
-  kubectl: 
-    manifests:
-      - "k8s/*.yaml"
+  helm:
+    releases:
+    - name: app-release # !!!
+      namespace: "{{.K8S_NAMESPACE}}" 
+      chartPath: 'charts/'
+      setValueTemplates:
+        secrets:
+          dotenv: "{{.DOTENV}}"
+          projects: "{{.PROJECTS}}"
+      wait: true
+      remote: false
+      artifactOverrides:
+        image: ghcr.io/github-username/repo-name # !!! Skaffold continuously tags your image, so no need to put one here.
 
 profiles:
 - name: ci-deploy
@@ -31,7 +40,7 @@ profiles:
       envTemplate:
         template: "{{.IMAGE_TAG}}"
     artifacts:
-      - image: ghcr.io/github-username/repo-name
+      - image: ghcr.io/github-username/repo-name # !!!
         context: .
         docker:
           dockerfile: Dockerfile
@@ -39,6 +48,6 @@ profiles:
 # As long as you pass `--port-forward` to `skaffold dev/debug`, this maps local port 5000 to the node application
 portForward:
 - resourceType: service
-  resourceName: app-service
+  resourceName: app-service # !!! this value is dynamic from the helm chart. Set value to charts/templates/deployment.yaml service name at bottom of file. 
   port: 80
   localPort: 5000

@@ -1,10 +1,10 @@
 apiVersion: policy/v1beta1
 kind: PodDisruptionBudget
 metadata:
-  name: app-pdb
+  name: {{ .Chart.Name }}-pdb
 spec:
-  maxUnavailable: 1 # Meaning 1 can be down at a time for making new deployments, for example. Kill 1, replace 1 repeat. 
+  maxUnavailable: {{ .Values.pdb.maxUnavailable }} 
   # minAvailable: "40%" # 60% of the desired number of replicas must exist as healthy
   selector:
     matchLabels:
-      app: app
+      app: {{ .Chart.Name }}

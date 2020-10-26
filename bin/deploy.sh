@@ -18,7 +18,6 @@ logSuccess "Docker login"
 logVerbose "Installing dependencies"
 curl -Lo skaffold https://storage.googleapis.com/skaffold/releases/latest/skaffold-linux-amd64 && sudo install skaffold /usr/local/bin/
 snap install kubectl --classic
-curl -s https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh | bash && sudo install kustomize /usr/local/bin/
 logSuccess "Installing dependencies"
 
 logVerbose "Building sources"

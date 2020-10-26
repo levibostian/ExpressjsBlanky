@@ -1,36 +1,36 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: app-deployment
+  name: {{ .Chart.Name }}
   labels:
-    app: app
+    app: {{ .Chart.Name }}
 spec:
   strategy:
    rollingUpdate:
-     maxSurge: 1
-     maxUnavailable: 0
+     maxSurge: {{ .Values.rollingUpdate.maxSurge }} 
+     maxUnavailable: {{ .Values.rollingUpdate.maxUnavailable }} 
    type: RollingUpdate   
   selector:
     matchLabels:
-      app: app
+      app: {{ .Chart.Name }}
   template:
     metadata:
       labels:
-        app: app
+        app: {{ .Chart.Name }}
     spec:
       containers:
-      - name: app
-        image: app-image
-        imagePullPolicy: IfNotPresent
+      - name: {{ .Chart.Name }}
+        image: {{ .Values.image }} # this value comes from the skaffold.yaml
+        imagePullPolicy: {{ .Values.imageConfig.pullPolicy }}
         ports:
         - containerPort: 5000
         resources:
-          limits: # the limit the container can use 
-            memory: "128Mi"
-            cpu: "150m" # 250 = 1/4 a cpu core
-          requests: # considered the minimum resources required for a container to run properly 
-            memory: "64Mi" # 64mb
-            cpu: "50m" # got value from running `kubectl top pods --all-namespaces` to determine how much pods were using
+          limits: 
+            memory: {{ quote .Values.limits.memory }}
+            cpu: {{ quote .Values.limits.cpu }}
+          requests: 
+            memory: {{ quote .Values.requests.memory }}
+            cpu: {{ quote .Values.requests.cpu }}
         readinessProbe:
           httpGet:
             path: /healthcheck
@@ -52,11 +52,11 @@ spec:
           # checks and service interruption.
           timeoutSeconds: 5
         volumeMounts:
-        - name: app-config-secret
+        - name: {{ .Chart.Name }}-volume-projects
           mountPath: "/home/app/dist/config/projects.json"
           subPath: projects.json
           readOnly: true
-        - name: dotenv-secret
+        - name: {{ .Chart.Name }}-volume-dotenv
           mountPath: "/home/app/.env"
           subPath: .env
           readOnly: true
@@ -65,20 +65,20 @@ spec:
       imagePullSecrets:
       - name: regcred
       volumes:
-      - name: app-config-secret
+      - name: {{ .Chart.Name }}-volume-projects
         secret:
-          secretName: app-config
-      - name: dotenv-secret
+          secretName: {{ .Chart.Name }}-secret-projects
+      - name: {{ .Chart.Name }}-volume-dotenv
         secret:
-          secretName: dotenv
+          secretName: {{ .Chart.Name }}-secret-dotenv
 ---        
 apiVersion: v1
 kind: Service
 metadata:
-  name: app-service
+  name: {{ .Chart.Name }}-service
 spec:
   ports:
   - port: 80
     targetPort: 5000
   selector:
-    app: app
+    app: {{ .Chart.Name }}

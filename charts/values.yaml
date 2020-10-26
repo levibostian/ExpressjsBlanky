@@ -1,0 +1,28 @@
+imageConfig:
+  pullPolicy: IfNotPresent
+
+rollingUpdate:
+  maxSurge: 1
+  maxUnavailable: 0
+
+limits: # the limit the container can use 
+  memory: "128Mi"
+  cpu: "150m" # 250 = 1/4 a cpu core
+
+requests: # considered the minimum resources required for a container to run properly 
+  memory: "64Mi" # 64mb
+  cpu: "50m"
+
+pdb:
+  maxUnavailable: 1 # Meaning 1 can be down at a time for making new deployments, for example. Kill 1, replace 1 repeat. 
+
+ingress:
+  host: api-testing.example.com
+  ssl:
+    enabled: true
+    issuer: "letsencrypt-staging"
+
+# DOTENV=$(cat .env); helm ... --set secrets.dotenv=$DOTENV
+secrets:
+  dotenv: "fake-data-here"
+  projects: "fake-data-here"
