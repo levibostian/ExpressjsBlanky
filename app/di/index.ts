@@ -10,6 +10,7 @@ import { AppAdminController } from "../controller/admin"
 import { AppUserController } from "../controller/user"
 import { FcmPushNotificationService } from "../service/push_notifications"
 import { AppFiles } from "../service"
+import { RandomJob } from "../jobs/random"
 
 export enum Dependency {
   Logger = "Logger",
@@ -40,6 +41,7 @@ class DiContainer {
       Dependency.JobQueueManager,
       new AppJobQueueManager(
         new SendPushNotificationJobUserJob(this.inject(Dependency.PushNotificationService)),
+        new RandomJob(this.inject(Dependency.Logger)),
         this.inject(Dependency.Logger)
       )
     )

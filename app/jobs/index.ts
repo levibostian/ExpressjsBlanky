@@ -12,6 +12,7 @@ import {
   SendPushNotificationJobUserJob,
   SendPushNotificationParam
 } from "./send_push_notification_user"
+import { RandomJob } from "./random"
 
 export const jobQueues: { [key: string]: JobContainer } = {}
 
@@ -46,6 +47,7 @@ export interface JobQueueManager {
   closeQueues(): Promise<void>
   clearQueues(): Promise<void>
   queueSendPushNotification(params: SendPushNotificationParam): Promise<void>
+  queueRandom(): Promise<void>
 }
 
 /**
@@ -56,9 +58,14 @@ export interface JobQueueManager {
 export class AppJobQueueManager implements JobQueueManager {
   public queues: {
     sendPushNotification: Queue<SendPushNotificationParam>
+    random: Queue<void>
   }
 
-  constructor(sendPushNotificationJob: SendPushNotificationJobUserJob, logger: Logger) {
+  constructor(
+    sendPushNotificationJob: SendPushNotificationJobUserJob,
+    randomJob: RandomJob,
+    logger: Logger
+  ) {
     logger.verbose("Starting up job queue manager")
 
     // re-use redis connections for queues
@@ -103,7 +110,8 @@ export class AppJobQueueManager implements JobQueueManager {
     }
 
     this.queues = {
-      sendPushNotification: getQueue(sendPushNotificationJob)
+      sendPushNotification: getQueue(sendPushNotificationJob),
+      random: getQueue(randomJob)
     }
 
     logger.verbose("Done starting up job queue manager")
@@ -158,5 +166,9 @@ export class AppJobQueueManager implements JobQueueManager {
 
   async queueSendPushNotification(params: SendPushNotificationParam): Promise<void> {
     await this.queues.sendPushNotification.add(params)
+  }
+
+  async queueRandom(): Promise<void> {
+    await this.queues.random.add()
   }
 }

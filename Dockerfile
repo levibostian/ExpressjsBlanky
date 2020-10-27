@@ -23,4 +23,5 @@ ENV NODE_ENV $ENV
 
 COPY --from=builder /app /app
 
-CMD ["start.js"] 
+# --async-stack-traces to make stacktraces have better support for async/await code. You no longer lose parts of your stacktrace when an error occurs. 
+CMD ["--async-stack-traces", "start.js"] 

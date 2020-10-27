@@ -143,11 +143,20 @@ Now, go back into your ingress rules and change to using `letsencrypt-production
 
 # Helm
 
-We use the tool [Helm](https://helm.sh) to install our application into our k8s cluster. You don't need to learn about Helm to use it in this project as everything is already setup for you. All of the k8s files are stored in `charts/templates/`. 
+We use the tool [Helm](https://helm.sh) to install our application into our k8s cluster. You don't need to learn about Helm to use it in this project as everything is already setup for you. All of the k8s files are stored in `charts/templates/`.
 
-What you need to do is... 
-1. Open up `charts/Chart.yaml` and edit `app-name-here` to the name of your application. 
-2. Edit `charts/values.yaml` to values that you want for your application. You can enable/disable SSL, setup ingress rules, etc. 
+What you need to do is...
+
+1. Open up `charts/Chart.yaml` and edit `app-name-here` to the name of your application.
+2. Edit `charts/values.yaml` to values that you want for your application. You can enable/disable SSL, setup ingress rules, etc.
+3. Create namespaces for each environment.
+
+```
+kubectl create namespace app-production
+kubectl create namespace app-testing
+```
+
+> Note: If you don't like the names of these namespaces, edit the `K8S_NAMESPACE` value in `.travis.yml`.
 
 # Autoscaling
 

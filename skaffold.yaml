@@ -20,7 +20,7 @@ deploy:
   helm:
     releases:
     - name: app-release # !!!
-      namespace: "app-name-{{.DEPLOY_ENV}}" # !!! only edit `app-name` to your app name
+      namespace: "{{.K8S_NAMESPACE}}" 
       chartPath: 'charts/'
       setValueTemplates:
         secrets:
@@ -50,6 +50,6 @@ profiles:
 # As long as you pass `--port-forward` to `skaffold dev/debug`, this maps local port 5000 to the node application
 portForward:
 - resourceType: service
-  resourceName: app-service # !!! this value is dynamic from the helm chart. Set value to charts/templates/deployment.yaml service name at bottom of file. 
+  resourceName: app-name-here-service # !!! this value is dynamic from the helm chart. Set value to charts/templates/deployment.yaml service name at bottom of file. 
   port: 80
   localPort: 5000

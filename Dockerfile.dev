@@ -19,4 +19,5 @@ RUN npm install -g install-subset &&\
 # nodemon to make auto restart node when compiled sources change.
 # --enable-source-maps to display .ts files in stacktrace instead of un-helpful transpiled .js files
 #    You can also use 'source-map-support' npm package if this built-in node arg doesn't work.
-CMD npx nodemon --enable-source-maps start.js
+# --async-stack-traces to make stacktraces have better support for async/await code. You no longer lose parts of your stacktrace when an error occurs. 
+CMD npx nodemon --async-stack-traces --enable-source-maps start.js

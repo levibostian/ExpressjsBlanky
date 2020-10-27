@@ -7,7 +7,7 @@
     "test:unit": "./bin/tests.sh unit",
     "test": "./bin/tests.sh",
     "dev:setup": "./bin/dev_setup.sh",
-    "dev": "npm run build:copy && npx tsc --watch",
+    "dev": "npx tsc --watch",
     "dev:debug": "skaffold debug --port-forward",
     "build": "rm -rf dist && npx tsc",
     "db:migrate:create": "npx sequelize migration:create",
@@ -71,11 +71,6 @@
   },
   "dependencies": {
     "@godaddy/terminus": "^4.3.1",
-    "@semantic-release/changelog": "^5.0.1",
-    "@semantic-release/exec": "^5.0.0",
-    "@semantic-release/git": "^9.0.0",
-    "@semantic-release/github": "^7.1.1",
-    "@semantic-release/npm": "^7.0.6",
     "axios": "^0.20.0",
     "body-parser": "^1.19.0",
     "bull": "^3.18.0",
@@ -106,7 +101,6 @@
     "pg-hstore": "^2.3.3",
     "postmark": "^2.6.0",
     "query-string": "^6.13.6",
-    "semantic-release": "^17.2.1",
     "sequelize": "^6.3.5",
     "uid2": "^0.0.3"
   },
@@ -141,8 +135,18 @@
     "@types/validator": "^13.1.0",
     "@typescript-eslint/eslint-plugin": "^4.5.0",
     "@typescript-eslint/parser": "^4.5.0",
+    "codecov": "^3.8.0",
+    "eslint": "^7.12.0",
+    "eslint-plugin-jest": "^24.1.0",
+    "husky": "^4.3.0",
+    "jest": "^26.6.1",
+    "jest-junit": "^12.0.0",
+    "lint-staged": "^10.5.0",
+    "nodemon": "^2.0.6",
+    "prettier": "^2.1.2",
     "sequelize-cli": "^6.2.0",
-    "source-map-support": "^0.5.19",
+    "supertest": "^5.0.0",
+    "ts-jest": "^26.4.3",
     "typescript": "^4.0.3"
   }
 }

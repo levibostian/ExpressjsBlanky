@@ -5,7 +5,7 @@ import isNil from "lodash.isnil"
 import path from "path"
 
 const dotEnvConfig: DotenvConfigOptions = {
-  path: path.join(__dirname, "../.env")
+  path: path.join(__dirname, ".env")
 }
 const result = dotenv.config(dotEnvConfig)
 

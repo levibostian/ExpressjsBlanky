@@ -37,6 +37,7 @@ jobs:
         - set -e
         - export DEPLOY_ENV=testing
         - export MAKE_RELEASE=true
+        - export K8S_NAMESPACE=app-testing
         - cici decrypt --set $DEPLOY_ENV
         - ./bin/deploy.sh
     - stage: prod-deploy
@@ -44,6 +45,7 @@ jobs:
         - set -e
         - export DEPLOY_ENV=production
         - export MAKE_RELEASE=false
+        - export K8S_NAMESPACE=app-production
         - cici decrypt --set $DEPLOY_ENV
         - ./bin/deploy.sh
 
