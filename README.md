@@ -56,12 +56,12 @@ Go ahead and explore the source code! No need to include _all_ of the details he
 
 This project uses a list of various services to send push notifications, emails, run a CI server, and more. To keep the code base simple, [keep the environments close](https://12factor.net/dev-prod-parity), and avoid runtime complexity/bugs, all of these services are configured with environment variables all defined with a `.env` file.
 
-The first thing you need to do is create a `.env` file in the root of the project.
+The first thing you need to do is create a `.env` file.
 
 _Note: This project relies on the CLI tool, [cici](https://github.com/levibostian/cici/) for helping with the environments. You may want to read up on the README of the project to understand how it's used in the scripts. Especially used on the CI server._
 
 ```
-cp .env.example .env
+cp app/.env.example app/.env
 ```
 
 Now, let's go into each of the variables, enabling the various services as we go on.

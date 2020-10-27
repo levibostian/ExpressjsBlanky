@@ -22,7 +22,7 @@ ingress:
     enabled: true
     issuer: "letsencrypt-staging"
 
-# DOTENV=$(cat .env); helm ... --set secrets.dotenv=$DOTENV
+# DOTENV=$(cat app/.env); helm ... --set secrets.dotenv=$DOTENV
 secrets:
   dotenv: "fake-data-here"
   projects: "fake-data-here"

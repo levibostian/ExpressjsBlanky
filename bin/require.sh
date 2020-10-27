@@ -58,13 +58,13 @@ function require_database_dotenv() {
     # This is how to get the IP address of the host machine from the minikube cluster. 
     HOST_IP=$(minikube ssh grep host.minikube.internal /etc/hosts | cut -f1)
     
-    if ! cat .env | grep -w "DATABASE_HOST=$HOST_IP" > /dev/null; then 
-        logError "Set DATABASE_HOST in .env to $HOST_IP and try again"
+    if ! cat app/.env | grep -w "DATABASE_HOST=$HOST_IP" > /dev/null; then 
+        logError "Set DATABASE_HOST in app/.env to $HOST_IP and try again"
         exit 1
     fi
 
-    if ! cat .env | grep -w "REDIS_HOST=$HOST_IP" > /dev/null; then 
-        logError "Set REDIS_HOST in .env to $HOST_IP and try again"
+    if ! cat app/.env | grep -w "REDIS_HOST=$HOST_IP" > /dev/null; then 
+        logError "Set REDIS_HOST in app/.env to $HOST_IP and try again"
         exit 1
     fi
 }

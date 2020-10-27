@@ -2,7 +2,7 @@
 const path = require("path")
 const { exit } = require("process")
 
-const dotEnvFilePath = path.resolve(process.cwd(), ".env")
+const dotEnvFilePath = path.resolve(process.cwd(), "app/.env")
 require("dotenv").config({ path: dotEnvFilePath })
 
 const useSSl = !Object.keys(process.env).includes("DISABLE_SSL")
@@ -10,7 +10,7 @@ const useSSl = !Object.keys(process.env).includes("DISABLE_SSL")
 if (!process.env.DATABASE_HOST) {
   console.error(` ########### ERROR ##############`)
   console.error(
-    `.env file not found or does not include database configurations. .env file path: ${dotEnvFilePath}`
+    `.env file not found or does not include database configurations. Wanted .env file path: ${dotEnvFilePath}`
   )
   console.error(`#################################`)
   exit(1)

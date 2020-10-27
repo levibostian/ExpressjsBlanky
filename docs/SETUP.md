@@ -23,7 +23,7 @@ npm install
 - Lastly, to get the app to compile you need to create some files that are hidden by default because they may contain sensitive information.
 
 ```
-cp .env.example .env
+cp app/.env.example app/.env
 cp app/config/projects.json.example app/config/projects.json
 ```
 
@@ -77,7 +77,7 @@ Now that you have servers and a cluster made, you can configure your code base t
 
 It's recommended that you create a `.env` for (1) production (2) testing (3) running tests and development. 3 in total.
 
-Check out `.env.example`. It has comments on the file explaining each piece for you to fill out.
+Check out `app/.env.example`. It has comments on the file explaining each piece for you to fill out.
 
 After you create each of the `.env` files, [encrypt these secrets using `cici`](https://github.com/levibostian/cici/#getting-started).
 

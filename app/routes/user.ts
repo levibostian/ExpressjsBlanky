@@ -2,7 +2,7 @@ import express from "express"
 import expressRoutesVersioning from "express-routes-versioning"
 import { authMiddleware, AuthType, bruteForcePrevent } from "../middleware"
 import { createEndpoint } from "./util"
-import { Success, UserEnteredBadDataError } from "../responses"
+import { ServerResponse, Success, UserEnteredBadDataError } from "../responses"
 import { UserModel, UserPublic } from "../model"
 import { check } from "express-validator"
 import { Dependency, Di } from "../di"
@@ -39,7 +39,7 @@ router.post(
   routesVersioning({
     "1.0.0": createEndpoint({
       validate: [check("email").exists().isEmail()],
-      request: async (req, res, next) => {
+      request: async (req, res, next): Promise<ServerResponse> => {
         const body: {
           email: string
         } = req.body
@@ -48,7 +48,7 @@ router.post(
 
         await userController.sendLoginLink(body.email, req.project)
 
-        next(new LoginUserSuccess("Check your email to login."))
+        return new LoginUserSuccess("Check your email to login.")
       }
     })
   })
@@ -65,7 +65,7 @@ router.post(
   routesVersioning({
     "1.0.0": createEndpoint({
       validate: [check("passwordless_token").exists()],
-      request: async (req, res, next) => {
+      request: async (req, res, next): Promise<ServerResponse> => {
         const body: {
           passwordless_token: string
         } = req.body
@@ -74,14 +74,12 @@ router.post(
 
         const user = await userController.exchangePasswordlessToken(body.passwordless_token)
         if (!user) {
-          return next(
-            new UserEnteredBadDataError(
-              "Sorry! Please enter your email into the app and try to login again. The link is expired."
-            )
+          return new UserEnteredBadDataError(
+            "Sorry! Please enter your email into the app and try to login again. The link is expired."
           )
         }
 
-        next(new LoginAccessTokenSuccess("Successfully logged in.", user.privateRepresentation()))
+        return new LoginAccessTokenSuccess("Successfully logged in.", user.privateRepresentation())
       }
     })
   })
@@ -93,7 +91,7 @@ router.post(
   routesVersioning({
     "1.0.0": createEndpoint({
       validate: [check("token").exists()],
-      request: async (req, res, next) => {
+      request: async (req, res, next): Promise<ServerResponse> => {
         const body: {
           token: string
         } = req.body
@@ -103,7 +101,7 @@ router.post(
 
         await userController.addFcmToken(user.id, body.token)
 
-        next(new Success("Updated."))
+        return new Success("Updated.")
       }
     })
   })

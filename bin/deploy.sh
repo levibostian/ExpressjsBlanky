@@ -30,5 +30,5 @@ npx sequelize db:migrate --debug
 logSuccess "Performing database migration"
 
 logVerbose "Deploying application"
-PROJECTS=$(cat app/config/projects.json | base64) DOTENV=$(cat .env | base64) IMAGE_TAG=$NEXT_VERSION skaffold deploy
+PROJECTS=$(cat app/config/projects.json | base64) DOTENV=$(cat app/.env | base64) IMAGE_TAG=$NEXT_VERSION skaffold deploy
 logSuccess "Deploying application"

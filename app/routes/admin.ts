@@ -6,7 +6,7 @@ import { Di, Dependency } from "../di"
 import { JobQueueManager } from "../jobs"
 import { createEndpoint } from "./util"
 import { Env } from "../env"
-import { Success } from "../responses"
+import { ServerResponse, Success } from "../responses"
 import { UserPublic } from "../model"
 import { check } from "express-validator"
 import { AdminController } from "../controller/admin"
@@ -48,7 +48,7 @@ router.post(
   routesVersioning({
     "1.0.0": createEndpoint({
       validate: [check("email").exists().isEmail()],
-      request: async (req, res, next) => {
+      request: async (req, res, next): Promise<ServerResponse> => {
         const body: {
           email: string
         } = req.body
@@ -57,7 +57,7 @@ router.post(
 
         const user = await controller.createOrGetUser(body.email)
 
-        next(new AddUserSuccess("Successfully created user.", user.publicRepresentation()))
+        return new AddUserSuccess("Successfully created user.", user.publicRepresentation())
       }
     })
   })

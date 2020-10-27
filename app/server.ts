@@ -6,7 +6,6 @@ import bodyParser from "body-parser"
 import passport from "passport"
 import helmet from "helmet"
 import {
-  ErrorResponseHandlerMiddleware,
   LogRequestMiddleware,
   NormalizeRequestBody,
   TransformResponseBodyMiddleware,
@@ -59,8 +58,6 @@ export const startServer = (): Server => {
   )
 
   app.use(controllers)
-
-  app.use(ErrorResponseHandlerMiddleware)
 
   logger.stop(app)
 

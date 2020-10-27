@@ -9,7 +9,7 @@ dist/
 .bundle/
 vendor/
 .config/configstore/
-.env
+app/.env
 junit.xml
 firebase_key.json
 secrets/
