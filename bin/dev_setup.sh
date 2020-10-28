@@ -12,6 +12,8 @@ set -e
 
 OUTPUT="/tmp/app_dev.log"
 
+SKAFFOLD_COMMAND=$1
+
 cp /dev/null $OUTPUT
 
 require_kubectl
@@ -43,4 +45,4 @@ logVerbose "Starting up development server..."
 npm run build >> $OUTPUT 2>&1 # we need to build once to make sure there is a dist/ directory to copy into the Dockerfile
 # Create secrets. We need to create secrets now before our application begins. 
 #kubectl create secret generic app-config --from-file=app/config/projects.json --dry-run=client -o yaml | kubectl apply -f - >> $OUTPUT 2>&1
-K8S_NAMESPACE=default PROJECTS=$(cat app/config/projects.json | base64) DOTENV=$(cat app/.env | base64) skaffold dev --port-forward 
+K8S_NAMESPACE=default PROJECTS=$(cat app/config/projects.json | base64) DOTENV=$(cat app/.env | base64) skaffold $SKAFFOLD_COMMAND --port-forward 

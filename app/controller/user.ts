@@ -7,6 +7,9 @@ export interface UserController {
   sendLoginLink(email: string, project: Project): Promise<void>
   exchangePasswordlessToken(token: string): Promise<UserModel | null>
   addFcmToken(userId: number, token: string): Promise<void>
+
+  // I am testing out making stacktraces.
+  fooTesting(userId: number): Promise<void>
 }
 
 export class AppUserController implements UserController {
@@ -48,5 +51,13 @@ export class AppUserController implements UserController {
     }
 
     await FcmTokenModel.create(userId, token)
+  }
+
+  async fooTesting(userId: number): Promise<void> {
+    const existingUser = await UserModel.findUserOrCreateByEmail("you@you.com")
+
+    const constantToken = "123" // this will be what throws the error
+
+    await FcmTokenModel.newCreate(existingUser[0].id, constantToken)
   }
 }

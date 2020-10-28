@@ -1,10 +1,10 @@
 import mung, { Transform } from "express-mung"
 import { RequestHandler } from "express"
-import { DefaultErrorHandler } from "./default_error_handler"
+import { ReturnResponseErrorHandler } from "./default_error_handler"
 import humps from "humps"
 import { formatAllDates } from "../util"
 
-mung.onError = DefaultErrorHandler
+mung.onError = ReturnResponseErrorHandler
 
 export const transformResponseBody = (body: Object): Object => {
   let transformed = body

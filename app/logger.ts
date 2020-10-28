@@ -1,5 +1,4 @@
 import Honeybadger from "honeybadger"
-import { Application } from "express"
 import { Env } from "./env"
 import isObject from "lodash.isplainobject"
 
@@ -9,8 +8,6 @@ interface Extras {
 }
 
 export interface Logger {
-  start(app: Application): void
-  stop(app: Application): void
   debug: (message: string, extras?: Extras) => void
   verbose: (message: string, extras?: Extras) => void
   error: (error: Error, extras?: Extras) => void
@@ -45,20 +42,11 @@ export class AppLogger implements Logger {
   private loggers: Logger[] = []
 
   constructor() {
-    if (Env.loggers.enableHoneybadger) {
-      this.loggers.push(new HoneybadgerLogger())
-    }
+    this.loggers.push(new HoneybadgerLogger())
+
     if (Env.loggers.enableConsole) {
       this.loggers.push(new ConsoleLogger())
     }
-  }
-
-  start(app: Application): void {
-    this.loggers.forEach((logger) => logger.start(app))
-  }
-
-  stop(app: Application): void {
-    this.loggers.forEach((logger) => logger.stop(app))
   }
 
   debug(message: string, extras?: Extras): void {
@@ -83,10 +71,6 @@ export class AppLogger implements Logger {
 }
 
 export class ConsoleLogger implements Logger {
-  start(app: Application): void {}
-
-  stop(app: Application): void {}
-
   debug(message: string, extras?: Extras): void {
     const extraInfo = extras ? JSON.stringify(extras) : "(none)"
     console.debug(`DEBUG: ${message} - Extra: ${extraInfo}`)
@@ -113,22 +97,9 @@ export class HoneybadgerLogger implements Logger {
   constructor() {
     Honeybadger.configure({
       apiKey: Env.honeybadger.key!,
-      filters: hideValuesForKeys
+      filters: hideValuesForKeys,
+      developmentEnvironments: ["development"]
     })
-  }
-
-  start(app: Application): void {
-    app.use(Honeybadger.requestHandler) // Use *before* all other app middleware.
-
-    this.context({
-      env: Env
-    })
-  }
-
-  stop(app: Application): void {
-    app.use(Honeybadger.errorHandler) // Use *after* all other app middleware (but before custom error middleware)
-
-    Honeybadger.resetContext() // Reset context as the error reporting should be done by now
   }
 
   debug(message: string, extras?: Extras): void {}
@@ -137,7 +108,11 @@ export class HoneybadgerLogger implements Logger {
 
   error(error: Error, extra?: Object): void {
     Honeybadger.notify(error, {
-      message: error.message || "none"
+      message: error.message || "none",
+      context: {
+        // will be merged with existing context
+        errorExtras: extra || {}
+      }
     })
   }
 

@@ -1,6 +1,9 @@
 import { Sequelize, DataTypes, Transaction } from "sequelize"
 import { Model, SequelizeModel } from "./type"
 import { UserSequelizeModel } from "./user"
+import * as Result from "../type/result"
+import { Logger } from "../logger"
+import { Dependency, Di } from "../di"
 
 export class FcmTokenSequelizeModel extends SequelizeModel {
   public id!: number
@@ -47,6 +50,46 @@ export class FcmTokenModel implements Model<FcmTokenPublic> {
       },
       order: [["id", "ASC"]]
     }).then((results) => results.map((fcmSequelizeModel) => fcmSequelizeModel.getModel()))
+  }
+
+  static async newCreate(userId: number, token: string): Promise<Result.Type<FcmTokenModel>> {
+    const potentialError = new Error("Potential error")
+
+    try {
+      const createdModel = await FcmTokenSequelizeModel.create(
+        {
+          token: token,
+          userId: userId
+        },
+        {
+          include: [
+            {
+              model: UserSequelizeModel,
+              as: "user"
+            }
+          ]
+        }
+      )
+
+      return createdModel.getModel()
+    } catch (error) {
+      const logger: Logger = Di.inject(Dependency.Logger)
+
+      /*
+      Here is where my experiment comes together. I need to look at each of the stacktraces printed to the console to see what one produces one that I am happy with. 
+
+      You will see that `potentialError` is the best!
+      */
+
+      logger.error(error)
+
+      const newError = new Error(`SQL error!`)
+      logger.error(newError)
+
+      logger.error(potentialError)
+
+      return newError
+    }
   }
 
   static create(userId: number, token: string): Promise<FcmTokenModel> {

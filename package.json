@@ -6,9 +6,9 @@
     "test:integration": "./bin/tests.sh integration",
     "test:unit": "./bin/tests.sh unit",
     "test": "./bin/tests.sh",
-    "dev:setup": "./bin/dev_setup.sh",
+    "dev:setup": "./bin/dev_setup.sh dev",
     "dev": "npx tsc --watch",
-    "dev:debug": "skaffold debug --port-forward",
+    "dev:debug": "./bin/dev_setup.sh debug",
     "build": "rm -rf dist && npx tsc",
     "db:migrate:create": "npx sequelize migration:create",
     "db:migrate": "npx sequelize db:migrate --debug",
@@ -102,6 +102,7 @@
     "postmark": "^2.6.0",
     "query-string": "^6.13.6",
     "sequelize": "^6.3.5",
+    "stack-trace": "0.0.10",
     "uid2": "^0.0.3"
   },
   "devDependencies": {
@@ -130,6 +131,7 @@
     "@types/passport-http-bearer": "^1.0.36",
     "@types/query-string": "^6.3.0",
     "@types/redis": "^2.8.28",
+    "@types/stack-trace": "0.0.29",
     "@types/supertest": "^2.0.10",
     "@types/uid2": "0.0.0",
     "@types/validator": "^13.1.0",

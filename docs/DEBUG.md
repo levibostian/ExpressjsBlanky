@@ -12,7 +12,7 @@ Let's get you debugging your code!
 
 > Note: This doc goes over how to use VSCode to debug your code. You can use [another client if you wish](https://nodejs.org/en/docs/guides/debugging-getting-started/#inspector-clients).
 
-1. In your terminal on your machine, run `npm run dev:setup`, just like when developing your app. Then, run the command `npm run dev:debug`. Wait until you see output similar to this:
+1. In your terminal on your machine, run `npm run dev:debug`. Wait until you see output similar to this:
 
 ```
 Waiting for deployments to stabilize...

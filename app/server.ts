@@ -1,6 +1,7 @@
 // Setup all dependencies for dependency injection here. Important to do here as we allow overriding for testing.
 import "./di"
 
+import Honeybadger from "honeybadger"
 import express from "express"
 import bodyParser from "body-parser"
 import passport from "passport"
@@ -9,8 +10,9 @@ import {
   LogRequestMiddleware,
   NormalizeRequestBody,
   TransformResponseBodyMiddleware,
-  DefaultErrorHandler,
-  AssertProjectMiddleware
+  ReturnResponseErrorHandler,
+  AssertProjectMiddleware,
+  BeforeAllMiddleware
 } from "./middleware"
 import http, { Server } from "http"
 import controllers from "./routes"
@@ -27,11 +29,23 @@ export const serverPostStart = async (): Promise<void> => {
 }
 
 export const startServer = (): Server => {
-  const app = express()
   const logger: Logger = Di.inject(Dependency.Logger)
 
-  logger.start(app)
+  process.on("uncaughtException", (err: Error) => {
+    logger.error(err)
+  })
 
+  const app = express()
+
+  logger.context({
+    env: Env
+  })
+
+  app.use(
+    BeforeAllMiddleware, // I want to use this before honeybadger request handler before I want to reset the context of honeybadger before.
+    Honeybadger.requestHandler // Use *before* all other app middleware
+  )
+  app.use(helmet())
   app.enable("trust proxy")
   app.use("/", express.static(__dirname + "/static")) // Host files located in the `./static` directory at the root.
   app.use(bodyParser.urlencoded({ extended: false, limit: "100kb" }))
@@ -39,7 +53,6 @@ export const startServer = (): Server => {
   app.use(NormalizeRequestBody)
   app.use(AssertProjectMiddleware)
   app.use(passport.initialize())
-  app.use(helmet())
   app.use(LogRequestMiddleware(logger))
   app.use(TransformResponseBodyMiddleware)
 
@@ -59,12 +72,8 @@ export const startServer = (): Server => {
 
   app.use(controllers)
 
-  logger.stop(app)
-
-  process.on("uncaughtException", (err: Error) => {
-    logger.error(err)
-  })
-  app.use(DefaultErrorHandler)
+  app.use(Honeybadger.errorHandler) // Use *after* all other app middleware but before our own error handlers
+  app.use(ReturnResponseErrorHandler)
 
   const server: Server = http.createServer(app)
 

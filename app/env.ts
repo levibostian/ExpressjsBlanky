@@ -15,7 +15,6 @@ if (result.error) {
 
 export interface Environment {
   loggers: {
-    enableHoneybadger: boolean
     enableConsole: boolean
     enableSql: boolean
   }
@@ -35,7 +34,7 @@ export interface Environment {
   }
   redis: ClientOpts & RedisOptions
   honeybadger: {
-    key: string | undefined
+    key: string
   }
   auth: {
     adminToken: string
@@ -65,7 +64,6 @@ export const isDefined = (key: string): boolean => {
 /* eslint-disable no-process-env */
 export const Env: Environment = {
   loggers: {
-    enableHoneybadger: isDefined("HONEY_BADGER_API_KEY"),
     enableConsole: !isDefined("DISABLE_CONSOLE"),
     enableSql: !isDefined("DISABLE_SQL_LOGGING")
   },
@@ -89,7 +87,7 @@ export const Env: Environment = {
     port: parseInt(requireEnv("REDIS_PORT"))
   },
   honeybadger: {
-    key: process.env.HONEY_BADGER_API_KEY
+    key: requireEnv("HONEY_BADGER_API_KEY")
   },
   auth: {
     adminToken: requireEnv("ADMIN_TOKEN")
