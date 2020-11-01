@@ -1,10 +1,10 @@
-import { databaseHealthcheck, initDatabase } from "./model"
+import { databaseHealthcheck, initDatabase } from "./model/database"
 import { Logger } from "./logger"
 import { Di, Dependency } from "./di"
 import { assertEmail } from "./email"
 import { Firebase } from "./service/firebase"
 import { PushNotificationService } from "./service/push_notifications"
-import { assertJobQueue } from "./jobs"
+import { assertRedis } from "./service/redis"
 import { projects, setupProjects } from "./projects"
 import { Files } from "./service"
 
@@ -23,7 +23,7 @@ export const startLocalServices = async (logger: Logger, files: Files): Promise<
   logger.verbose(`--X---- DATABASE CONNECTION SUCCESS`)
 
   logger.verbose(`---X--- REDIS CONNECTION`)
-  await assertJobQueue()
+  await assertRedis()
   logger.verbose(`---X--- REDIS CONNECTION SUCCESS`)
 }
 

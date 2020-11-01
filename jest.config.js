@@ -8,5 +8,10 @@ module.exports = {
   resetMocks: true,
   setupFilesAfterEnv: ["./tests/setup.ts"],
   coverageDirectory: "./coverage/",
-  collectCoverage: true
+  collectCoverage: true,
+  globals: {
+    "ts-jest": {
+      tsConfig: "tsconfig.lint.json"
+    }
+  }
 }

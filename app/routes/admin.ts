@@ -6,30 +6,14 @@ import { Di, Dependency } from "../di"
 import { JobQueueManager } from "../jobs"
 import { createEndpoint } from "./util"
 import { Env } from "../env"
-import { ServerResponse, Success } from "../responses"
-import { UserPublic } from "../model"
+import { ServerResponse } from "../responses"
 import { check } from "express-validator"
 import { AdminController } from "../controller/admin"
 import { authMiddleware, AuthType } from "../middleware"
+import * as Result from "../type/result"
 
 const routesVersioning = expressRoutesVersioning()
 const router = express.Router()
-
-/**
- * @apiDefine AddUserSuccess
- * @apiSuccessExample {json} Success-Response:
- *     {
- *       "message": "Human readable successful message",
- *       "user": {
- *         (see UserPublic type)
- *       }
- *     }
- */
-class AddUserSuccess extends Success {
-  constructor(message: string, public user: UserPublic) {
-    super(message)
-  }
-}
 
 /**
  * @api {post} /admin/user Request Add user
@@ -56,8 +40,9 @@ router.post(
         const controller: AdminController = Di.inject(Dependency.AdminController)
 
         const user = await controller.createOrGetUser(body.email)
+        if (Result.isError(user)) return res.responses.error.developerError()
 
-        return new AddUserSuccess("Successfully created user.", user.publicRepresentation())
+        return res.responses.userLoggedIn(user)
       }
     })
   })

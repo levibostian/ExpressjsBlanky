@@ -1,186 +1,73 @@
 import uid2 from "uid2"
-import { Sequelize, DataTypes, Transaction } from "sequelize"
-import { Model, SequelizeModel } from "./type"
+import { DatabaseQueryRunner } from "./database_query"
+import { BaseModel } from "./model"
+import _ from "../util"
 
-export class UserSequelizeModel extends SequelizeModel {
-  public id!: number
+export class UserModel extends BaseModel {
   public email!: string
   public accessToken?: string
   public passwordToken?: string
   public passwordTokenCreated?: Date
-  public createdAt!: Date
-  public updatedAt!: Date
 
-  static initModel(sequelize: Sequelize): void {
-    UserSequelizeModel.init(
-      {
-        email: { type: DataTypes.STRING, allowNull: false, unique: true },
-        accessToken: { type: DataTypes.STRING, allowNull: true, unique: true },
-        passwordToken: {
-          type: DataTypes.STRING,
-          allowNull: true,
-          unique: true
-        },
-        passwordTokenCreated: {
-          type: DataTypes.DATE,
-          allowNull: true,
-          unique: false
-        }
-      },
-      {
-        modelName: "User",
-        sequelize: sequelize
-      }
-    )
-  }
+  public static tableName = "User"
 
-  static setupAssociations(): void {}
+  static async findOrCreateByEmail(
+    queryRunner: DatabaseQueryRunner,
+    emailAddress: string
+  ): Promise<{ user: UserModel; justCreated: boolean }> {
+    const existing = await UserModel.query(queryRunner.getTransaction()).where({
+      email: emailAddress
+    })
 
-  getUser(): UserModel {
-    return new UserModel(
-      this.id,
-      this.email,
-      this.createdAt,
-      this.updatedAt,
-      this.accessToken,
-      this.passwordToken,
-      this.passwordTokenCreated
-    )
-  }
-}
-
-export interface UserPublic {
-  id: number
-}
-
-export interface UserPrivate {
-  id: number
-  email: string
-  accessToken?: string
-  passwordToken?: string
-}
-
-export class UserModel implements Model<UserPublic> {
-  constructor(
-    public id: number,
-    public email: string,
-    public createdAt: Date,
-    public updatedAt: Date,
-    public accessToken?: string,
-    public passwordToken?: string,
-    public passwordTokenCreated?: Date
-  ) {}
-
-  static findUserOrCreateByEmail(emailAddress: string): Promise<[UserModel, boolean]> {
-    return UserSequelizeModel.findCreateFind({
-      where: {
+    if (_.array.isEmpty(existing)) {
+      const created = await UserModel.query(queryRunner.getTransaction()).insert({
         email: emailAddress
-      },
-      defaults: {
-        passwordToken: uid2(255),
-        passwordTokenCreated: new Date()
+      })
+
+      return {
+        user: created,
+        justCreated: true
       }
-    }).then((res) => [res[0].getUser(), res[1]])
+    }
+
+    return {
+      user: existing[0],
+      justCreated: false
+    }
   }
 
-  static findUserById(userId: number): Promise<UserModel | null> {
-    return UserSequelizeModel.findOne({
-      where: {
-        id: userId
-      }
-    }).then((res) => (res ? res.getUser() : null))
+  static findUserById(queryRunner: DatabaseQueryRunner, userId: number): Promise<UserModel | null> {
+    return UserModel.query(queryRunner.getTransaction()).findById(userId)
   }
 
-  static findUserByAccessToken(accessToken: string): Promise<UserModel | null> {
-    return UserSequelizeModel.findOne({
-      where: {
-        accessToken: accessToken
-      }
-    }).then((res) => (res ? res.getUser() : null))
+  static findUserByAccessToken(
+    queryRunner: DatabaseQueryRunner,
+    accessToken: string
+  ): Promise<UserModel | null> {
+    return UserModel.query(queryRunner.getTransaction()).findOne({
+      accessToken: accessToken
+    })
   }
 
-  static findByPasswordlessToken(token: string): Promise<UserModel | null> {
-    return UserSequelizeModel.findOne({
-      where: {
-        passwordToken: token
-      }
-    }).then((res) => (res ? res.getUser() : null))
+  static findByPasswordlessToken(
+    queryRunner: DatabaseQueryRunner,
+    token: string
+  ): Promise<UserModel | null> {
+    return UserModel.query(queryRunner.getTransaction()).findOne({
+      passwordToken: token
+    })
   }
 
-  static create(email: string): Promise<UserModel> {
-    return UserSequelizeModel.create({
-      email: email,
-      passwordToken: uid2(255),
-      passwordTokenCreated: new Date()
-    }).then((res) => res.getUser())
-  }
-
-  static findByEmail(emailAddress: string): Promise<UserModel | null> {
-    return UserSequelizeModel.findOne({
-      where: {
-        email: emailAddress
-      }
-    }).then((res) => (res ? res.getUser() : null))
-  }
-
-  findOrCreateSelf(transaction: Transaction): Promise<UserModel> {
-    return UserSequelizeModel.findCreateFind({
-      where: {
-        email: this.email
-      },
-      defaults: {
-        accessToken: this.accessToken,
-        passwordToken: this.passwordToken,
-        passwordTokenCreated: this.passwordTokenCreated,
-        createdAt: this.createdAt,
-        updatedAt: this.updatedAt
-      },
-      transaction: transaction
-    }).then((res) => res[0].getUser())
-  }
-
-  private update(update: Object): Promise<UserModel> {
-    return UserSequelizeModel.update(update, {
-      where: {
-        id: this.id
-      },
-      returning: true
-    }).then((res) => res[1][0].getUser())
-  }
-
-  async delete(): Promise<void> {
-    await UserSequelizeModel.destroy({
-      where: {
-        id: this.id
-      }
-    }).then()
-  }
-
-  newPasswordToken(): Promise<UserModel> {
-    return this.update({
+  newPasswordToken(queryRunner: DatabaseQueryRunner): Promise<UserModel> {
+    return this.$query(queryRunner.getTransaction()).patchAndFetch({
       passwordToken: uid2(255),
       passwordTokenCreated: new Date()
     })
   }
 
-  newAccessToken(): Promise<UserModel> {
-    return this.update({
+  newAccessToken(queryRunner: DatabaseQueryRunner): Promise<UserModel> {
+    return this.$query(queryRunner.getTransaction()).patchAndFetch({
       accessToken: uid2(255)
     })
-  }
-
-  publicRepresentation(): UserPublic {
-    return {
-      id: this.id
-    }
-  }
-
-  privateRepresentation(): UserPrivate {
-    return {
-      id: this.id,
-      email: this.email,
-      accessToken: this.accessToken,
-      passwordToken: this.passwordToken
-    }
   }
 }

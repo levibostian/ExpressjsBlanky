@@ -1,13 +1,9 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import Bull, { Queue, QueueOptions } from "bull"
 import { Job } from "./type"
 import { Logger } from "../logger"
 import { Env } from "../env"
-import { ClientOpts, RedisClient } from "redis"
-import { promisify } from "util"
+import { ClientOpts } from "redis"
 import Redis from "ioredis"
-import { Dependency, Di } from "../di"
 import {
   SendPushNotificationJobUserJob,
   SendPushNotificationParam
@@ -16,21 +12,8 @@ import { RandomJob } from "./random"
 
 export const jobQueues: { [key: string]: JobContainer } = {}
 
-export const assertJobQueue = async (): Promise<void> => {
-  const redisClient: RedisClient = Di.inject(Dependency.RedisClient)
-  const pingAsync = promisify(redisClient.ping).bind(redisClient)
-
-  await pingAsync().then((result) => {
-    if (result !== "PONG") {
-      throw Error(`Connection to redis server unsuccessful. Response from PING: ${result}`)
-    }
-
-    return Promise.resolve()
-  })
-}
-
 interface JobContainer {
-  job: Job<any, any>
+  job: Job<unknown, unknown>
   queue: Queue
 }
 
@@ -42,7 +25,7 @@ export interface BullQueueInfo {
 }
 
 export interface JobQueueManager {
-  getQueues(): { [key: string]: Queue<any> }
+  getQueues(): { [key: string]: Queue<unknown> }
   getQueueInfo(): BullQueueInfo[]
   closeQueues(): Promise<void>
   clearQueues(): Promise<void>
@@ -88,17 +71,22 @@ export class AppJobQueueManager implements JobQueueManager {
       }
     }
 
-    const getQueue = <T>(job: Job<any, any>): Queue<T> => {
+    const getQueue = <T>(job: Job<unknown, unknown>): Queue<T> => {
       const queue = new Bull(job.name, opts)
 
       queue.on("error", (err) => {
-        logger.error(err)
+        logger.error(err, "Job runner error", `Generic error. ${err.message}`)
       })
       queue.on("failed", (job, err) => {
-        logger.error(err, job)
+        logger.error(err, `${job.name} job failed`, `Job failed. name: ${job.name}`, {
+          job
+        })
       })
       queue.on("completed", (job, result) => {
-        logger.debug(`Job complete. Id: ${job.id}`, job)
+        logger.debug(`Job complete. Id:`, {
+          job: job,
+          result: result
+        })
       })
       queue.process((jobData) => {
         logger.debug(`Job id: ${jobData.id} running.`)
@@ -117,7 +105,7 @@ export class AppJobQueueManager implements JobQueueManager {
     logger.verbose("Done starting up job queue manager")
   }
 
-  getQueues(): { [key: string]: Queue<any> } {
+  getQueues(): { [key: string]: Queue<unknown> } {
     return this.queues
   }
 
@@ -125,7 +113,7 @@ export class AppJobQueueManager implements JobQueueManager {
     const info: BullQueueInfo[] = []
 
     for (const key in this.queues) {
-      const queues = this.queues as { [key: string]: Queue<any> }
+      const queues = this.queues as { [key: string]: Queue<unknown> }
       const queue = queues[key]
 
       info.push({
@@ -141,7 +129,7 @@ export class AppJobQueueManager implements JobQueueManager {
 
   async clearQueues(): Promise<void> {
     const queueEmptyTasks: Promise<void>[] = []
-    const queues = this.queues as { [key: string]: Queue<any> }
+    const queues = this.queues as { [key: string]: Queue<unknown> }
     for (const key in this.queues) {
       const queue = queues[key]
 
@@ -155,7 +143,7 @@ export class AppJobQueueManager implements JobQueueManager {
     const closeQueueTasks: Promise<void>[] = []
 
     for (const key in this.queues) {
-      const queues = this.queues as { [key: string]: Queue<any> }
+      const queues = this.queues as { [key: string]: Queue<unknown> }
       const queue = queues[key]
 
       closeQueueTasks.push(queue.close())

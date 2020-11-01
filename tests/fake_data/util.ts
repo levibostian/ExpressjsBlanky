@@ -1,7 +1,7 @@
 import { FakeDataGenerator } from "./types"
-import { transaction } from "../../app/model"
+import { BaseModel } from "../../app/model/model"
 import uid2 from "uid2"
-import { Transaction } from "sequelize"
+import { Model, Transaction } from "objection"
 
 export const createDependencies = async (dependencies: FakeDataGenerator[]): Promise<void> => {
   const getCreateQueries = async (
@@ -9,15 +9,23 @@ export const createDependencies = async (dependencies: FakeDataGenerator[]): Pro
     transaction: Transaction
   ): Promise<void> => {
     for await (const dependency of dependencies) {
-      if (dependency.dependencies.length > 0) {
+      if (dependency.dependencies && dependency.dependencies.length > 0) {
         await getCreateQueries(dependency.dependencies, transaction)
       }
 
-      await dependency.create(transaction)
+      const model = (dependency as unknown) as BaseModel
+
+      const existing = await model.$query(transaction).findById(model.id)
+      if (!existing) {
+        const modelCopy = dependency
+        delete modelCopy.dependencies
+
+        await model.$query(transaction).insert((modelCopy as unknown) as BaseModel)
+      }
     }
   }
 
-  await transaction(async (transaction) => {
+  await Model.transaction(async (transaction) => {
     await getCreateQueries(dependencies, transaction)
   })
 }

@@ -1,16 +1,20 @@
+import { DatabaseQueryRunner } from "../model/database_query"
 import { UserModel } from "../model"
+import * as Result from "../type/result"
 
 export interface AdminController {
-  createOrGetUser(email: string): Promise<UserModel>
+  createOrGetUser(email: string): Promise<Result.Type<UserModel>>
 }
 
 export class AppAdminController implements AdminController {
-  async createOrGetUser(email: string): Promise<UserModel> {
-    const existingUser = await UserModel.findByEmail(email)
-    if (existingUser) {
-      return existingUser
-    }
+  constructor(private queryRunner: DatabaseQueryRunner) {}
 
-    return UserModel.create(email)
+  async createOrGetUser(email: string): Promise<Result.Type<UserModel>> {
+    return this.queryRunner.performQuery(async (queryRunner) => {
+      const existingUserQueryResult = await UserModel.findOrCreateByEmail(queryRunner, email)
+      if (Result.isError(existingUserQueryResult)) return existingUserQueryResult
+
+      return existingUserQueryResult.user
+    })
   }
 }

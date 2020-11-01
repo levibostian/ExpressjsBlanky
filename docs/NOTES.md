@@ -43,3 +43,131 @@ In our application, there are many tasks like performing HTTP requests and perfo
 For the scenarios like this, have the return type be `Promise<Result<Type>>` where `Type` is the dt type that you are resolving in the `Promise`. The `Result` data structure (located in `app/types/result.ts`) is very simple where it can either be a successful result or Error.
 
 When code (such as a controller) calls a function that returns a `Promise<Result<Type>>`, it's up to the caller to handle the `Result` and behave accordingly.
+
+### Avoiding circular dependencies
+
+In nodejs development where you are doing lots of `import ... from ...` statements, circular dependencies are prone to happen to your code. Circular dependencies can cause lots of issues including issues that are hard to diagnose. You will not get an error message saying, "You have a circular dependency, please fix it" you will get error messages like, "TypeError: Class extends value undefined is not a constructor or null". These messages are hard to diagnose!
+
+##### What are circular dependencies?
+
+Let's say that you have file `Pet.ts` and a file `Human.ts`.
+
+```typescript
+// Human.ts file
+import { Pet } from "./pet"
+
+export interface Human {
+  name: string
+  pet: Pet
+}
+
+// Pet.ts file
+import { Human } from "./human"
+
+export interface Pet {
+  name: string
+  owner: Human
+}
+```
+
+Each time that you have an `import` statement in your code, nodejs opens that file and executes all of the code in the file. Looking at the code above, If we execute the `Human.ts` file, it sees the Pet file import where node will execute the `Pet.ts` file. When the Pet file runs, node sees the import statement at the top and executes the Human file, ......are you starting to see a pattern here? It's like an infinite loop. This is a circular dependency.
+
+This example is easy to find and easy to fix because it's from one file to another: `Human -> Pet -> Human`. But, sometimes there are circular dependencies that are more difficult to find:
+
+```typescript
+// Person.ts file
+import { Food } from "./food"
+
+export interface Person {
+  favoriteFood: Food
+}
+
+// Food.ts file
+import { GroceryStore } from "./grocery_store"
+
+export interface Food {
+  name: string
+  store: GroceryStore
+}
+
+// GroceryStore.ts file
+import { Person } from "./person"
+
+export interface GroceryStore {
+  employees: Person[]
+}
+```
+
+This is harder to see, but it's still a circular dependency: `Person -> Food -> GroceryStore -> Person`
+
+##### How to fix circular dependencies?
+
+I have found that I get circular dependencies the most when my modules are importing Typescript types from files. I find this is because importing Typescript types is a common pattern.
+
+You might have a file like this:
+
+```typescript
+// index.ts
+export interface Model {
+  name: string
+}
+
+export abstract class BaseModel implements Model {}
+
+export * from "./user_model"
+```
+
+And then the User Model module importing the `Model` type:
+
+```ts
+// user_model.ts
+import { BaseModel } from "./index"
+
+export class UserModel extends BaseModel {}
+```
+
+This is a circular dependency: `UserModel -> Model -> UserModel`. Even though the `index.ts` file is not importing the UserModel module, it is importing it with the line `export * from "./user_model"`. An export is still importing!
+
+A common pattern that I like to use is create separate files for my Typescript types that do not import any other code but maybe other types. So, that means to take lots of the code from `index.ts` out of the file and put it somewhere else:
+
+```ts
+// model.ts
+export interface Model {
+  name: string
+}
+
+export abstract class BaseModel implements Model {}
+
+// index.ts
+export * from "./model"
+export * from "./user_model"
+
+// user_model.ts
+import { BaseModel } from "."
+
+export class UserModel extends BaseModel {}
+```
+
+Notice that we made the `model.ts` file that is pretty simple. It only defines some basic types with no imports. No circular dependencies anymore. Moving types into their own files fixes most problems I have found.
+
+Another place that I see circular dependencies being common is when using `Di.inject(Dependency.X)` in your code. That is because the file `di/index.ts` has _lots_ of import statements inside of it which means there are lots of opportunities for circular dependencies. Avoid this by only using `Di.inject(Dependency.X)` in places like in `app/routes/` code or `healthcheck.ts` Those places are good places but other code like controllers, jobs, those should all by put in the dependency graph and use it's constructor to get all of it's dependencies.
+
+##### Find circular dependencies
+
+Luckily, there is [a handy tool](https://github.com/pahen/madge) you can use to _help_ find circular dependencies in the code.
+
+> Note: This is just a tool. It may not find all issues and it may find false positives. Use it as a tool for help but know there may still be issues.
+
+You want to try and check for circular dependencies against your Typescript code _and_ your compiled Javascript code. Both will give different results!
+
+Check your Typescript code:
+
+```
+npx madge --circular --extensions ts app
+```
+
+Once you fix all of the issues, check your Javascript code:
+
+```
+npm run build && npx madge --circular dist
+```

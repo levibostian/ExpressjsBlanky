@@ -1,8 +1,8 @@
 // Setup environment, first
 import "./env"
 
-import { databaseHealthcheck } from "./model"
-import { assertJobQueue } from "./jobs"
+import { databaseHealthcheck } from "./model/database"
+import { assertRedis } from "./service/redis"
 import { Logger } from "./logger"
 import { Di, Dependency } from "./di"
 
@@ -21,8 +21,8 @@ export const assertServices = async (): Promise<void> => {
   logger.verbose("Checking database heath...")
   await databaseHealthcheck()
 
-  logger.verbose("Checking job queue health...")
-  await assertJobQueue() // checks redis, too.
+  logger.verbose("Checking Redis health...")
+  await assertRedis()
 
   logger.verbose("Services healthcheck successful")
 }

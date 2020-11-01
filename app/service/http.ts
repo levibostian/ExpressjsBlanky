@@ -25,6 +25,8 @@ export class Http {
     path: string,
     options?: { headers?: { [key: string]: string } }
   ): Promise<HttpResponse.Type<T>> {
+    const stacktraceError = new Error("")
+
     try {
       const successfulResponse = await this.axiosInstance
         .get(path, {
@@ -36,7 +38,7 @@ export class Http {
 
       return successfulResponse.data
     } catch (error) {
-      return this.processErrorResponse(error, path, undefined, options)
+      return this.processErrorResponse(stacktraceError, error, path, undefined, options)
     }
   }
 
@@ -45,6 +47,8 @@ export class Http {
     body: Object,
     options?: { headers?: { [key: string]: string } }
   ): Promise<HttpResponse.Type<T>> {
+    const stacktraceError = new Error("")
+
     try {
       const successfulResponse = await this.axiosInstance
         .post(path, body, {
@@ -56,12 +60,13 @@ export class Http {
 
       return successfulResponse.data
     } catch (error) {
-      return this.processErrorResponse(error, path, body, options)
+      return this.processErrorResponse(stacktraceError, error, path, body, options)
     }
   }
 
   /* eslint-disable @typescript-eslint/no-explicit-any */
   private processErrorResponse(
+    stacktraceError: Error,
     error: any,
     path: string,
     body?: Object,
@@ -77,12 +82,17 @@ export class Http {
       console.log("Request was made, but no response received")
       return new HttpResponse.HttpNoResponseError()
     } else {
-      // Something happened in setting up the request that triggered an Error
-      this.logger.error(error, {
-        path,
-        body,
-        options
-      })
+      this.logger.error(
+        stacktraceError,
+        `HTTPSetupError`,
+        `Something happened in setting up the request that triggered an Error`,
+        {
+          path,
+          body,
+          options,
+          error
+        }
+      )
 
       return new HttpResponse.HttpNoResponseError()
     }

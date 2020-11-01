@@ -17,7 +17,7 @@ function installJest() {
 npx --no-install jest -v > /dev/null || installJest
 
 # Note: do not override environment variables here. Set in ./tests/setup.ts instead. 
-BASE_TEST_COMMAND="npx --no-install jest --runInBand --detectOpenHandles --forceExit --silent"
+BASE_TEST_COMMAND="npx --no-install jest --runInBand --detectOpenHandles --forceExit $@"
 
 if [[ $1 == "unit" ]]; then 
     log "Running unit tests..."

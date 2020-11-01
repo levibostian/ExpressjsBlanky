@@ -11,7 +11,7 @@ import {
   NormalizeRequestBody,
   TransformResponseBodyMiddleware,
   ReturnResponseErrorHandler,
-  AssertProjectMiddleware,
+  AssertHeadersMiddleware,
   BeforeAllMiddleware
 } from "./middleware"
 import http, { Server } from "http"
@@ -32,7 +32,7 @@ export const startServer = (): Server => {
   const logger: Logger = Di.inject(Dependency.Logger)
 
   process.on("uncaughtException", (err: Error) => {
-    logger.error(err)
+    logger.error(err, `Node uncaught exception`, err.message)
   })
 
   const app = express()
@@ -51,7 +51,7 @@ export const startServer = (): Server => {
   app.use(bodyParser.urlencoded({ extended: false, limit: "100kb" }))
   app.use(bodyParser.json({ limit: "100kb" }))
   app.use(NormalizeRequestBody)
-  app.use(AssertProjectMiddleware)
+  app.use(AssertHeadersMiddleware)
   app.use(passport.initialize())
   app.use(LogRequestMiddleware(logger))
   app.use(TransformResponseBodyMiddleware)

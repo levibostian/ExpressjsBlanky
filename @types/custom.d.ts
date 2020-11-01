@@ -1,4 +1,5 @@
-import { Project } from "../app/type/project"
+import { Project, RequestVersion } from "../app/type"
+import { Responses } from "../app/responses"
 
 /**
  * This file is where we add our own modifications to existing typescript definitions. This is known as *declaration merging*: https://www.typescriptlang.org/docs/handbook/declaration-merging.html. This is not where I define my own types. That's in 'app/types/' where I store those usually. I create actual Typescript interfaces there to use in my source code. Here is where I modify 3rd party node_modules. 
@@ -30,7 +31,7 @@ import { Project } from "../app/type/project"
     },
     "typeRoots": ["@types", "./node_modules/@types"]
   },
-  "include": ["app/**\/*", "@types/**\/*"] // if you see `/\*` ignore the `\`. It's only there to make the javsscript comment block happy. 
+  "include": ["app/**\/*", "@types/**\/*"] // if you see `/\*` ignore the `\`. It's only there to make the javascript comment block happy. 
   }
   * ```
  */
@@ -39,18 +40,11 @@ declare global {
   namespace Express {
     export interface Request {
       project: Project
+      requestVersion: RequestVersion
     }
-  }
-}
 
-/**
- * Custom jest matchers
- */
-declare global {
-  namespace jest {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    interface Matchers<R, T> {
-      toEqualServerResponse(a: object): R
+    export interface Response {
+      responses: Responses
     }
   }
 }

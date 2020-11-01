@@ -1,7 +1,6 @@
 import { UserModel } from "../../../app//model"
 import uid2 from "uid2"
 import { FakeDataGenerator } from "../types"
-import { Transaction } from "sequelize/types"
 
 export class UserFakeDataGenerator extends UserModel implements FakeDataGenerator {
   public dependencies: FakeDataGenerator[] = []
@@ -36,18 +35,18 @@ export class UserFakeDataGenerator extends UserModel implements FakeDataGenerato
     passwordTokenCreated: Date,
     accessToken?: string
   ): UserFakeDataGenerator {
-    return new UserFakeDataGenerator(
+    const properties = {
       id,
       email,
-      new Date(),
-      new Date(),
-      accessToken,
       passwordToken,
-      passwordTokenCreated
-    )
-  }
+      passwordTokenCreated,
+      accessToken
+    }
 
-  create(transaction: Transaction): Promise<unknown> {
-    return this.findOrCreateSelf(transaction)
+    const user = new UserFakeDataGenerator()
+
+    Object.assign(user, properties)
+
+    return user
   }
 }

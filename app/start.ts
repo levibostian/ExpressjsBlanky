@@ -1,11 +1,12 @@
 // Setup environment, first
 import "./env"
+import "./extensions"
 
 import { Dependency, Di } from "./di"
 import { Logger } from "./logger"
 import { Files } from "./service"
 import { startLocalServices, startRemoteServices } from "./app_startup"
-import { sleep } from "./util"
+import _ from "./util"
 
 const logger: Logger = Di.inject(Dependency.Logger)
 const files: Files = Di.inject(Dependency.Files)
@@ -30,7 +31,7 @@ new Promise(async (res, rej) => {
   })
   .catch(async (error: Error) => {
     logger.verbose("!!!!!!!!!!!! SERVER STARTUP FAILED !!!!!!!!!!!!")
-    logger.error(error)
+    logger.error(error, `Server startup failed`, error.message)
 
-    await sleep(300000) // 5 minutes. This is so we can debug, locally. If we fail instantly, k8s will restart the container instantly but if we sleep for a while k8s will only restart after the readiness probe fails.
+    await _.sleep(300000) // 5 minutes. This is so we can debug, locally. If we fail instantly, k8s will restart the container instantly but if we sleep for a while k8s will only restart after the readiness probe fails.
   })

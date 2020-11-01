@@ -1,5 +1,5 @@
 import { RequestHandler } from "express"
-import { normalizeEmail } from "../util"
+import _ from "../util"
 
 /**
  * Code inspired from: https://github.com/samora/trim-body
@@ -12,7 +12,7 @@ const normalizeBody = (body: any): void => {
 
       if (typeof value === "string") {
         let normalizedValue = value.trim()
-        normalizedValue = normalizeEmail(normalizedValue)
+        normalizedValue = _.string.normalizeEmail(normalizedValue)
 
         body[key] = normalizedValue
       }

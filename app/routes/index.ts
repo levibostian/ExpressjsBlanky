@@ -2,9 +2,6 @@ import express from "express"
 import userRouter from "./user"
 import adminRouter from "./admin"
 import path from "path"
-import { JobQueueManager } from "../jobs"
-import { Dependency, Di } from "../di"
-import { UserController } from "../controller/user"
 
 const router = express.Router()
 
@@ -22,12 +19,6 @@ router.get("/version", async (req, res, next) => {
 
     version = filePath.version
   }
-
-  const jobs: JobQueueManager = Di.inject(Dependency.JobQueueManager)
-  await jobs.queueRandom()
-
-  const controller: UserController = Di.inject(Dependency.UserController)
-  await controller.fooTesting(1)
 
   return res.send({
     version: version

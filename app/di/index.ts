@@ -11,6 +11,7 @@ import { AppUserController } from "../controller/user"
 import { FcmPushNotificationService } from "../service/push_notifications"
 import { AppFiles } from "../service"
 import { RandomJob } from "../jobs/random"
+import { DatabaseQueryRunner } from "../model/database_query"
 
 export enum Dependency {
   Logger = "Logger",
@@ -22,7 +23,8 @@ export enum Dependency {
   Firebase = "Firebase",
   AdminController = "AdminController",
   UserController = "UserController",
-  Files = "Files"
+  Files = "Files",
+  DatabaseQueryRunner = "DatabaseQueryRunner"
 }
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -40,7 +42,10 @@ class DiContainer {
     this.singletons.set(
       Dependency.JobQueueManager,
       new AppJobQueueManager(
-        new SendPushNotificationJobUserJob(this.inject(Dependency.PushNotificationService)),
+        new SendPushNotificationJobUserJob(
+          this.inject(Dependency.PushNotificationService),
+          this.inject(Dependency.DatabaseQueryRunner)
+        ),
         new RandomJob(this.inject(Dependency.Logger)),
         this.inject(Dependency.Logger)
       )
@@ -76,9 +81,12 @@ class DiContainer {
       case Dependency.KeyValueStorage:
         return (new RedisKeyValueStorage(this.inject(Dependency.RedisClient)) as unknown) as T
       case Dependency.AdminController:
-        return (new AppAdminController() as unknown) as T
+        return (new AppAdminController(this.inject(Dependency.DatabaseQueryRunner)) as unknown) as T
       case Dependency.UserController:
-        return (new AppUserController(this.inject(Dependency.EmailSender)) as unknown) as T
+        return (new AppUserController(
+          this.inject(Dependency.EmailSender),
+          this.inject(Dependency.DatabaseQueryRunner)
+        ) as unknown) as T
       case Dependency.PushNotificationService:
         return this.singletons.get(Dependency.PushNotificationService)
       case Dependency.RedisClient:
@@ -87,6 +95,8 @@ class DiContainer {
         return (new AppFiles() as unknown) as T
       case Dependency.Firebase:
         return (new AppFirebase(this.inject(Dependency.Logger)) as unknown) as T
+      case Dependency.DatabaseQueryRunner:
+        return (new DatabaseQueryRunner(this.inject(Dependency.Logger)) as unknown) as T
     }
   }
 }

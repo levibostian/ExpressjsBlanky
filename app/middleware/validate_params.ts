@@ -1,19 +1,13 @@
 import { validationResult } from "express-validator"
 import { RequestHandler } from "express"
-import { FieldsError } from "../responses"
-
-export interface FieldError {
-  location: string
-  msg: string
-  param: string
-}
+import { FieldError } from "../type"
 
 export const ValidateParamsMiddleware: RequestHandler = (req, res, next) => {
   const errors = validationResult(req)
   if (!errors.isEmpty()) {
-    return res
-      .status(FieldsError.code)
-      .send(new FieldsError((errors.array() as unknown) as FieldError[]))
+    const response = res.responses.error.fieldsError((errors.array() as unknown) as FieldError[])
+
+    return res.status(response.code).send(response.response)
   } else {
     return next()
   }

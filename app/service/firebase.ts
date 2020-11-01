@@ -1,13 +1,13 @@
 import * as HttpResponse from "../type/http_response"
 import { Logger } from "../logger"
 import { Http } from "./http"
-import { createDynamicLink } from "../util"
 import { Project } from "../type/project"
 import { projects } from "../projects"
+import { DynamicLink } from "../type/dynamic_link"
 
 export interface Firebase {
   startup(): Promise<void>
-  getShortDynamicLink(longLink: string, project: Project): Promise<HttpResponse.Type<string>>
+  getShortDynamicLink(longLink: DynamicLink, project: Project): Promise<HttpResponse.Type<string>>
 }
 
 interface GetShortLinkDynamicLinkSuccessfulResponse {
@@ -31,10 +31,7 @@ export class AppFirebase implements Firebase {
       // We want to test to make sure that we are setup successfully to work with Firebase. Test authentication.
       // To do that, we will create a dynamic link for a random URL and see if it worked. If so, we know it's successful.
       const response = await this.getShortDynamicLink(
-        createDynamicLink(
-          "https://en.wikipedia.org/wiki/Smith_Park_(Middletown,_Connecticut)?foo=bar&bar=foo",
-          project
-        ),
+        DynamicLink.create({ foo: "bar" }, project),
         project
       )
 
@@ -46,7 +43,7 @@ export class AppFirebase implements Firebase {
    * Make sure to call `createDynamicLink()` before you call this.
    */
   async getShortDynamicLink(
-    longLink: string,
+    longLink: DynamicLink,
     project: Project
   ): Promise<HttpResponse.Type<string>> {
     const webApiKey = this.firebaseApps.get(project)!

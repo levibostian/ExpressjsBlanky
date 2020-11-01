@@ -34,7 +34,7 @@ export const createEndpoint = (endpoint: Endpoint): RequestHandler => {
       .append(async (req, res, next) => {
         const serverResponse = await endpoint.request(req, res, next)
 
-        res.status(serverResponse.code).send(serverResponse)
+        res.status(serverResponse.code).send(serverResponse.response)
       })
       .run()
   }

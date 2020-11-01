@@ -7,7 +7,7 @@ process.env.DISABLE_BRUTEFORCE_PREVENTION = "true"
 /* eslint-enable no-process-env */
 import "../app/env" // Setup .env
 
-import { resetDatabase } from "../app/model"
+import { resetDatabase } from "../app/model/database"
 import { Di, Dependency } from "../app/di"
 import { Logger } from "../app/logger"
 import { JobQueueManager } from "../app/jobs"

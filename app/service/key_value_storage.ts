@@ -1,7 +1,6 @@
 import { RedisClient } from "redis"
-import isnil from "lodash.isnil"
+import _ from "../util"
 import { promisify } from "util"
-import { jsonReviver } from "../extensions/json"
 import { Foo } from "../type"
 
 export interface KeyValueStorage {
@@ -25,11 +24,11 @@ export class RedisKeyValueStorage implements KeyValueStorage {
 
     const value = await getAsync(key)
 
-    if (isnil(value)) {
+    if (_.isNullOrUndefined(value)) {
       return undefined
     }
 
-    return JSON.parse(value, jsonReviver)
+    return _.json.parse(value)
   }
 
   private async set<T>(key: string, value: T): Promise<void> {

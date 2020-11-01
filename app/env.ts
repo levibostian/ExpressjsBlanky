@@ -1,7 +1,8 @@
 import dotenv, { DotenvConfigOptions } from "dotenv"
 import { ClientOpts } from "redis"
 import { RedisOptions } from "ioredis"
-import isNil from "lodash.isnil"
+import _ from "./util"
+
 import path from "path"
 
 const dotEnvConfig: DotenvConfigOptions = {
@@ -47,7 +48,7 @@ export const requireEnv = (key: string): string => {
   // eslint-disable-next-line no-process-env
   const value: string = process.env[key]!
 
-  if (isNil(value)) throw Error(`Forgot to create ${key} in .env`)
+  if (_.isNullOrUndefined(value)) throw Error(`Forgot to create ${key} in .env`)
 
   return value
 }
@@ -56,7 +57,7 @@ export const isDefined = (key: string): boolean => {
   // eslint-disable-next-line no-process-env
   const value: string = process.env[key]!
 
-  const isNotDefined = isNil(value)
+  const isNotDefined = _.isNullOrUndefined(value)
 
   return !isNotDefined
 }

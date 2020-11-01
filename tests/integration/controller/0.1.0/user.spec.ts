@@ -1,24 +1,19 @@
 import { setup, serverRequest, endpointVersionHeader, authHeader } from "../../../integration/index"
 import uid2 from "uid2"
-import {
-  UserEnteredBadDataError,
-  Success,
-  Unauthorized,
-  FieldsError
-} from "../../../../app/responses"
+import { ResponseCodes } from "../../../../app/responses"
 import { UserFakeDataGenerator, FcmTokenFakeDataGenerator } from "../../../fake_data"
 import { UserModel, FcmTokenModel } from "../../../../app/model"
-import { EmailSender } from "../../../../app/email"
 import { Di, Dependency } from "../../../../app/di"
-import { endpointVersion } from "./index"
-import * as arrayExtensions from "../../../../app/extensions/array"
+import { endpointVersion, responses } from "./index"
 import { Env } from "../../../../app/env"
 import { projects } from "../../../../app/projects"
+import * as Result from "../../../../app/type/result"
+import { EmailSenderMock } from "../../../mocks"
+import { DatabaseQueryRunner } from "../../../../app/model/database_query"
+import _ from "../../../../app/util"
 
-const sendWelcomeMock = jest.fn()
-const emailSenderMock: EmailSender = {
-  sendLogin: sendWelcomeMock
-}
+const emailSenderMock = new EmailSenderMock()
+const queryRunner: DatabaseQueryRunner = Di.inject(Dependency.DatabaseQueryRunner)
 
 const overrideDependencies = (): void => {
   Di.override(Dependency.EmailSender, emailSenderMock)
@@ -32,7 +27,7 @@ describe(`Receive login email passwordless token.`, () => {
       .post(endpoint)
       .set(endpointVersionHeader(endpointVersion))
       .then((res) => {
-        expect(res.status).toBe(FieldsError.code)
+        expect(res.status).toBe(ResponseCodes.fieldsError)
       })
   })
   it("should error email param not an email address", async () => {
@@ -42,7 +37,7 @@ describe(`Receive login email passwordless token.`, () => {
       .set(endpointVersionHeader(endpointVersion))
       .send({ email: uid2(20) })
       .then((res) => {
-        expect(res.status).toBe(FieldsError.code)
+        expect(res.status).toBe(ResponseCodes.fieldsError)
       })
   })
   it("should succeed. Create new user.", async () => {
@@ -52,13 +47,13 @@ describe(`Receive login email passwordless token.`, () => {
       .post(endpoint)
       .set(endpointVersionHeader(endpointVersion))
       .send({ email: testUser.email, bundle: "com.foo.foo" })
-      .expect(Success.code)
+      .expect(ResponseCodes.success)
       .then((res) => {
-        expect(sendWelcomeMock).toBeCalledTimes(1)
-        expect(sendWelcomeMock.mock.calls[0][2].appLoginLink).toEqual(
+        expect(emailSenderMock.sendLoginMock).toBeCalledTimes(1)
+        expect(emailSenderMock.sendLoginMock.mock.calls[0][2].appLoginLink).toEqual(
           expect.stringContaining(projects[0].config.dynamic_link_hostname)
         )
-        expect(sendWelcomeMock.mock.calls[0][2].appLoginLink).toEqual(
+        expect(emailSenderMock.sendLoginMock.mock.calls[0][2].appLoginLink).toEqual(
           expect.stringContaining(encodeURIComponent(Env.appHost))
         )
       })
@@ -70,13 +65,13 @@ describe(`Receive login email passwordless token.`, () => {
       .post(endpoint)
       .set(endpointVersionHeader(endpointVersion))
       .send({ email: testUser.email, bundle: "com.foo.foo" })
-      .expect(Success.code)
+      .expect(ResponseCodes.success)
       .then((res) => {
-        expect(sendWelcomeMock).toBeCalledTimes(1)
-        expect(sendWelcomeMock.mock.calls[0][2].appLoginLink).toEqual(
+        expect(emailSenderMock.sendLoginMock).toBeCalledTimes(1)
+        expect(emailSenderMock.sendLoginMock.mock.calls[0][2].appLoginLink).toEqual(
           expect.stringContaining(projects[0].config.dynamic_link_hostname)
         )
-        expect(sendWelcomeMock.mock.calls[0][2].appLoginLink).toEqual(
+        expect(emailSenderMock.sendLoginMock.mock.calls[0][2].appLoginLink).toEqual(
           expect.stringContaining(encodeURIComponent(Env.appHost))
         )
       })
@@ -92,7 +87,7 @@ describe(`Get access token from passwordless token`, () => {
       .post(endpoint)
       .set(endpointVersionHeader(endpointVersion))
       .then((res) => {
-        expect(res.status).toBe(FieldsError.code)
+        expect(res.status).toBe(ResponseCodes.fieldsError)
       })
   })
   it("should error passwordless token does not exist.", async () => {
@@ -102,7 +97,7 @@ describe(`Get access token from passwordless token`, () => {
       .set(endpointVersionHeader(endpointVersion))
       .send({ passwordless_token: uid2(20) })
       .then((res) => {
-        expect(res.status).toBe(UserEnteredBadDataError.code)
+        expect(res.status).toBe(ResponseCodes.userEnteredBadData)
       })
   })
   it("should error passwordless token expired.", async () => {
@@ -119,7 +114,7 @@ describe(`Get access token from passwordless token`, () => {
       .set(endpointVersionHeader(endpointVersion))
       .send({ passwordless_token: testUser.passwordToken })
       .then((res) => {
-        expect(res.status).toBe(UserEnteredBadDataError.code)
+        expect(res.status).toBe(ResponseCodes.userEnteredBadData)
       })
   })
   it("should succeed get access token.", async () => {
@@ -129,10 +124,13 @@ describe(`Get access token from passwordless token`, () => {
       .post(endpoint)
       .set(endpointVersionHeader(endpointVersion))
       .send({ passwordless_token: testUser.passwordToken })
-      .expect(Success.code)
+      .expect(ResponseCodes.success)
       .then(async (res) => {
-        const testUserAfterCall = await UserModel.findUserById(testUser.id)
-        expect(res.body.user).toEqualServerResponse(testUserAfterCall!.privateRepresentation())
+        await queryRunner.performQuery(async (queryRunner) => {
+          const testUserAfterCall = (await UserModel.findUserById(queryRunner, testUser.id))!
+
+          expect(res.body).toEqual(responses.userLoggedIn(testUserAfterCall))
+        })
       })
   })
 })
@@ -146,7 +144,7 @@ describe(`Update FCM token.`, () => {
       .post(endpoint)
       .set(endpointVersionHeader(endpointVersion))
       .then((res) => {
-        expect(res.status).toBe(Unauthorized.code)
+        expect(res.status).toBe(ResponseCodes.unauthorized)
       })
   })
   it("should error bad access token.", async () => {
@@ -157,7 +155,7 @@ describe(`Update FCM token.`, () => {
       .set(authHeader(testUser.accessToken!))
       .set(endpointVersionHeader(endpointVersion))
       .then((res) => {
-        expect(res.status).toBe(Unauthorized.code)
+        expect(res.status).toBe(ResponseCodes.unauthorized)
       })
   })
   it("should error missing param", async () => {
@@ -168,7 +166,7 @@ describe(`Update FCM token.`, () => {
       .set(authHeader(testUser.accessToken!))
       .set(endpointVersionHeader(endpointVersion))
       .then((res) => {
-        expect(res.status).toBe(FieldsError.code)
+        expect(res.status).toBe(ResponseCodes.fieldsError)
       })
   })
   it("should succeed and create fcm token", async () => {
@@ -180,9 +178,12 @@ describe(`Update FCM token.`, () => {
       .set(endpointVersionHeader(endpointVersion))
       .set(authHeader(testUser.accessToken!))
       .send({ token: newToken })
-      .expect(Success.code)
+      .expect(ResponseCodes.success)
       .then(async (res) => {
-        const createdTokens = await FcmTokenModel.findByUserId(testUser.id)
+        const createdTokens = await queryRunner.performQuery((queryRunner) => {
+          return FcmTokenModel.findByUserId(queryRunner, testUser.id)
+        })
+        if (Result.isError(createdTokens)) throw createdTokens
 
         expect(createdTokens).toHaveLength(1)
         expect(createdTokens[0].token).toBe(newToken)
@@ -206,12 +207,14 @@ describe(`Update FCM token.`, () => {
       .set(endpointVersionHeader(endpointVersion))
       .set(authHeader(testUser.accessToken!))
       .send({ token: newToken })
-      .expect(Success.code)
+      .expect(ResponseCodes.success)
       .then(async (res) => {
-        const tokensForUser = await FcmTokenModel.findByUserId(testUser.id)
+        await queryRunner.performQuery(async (queryRunner) => {
+          const tokensForUser = await FcmTokenModel.findByUserId(queryRunner, testUser.id)
 
-        expect(tokensForUser).toHaveLength(100)
-        expect(arrayExtensions.last(tokensForUser).token).toBe(newToken)
+          expect(tokensForUser).toHaveLength(100)
+          expect(_.array.last(tokensForUser)!.token).toBe(newToken)
+        })
       })
   })
 })

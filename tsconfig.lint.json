@@ -3,5 +3,5 @@
   "compilerOptions": {
     "noEmit": true
   },
-  "include": ["app/**/*", "tests/**/*", "@types/**/*"]
+  "include": ["app/**/*", "tests/**/*", "db/**/*", "@types/**/*"]
 }

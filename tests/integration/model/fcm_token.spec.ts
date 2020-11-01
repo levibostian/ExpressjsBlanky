@@ -1,20 +1,67 @@
 import { setup } from "../../integration/index"
 import { UserFakeDataGenerator, FcmTokenFakeDataGenerator } from "../../fake_data"
 import { FcmTokenModel } from "../../../app/model"
+import { Di, Dependency } from "../../../app/di"
+import uid2 from "uid2"
+import { DatabaseQueryRunner } from "../../../app/model/database_query"
 
-describe(`FcmModel tests`, () => {
-  it("should delete fcm token after deleting user", async () => {
-    const user = UserFakeDataGenerator.completeSignup(1)
-    const fcmToken = FcmTokenFakeDataGenerator.tokenForUserDevice(1, user)
+const queryRunner: DatabaseQueryRunner = Di.inject(Dependency.DatabaseQueryRunner)
 
-    await setup([fcmToken, user])
+describe(`FcmTokenModel tests`, () => {
+  describe("foreign keys", () => {
+    it(`should delete all tokens when user is deleted`, async () => {
+      const user = UserFakeDataGenerator.completeSignup(1)
+      const fcmToken = FcmTokenFakeDataGenerator.tokenForUserDevice(1, user)
 
-    const fcmTokenBeforeUserDelete = await FcmTokenModel.findByUserId(user.id)
-    expect(fcmTokenBeforeUserDelete).toHaveLength(1)
+      await setup([fcmToken, user])
 
-    await user.delete()
+      await queryRunner.performQuery(async (queryRunner) => {
+        const fcmTokenBeforeUserDelete = await FcmTokenModel.findByUserId(queryRunner, user.id)
+        expect(fcmTokenBeforeUserDelete).toHaveLength(1)
 
-    const fcmTokenAfterUserDelete = await FcmTokenModel.findByUserId(user.id)
-    expect(fcmTokenAfterUserDelete).toHaveLength(0)
+        await user.delete(queryRunner)
+
+        const fcmTokenAfterUserDelete = await FcmTokenModel.findByUserId(queryRunner, user.id)
+        expect(fcmTokenAfterUserDelete).toHaveLength(0)
+      })
+    })
+  })
+
+  describe(`findByUserId`, () => {
+    it("should return an empty array when no tokens exist for user", async () => {
+      await queryRunner.performQuery(async (queryRunner) => {
+        expect(await FcmTokenModel.findByUserId(queryRunner, 1)).toHaveLength(0)
+      })
+    })
+
+    it("should return tokens for user that belong to user", async () => {
+      const user = UserFakeDataGenerator.completeSignup(1)
+      const otherUser = UserFakeDataGenerator.completeSignup(2)
+      const fcmToken1 = FcmTokenFakeDataGenerator.tokenForUserDevice(1, user)
+      const fcmToken2 = FcmTokenFakeDataGenerator.tokenForUserDevice(2, user)
+      const fcmToken3 = FcmTokenFakeDataGenerator.tokenForUserDevice(3, otherUser)
+
+      await setup([fcmToken1, fcmToken2, fcmToken3])
+
+      await queryRunner.performQuery(async (queryRunner) => {
+        expect(await FcmTokenModel.findByUserId(queryRunner, user.id)).toHaveLength(2)
+      })
+    })
+  })
+
+  describe(`create`, () => {
+    it("should create and return token after creating", async () => {
+      const givenToken = uid2(20)
+
+      const user = UserFakeDataGenerator.completeSignup(1)
+      await setup([user])
+
+      await queryRunner.performQuery(async (queryRunner) => {
+        const createdToken = await FcmTokenModel.create(queryRunner, user.id, givenToken)
+
+        expect(createdToken.token).toBe(givenToken)
+        expect(createdToken.userId).toBe(user.id)
+      })
+    })
   })
 })

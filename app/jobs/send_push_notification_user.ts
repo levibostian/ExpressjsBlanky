@@ -2,6 +2,8 @@ import { Project } from "../type/project"
 import { Job } from "../jobs/type"
 import { FcmTokenModel } from "../model/fcm_token"
 import { PushNotificationService } from "../service/push_notifications"
+import * as Result from "../type/result"
+import { DatabaseQueryRunner } from "../model/database_query"
 
 export interface SendMessagePushNotificationParam {
   userId: number
@@ -29,12 +31,18 @@ export type SendPushNotificationParam =
 export class SendPushNotificationJobUserJob implements Job<SendPushNotificationParam, void> {
   public name = "SendPushNotificationJobUserJob"
 
-  constructor(private pushNotificationService: PushNotificationService) {}
+  constructor(
+    private pushNotificationService: PushNotificationService,
+    private queryRunner: DatabaseQueryRunner
+  ) {}
 
   async run(param: SendPushNotificationParam): Promise<void> {
-    const fcmTokens = (await FcmTokenModel.findByUserId(param.userId)).map(
-      (fcmToken) => fcmToken.token
-    )
+    const fcmTokensQueryResult = await this.queryRunner.performQuery(async (queryRunner) => {
+      return FcmTokenModel.findByUserId(queryRunner, param.userId)
+    })
+    if (Result.isError(fcmTokensQueryResult)) throw fcmTokensQueryResult
+
+    const fcmTokens = fcmTokensQueryResult.map((model) => model.token)
 
     if (isMessagePushNotification(param)) {
       await this.pushNotificationService.sendUserMessageNotification(

@@ -26,7 +26,8 @@ NEXT_VERSION=$(node -p "require('./package.json').version")
 logVerbose "Starting deploy. tag: $NEXT_VERSION"
 
 logVerbose "Performing database migration"
-npx sequelize db:migrate --debug
+npm run db:migrate:list 
+npm run db:migrate
 logSuccess "Performing database migration"
 
 logVerbose "Deploying application"

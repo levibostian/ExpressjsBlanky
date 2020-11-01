@@ -1,4 +1,3 @@
-import "./custom_matchers"
 import { RedisClient } from "redis"
 import { Di, Dependency } from "../app/di"
 import dayjs from "dayjs"

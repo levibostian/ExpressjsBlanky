@@ -2,27 +2,15 @@ import express from "express"
 import expressRoutesVersioning from "express-routes-versioning"
 import { authMiddleware, AuthType, bruteForcePrevent } from "../middleware"
 import { createEndpoint } from "./util"
-import { ServerResponse, Success, UserEnteredBadDataError } from "../responses"
-import { UserModel, UserPublic } from "../model"
+import { ServerResponse } from "../responses"
+import { UserModel } from "../model"
 import { check } from "express-validator"
 import { Dependency, Di } from "../di"
 import { UserController } from "../controller/user"
+import * as Result from "../type/result"
 
 const router = express.Router()
 const routesVersioning = expressRoutesVersioning()
-
-/**
- * @apiDefine LoginUserSuccess
- * @apiSuccessExample {json} Success-Response:
- *     {
- *        message: "Human readable successful message"
- *     }
- */
-class LoginUserSuccess extends Success {
-  constructor(message: string) {
-    super(message)
-  }
-}
 
 /**
  * @api {post} /user/login Add user
@@ -46,19 +34,14 @@ router.post(
 
         const userController: UserController = Di.inject(Dependency.UserController)
 
-        await userController.sendLoginLink(body.email, req.project)
+        const sendLoginLinkResult = await userController.sendLoginLink(body.email, req.project)
+        if (Result.isError(sendLoginLinkResult)) return res.responses.error.developerError()
 
-        return new LoginUserSuccess("Check your email to login.")
+        return res.responses.message("Check your email to login.")
       }
     })
   })
 )
-
-class LoginAccessTokenSuccess extends Success {
-  constructor(message: string, public user: UserPublic) {
-    super(message)
-  }
-}
 
 router.post(
   "/user/login/token",
@@ -73,13 +56,15 @@ router.post(
         const userController: UserController = Di.inject(Dependency.UserController)
 
         const user = await userController.exchangePasswordlessToken(body.passwordless_token)
+        if (Result.isError(user)) return res.responses.error.developerError()
+
         if (!user) {
-          return new UserEnteredBadDataError(
+          return res.responses.error.userEnteredBadData(
             "Sorry! Please enter your email into the app and try to login again. The link is expired."
           )
         }
 
-        return new LoginAccessTokenSuccess("Successfully logged in.", user.privateRepresentation())
+        return res.responses.userLoggedIn(user)
       }
     })
   })
@@ -99,9 +84,10 @@ router.post(
 
         const userController: UserController = Di.inject(Dependency.UserController)
 
-        await userController.addFcmToken(user.id, body.token)
+        const addTokenResult = await userController.addFcmToken(user.id, body.token)
+        if (Result.isError(addTokenResult)) return res.responses.error.developerError()
 
-        return new Success("Updated.")
+        return res.responses.message("Updated")
       }
     })
   })

@@ -5,10 +5,10 @@ import {
   adminAuthHeader
 } from "../../../integration/index"
 import uid2 from "uid2"
-import { Success, Unauthorized, FieldsError } from "../../../../app/responses"
+import { ResponseCodes } from "../../../../app/responses"
 import { UserFakeDataGenerator } from "../../../fake_data"
 import { Di, Dependency } from "../../../../app/di"
-import { endpointVersion } from "./index"
+import { endpointVersion, responses } from "./index"
 import { EmailSenderMock } from "../../../mocks/email_sender"
 
 describe(`Create user`, () => {
@@ -24,7 +24,7 @@ describe(`Create user`, () => {
     await serverRequest()
       .post(endpoint)
       .set(endpointVersionHeader(endpointVersion))
-      .expect(Unauthorized.code)
+      .expect(ResponseCodes.unauthorized)
       .then(() => {
         expect(emailSenderMock.sendLoginMock).not.toHaveBeenCalled()
       })
@@ -35,7 +35,7 @@ describe(`Create user`, () => {
       .post(endpoint)
       .set("Authorization", `Bearer ${uid2(200)}`)
       .set(endpointVersionHeader(endpointVersion))
-      .expect(Unauthorized.code)
+      .expect(ResponseCodes.unauthorized)
       .then(() => {
         expect(emailSenderMock.sendLoginMock).not.toHaveBeenCalled()
       })
@@ -46,7 +46,7 @@ describe(`Create user`, () => {
       .post(endpoint)
       .set(adminAuthHeader())
       .set(endpointVersionHeader(endpointVersion))
-      .expect(FieldsError.code)
+      .expect(ResponseCodes.fieldsError)
       .then(() => {
         expect(emailSenderMock.sendLoginMock).not.toHaveBeenCalled()
       })
@@ -60,7 +60,7 @@ describe(`Create user`, () => {
       .set(adminAuthHeader())
       .set(endpointVersionHeader(endpointVersion))
       .send({ email: user.email })
-      .expect(Success.code)
+      .expect(ResponseCodes.success)
       .then(() => {
         expect(emailSenderMock.sendLoginMock).not.toHaveBeenCalled()
       })
@@ -74,9 +74,9 @@ describe(`Create user`, () => {
       .set(adminAuthHeader())
       .set(endpointVersionHeader(endpointVersion))
       .send({ email: user.email })
-      .expect(Success.code)
+      .expect(ResponseCodes.success)
       .then(async (res) => {
-        expect(res.body.user).toEqual(user.publicRepresentation())
+        expect(res.body).toEqual(responses.userLoggedIn(user))
         expect(emailSenderMock.sendLoginMock).not.toHaveBeenCalled()
       })
   })
