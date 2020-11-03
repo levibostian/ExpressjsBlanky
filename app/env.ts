@@ -1,3 +1,4 @@
+/* eslint-disable no-process-env */
 import dotenv, { DotenvConfigOptions } from "dotenv"
 import { ClientOpts } from "redis"
 import { RedisOptions } from "ioredis"
@@ -45,7 +46,6 @@ export interface Environment {
 }
 
 export const requireEnv = (key: string): string => {
-  // eslint-disable-next-line no-process-env
   const value: string = process.env[key]!
 
   if (_.isNullOrUndefined(value)) throw Error(`Forgot to create ${key} in .env`)
@@ -54,7 +54,6 @@ export const requireEnv = (key: string): string => {
 }
 
 export const isDefined = (key: string): boolean => {
-  // eslint-disable-next-line no-process-env
   const value: string = process.env[key]!
 
   const isNotDefined = _.isNullOrUndefined(value)
@@ -62,7 +61,6 @@ export const isDefined = (key: string): boolean => {
   return !isNotDefined
 }
 
-/* eslint-disable no-process-env */
 export const Env: Environment = {
   loggers: {
     enableConsole: !isDefined("DISABLE_CONSOLE"),
@@ -96,4 +94,3 @@ export const Env: Environment = {
   appHost: requireEnv("APP_HOST"),
   enableBruteforcePrevention: !isDefined("DISABLE_BRUTEFORCE_PREVENTION")
 }
-/* eslint-enable no-process-env */

@@ -64,6 +64,7 @@ export class Http {
     }
   }
 
+  // We are using `any` for `error` because that's the type that axios gives us. The code below was suggested in the docs for Axios.
   /* eslint-disable @typescript-eslint/no-explicit-any */
   private processErrorResponse(
     stacktraceError: Error,

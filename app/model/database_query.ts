@@ -131,7 +131,8 @@ export class DatabaseQueryRunner {
         {
           sqlError: {
             constraint: error.constraint,
-            table: error.table
+            table: error.table,
+            error
           }
         }
       )
@@ -145,7 +146,8 @@ export class DatabaseQueryRunner {
         {
           sqlError: {
             constraint: error.constraint,
-            table: error.table
+            table: error.table,
+            error
           }
         }
       )
@@ -154,7 +156,8 @@ export class DatabaseQueryRunner {
     } else if (error instanceof DataError) {
       this.logger.error(stacktraceError, error.name, error.message, {
         sqlError: {
-          message: error.message
+          message: error.message,
+          error
         }
       })
 
@@ -162,13 +165,18 @@ export class DatabaseQueryRunner {
     } else if (error instanceof DBError) {
       this.logger.error(stacktraceError, error.name, error.message, {
         sqlError: {
-          message: error.message
+          message: error.message,
+          error
         }
       })
 
       return error
     } else {
-      this.logger.error(stacktraceError, error.name, error.message)
+      this.logger.error(stacktraceError, error.name, error.message, {
+        sqlError: {
+          error
+        }
+      })
 
       return new UnknownSqlQueryError(error)
     }

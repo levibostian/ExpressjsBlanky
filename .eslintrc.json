@@ -13,7 +13,9 @@
     "@typescript-eslint/indent": "off",
     "@typescript-eslint/no-namespace": "off",
     "@typescript-eslint/no-non-null-assertion": "off",
+    "no-unused-vars": "off", // note you must disable the base rule as it can report incorrect errors
     "@typescript-eslint/no-unused-vars": [
+      // https://github.com/typescript-eslint/typescript-eslint/blob/master/packages/eslint-plugin/docs/rules/no-unused-vars.md
       "error",
       {
         "args": "none"
@@ -29,7 +31,6 @@
         }
       }
     ],
-    "@typescript-eslint/no-empty-function": "off",
     "@typescript-eslint/no-parameter-properties": "off",
     "@typescript-eslint/member-delimiter-style": [
       "error",
@@ -44,7 +45,9 @@
         }
       }
     ],
+    "no-use-before-define": "off", // note you must disable the base rule as it can report incorrect errors
     "@typescript-eslint/no-use-before-define": [
+      // https://github.com/typescript-eslint/typescript-eslint/blob/master/packages/eslint-plugin/docs/rules/no-use-before-define.md
       "error",
       {
         "functions": true,

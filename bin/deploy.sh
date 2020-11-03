@@ -33,3 +33,16 @@ logSuccess "Performing database migration"
 logVerbose "Deploying application"
 PROJECTS=$(cat app/config/projects.json | base64) DOTENV=$(cat app/.env | base64) IMAGE_TAG=$NEXT_VERSION skaffold deploy
 logSuccess "Deploying application"
+
+if [[ -z "${HONEY_BADGER_API_KEY}" ]]; then
+    logVerbose "Skipping honeybadger deployment notice."
+else
+    logVerbose "Honeybadger deployment notice"
+    curl --silent https://api.honeybadger.io/v1/deploys \
+        -F api_key="$HONEY_BADGER_API_KEY" \
+        -F deploy[environment]="$DEPLOY_ENV" \
+        -F deploy[revision]="$NEXT_VERSION" \
+        -F deploy[repository]="https://github.com/$TRAVIS_REPO_SLUG" \ 
+        -F deploy[local_username]="travis-ci"
+    logSuccess "Honeybadger deployment notice"
+fi 

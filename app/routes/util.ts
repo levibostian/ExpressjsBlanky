@@ -4,6 +4,7 @@ import { ValidateParamsMiddleware } from "../middleware"
 import ConnectSequence from "connect-sequence"
 import { ServerResponse } from "../responses"
 
+// We are using `any` here because that's what Express uses. It also allows us to cast the req.body in the routers easily to whatever we want.
 /* eslint-disable @typescript-eslint/no-explicit-any */
 interface ResponseRequestHandler<
   P = { [key: string]: string },

@@ -28,7 +28,7 @@ else
         sourceFile=${mapFile::-4}
         curl --silent https://api.honeybadger.io/v1/source_maps \
             -F api_key="$HONEY_BADGER_API_KEY" \
-            -F revision="$TRAVIS_COMMIT" \
+            -F revision="$NEXT_VERSION" \
             -F source_map="@$mapFile" \
             -F minified_file="@$sourceFile"
     done

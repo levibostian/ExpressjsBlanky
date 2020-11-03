@@ -4,6 +4,7 @@ import _ from "../util"
 /**
  * Code inspired from: https://github.com/samora/trim-body
  */
+// Using `any` here because that's the type that Express gives us for req.body
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const normalizeBody = (body: any): void => {
   if (Object.prototype.toString.call(body) === "[object Object]") {

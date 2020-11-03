@@ -43,7 +43,6 @@ export interface PushNotificationService {
     project: Project
   ): Promise<Result.Type<void>>
   sendTopicProjectUpdated(project: Project): Promise<Result.Type<void>>
-  // sendToTopic(topicName: string, payload: PushNotificationPayload, project: Project): Promise<Result.Type<void>> // meant to be used privately
 }
 
 export class FcmPushNotificationService implements PushNotificationService {
@@ -127,8 +126,6 @@ export class FcmPushNotificationService implements PushNotificationService {
       return error
     }
   }
-
-  async sendMessageToDevices(deviceTokens: string[], title: string, body: string): Promise<void> {}
 
   async sendTopicProjectUpdated(project: Project): Promise<Result.Type<void>> {
     const topicName = `project_updated_${project.name}`

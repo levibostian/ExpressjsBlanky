@@ -88,7 +88,9 @@ export class ConsoleLogger implements Logger {
     this.error(stacktraceError, developerError.name, developerError.message, extras)
   }
 
-  context(data: KeyObject): void {}
+  context(data: KeyObject): void {
+    // no need to implement
+  }
 
   breadcrumb(key: string, extras?: KeyObject): void {
     this.debug(`BREADCRUMB: ${key}`, extras)
@@ -104,9 +106,13 @@ export class HoneybadgerLogger implements Logger {
     })
   }
 
-  debug(message: string, extras?: KeyObject): void {}
+  debug(message: string, extras?: KeyObject): void {
+    // no need to implement.
+  }
 
-  verbose(message: string, extras?: KeyObject): void {}
+  verbose(message: string, extras?: KeyObject): void {
+    // no need to implement
+  }
 
   error(stacktraceError: Error, title: string, message: string, extras?: KeyObject): void {
     /*

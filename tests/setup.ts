@@ -4,6 +4,7 @@
 process.env.DATABASE_HOST = "localhost"
 process.env.REDIS_HOST = "localhost"
 process.env.DISABLE_BRUTEFORCE_PREVENTION = "true"
+process.env.NODE_ENV = "development" // to prevent honeybadger from reporting errors
 /* eslint-enable no-process-env */
 import "../app/env" // Setup .env
 

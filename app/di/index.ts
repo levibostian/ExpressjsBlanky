@@ -27,10 +27,9 @@ export enum Dependency {
   DatabaseQueryRunner = "DatabaseQueryRunner"
 }
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
 class DiContainer {
-  private overrides: { [key in Dependency]?: any } = {}
-  private singletons: Map<Dependency, any> = new Map()
+  private overrides: { [key in Dependency]?: unknown } = {}
+  private singletons: Map<Dependency, unknown> = new Map()
 
   constructor() {
     this.singletons.set(Dependency.RedisClient, new RedisClient(Env.redis))
@@ -66,7 +65,7 @@ class DiContainer {
   }
 
   inject<T>(dependency: Dependency): T {
-    const overridenValue = this.overrides[dependency]
+    const overridenValue = this.overrides[dependency] as T
     if (overridenValue) {
       return overridenValue
     }
@@ -77,7 +76,7 @@ class DiContainer {
       case Dependency.EmailSender:
         return (new AppEmailSender() as unknown) as T
       case Dependency.JobQueueManager:
-        return this.singletons.get(Dependency.JobQueueManager)
+        return this.singletons.get(Dependency.JobQueueManager) as T
       case Dependency.KeyValueStorage:
         return (new RedisKeyValueStorage(this.inject(Dependency.RedisClient)) as unknown) as T
       case Dependency.AdminController:
@@ -88,9 +87,9 @@ class DiContainer {
           this.inject(Dependency.DatabaseQueryRunner)
         ) as unknown) as T
       case Dependency.PushNotificationService:
-        return this.singletons.get(Dependency.PushNotificationService)
+        return this.singletons.get(Dependency.PushNotificationService) as T
       case Dependency.RedisClient:
-        return this.singletons.get(Dependency.RedisClient)
+        return this.singletons.get(Dependency.RedisClient) as T
       case Dependency.Files:
         return (new AppFiles() as unknown) as T
       case Dependency.Firebase:
@@ -100,6 +99,5 @@ class DiContainer {
     }
   }
 }
-/* eslint-enable @typescript-eslint/no-explicit-any */
 
 export const Di = new DiContainer()
