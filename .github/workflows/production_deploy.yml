@@ -1,0 +1,41 @@
+name: Testing deployment 
+on:
+  push:
+    branches:
+      - production-deploy
+
+env:
+  DEPLOY_ENV: production
+  MAKE_RELEASE: false
+  K8S_NAMESPACE: app-production
+  DOCKER_REGISTRY: ghcr.io # github registry
+  DOCKER_USERNAME: username-here
+  CICI_DECRYPT_KEY: ${{ secrets.CICI_DECRYPT_KEY }}
+  CICI_DECRYPT_IV: ${{ secrets.CICI_DECRYPT_IV }}
+  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  HONEY_BADGER_API_KEY: ${{ secrets.HONEY_BADGER_API_KEY }}
+  # --------- The below entries need to be created as secrets -------------
+  # DOCKER_PASSWORD - GitHub token you generated to give access to packages. 
+  # GITHUB_TOKEN - personal access token where github username has push access to the repo to make comments and releases. 
+  # HONEY_BADGER_API_KEY - API key to honeybadger project. Used to upload source maps.
+  # CICI_DECRYPT_KEY
+  # CICI_DECRYPT_IV
+
+jobs:
+  deploy:
+    name: Deploy to testing
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Read .nvmrc
+        run: echo ::set-output name=NODE_VERSION::$(cat .nvmrc)
+        id: nvm
+      - name: Setup node
+        uses: actions/setup-node@v2-beta
+        with:
+          node-version: '${{ steps.nvm.outputs.NODE_VERSION }}'
+      - name: Get secrets 
+        run: sudo gem install cici && cici decrypt --verbose --set $DEPLOY_ENV
+      - name: Deploy
+        run: ./bin/deploy.sh
