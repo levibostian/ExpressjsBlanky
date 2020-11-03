@@ -1,6 +1,5 @@
 // Setup environment, first
 import "./env"
-import "./extensions"
 
 import { Dependency, Di } from "./di"
 import { Logger } from "./logger"

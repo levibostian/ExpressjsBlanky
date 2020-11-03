@@ -7,9 +7,7 @@ import bodyParser from "body-parser"
 import passport from "passport"
 import helmet from "helmet"
 import {
-  LogRequestMiddleware,
   NormalizeRequestBody,
-  TransformResponseBodyMiddleware,
   ReturnResponseErrorHandler,
   AssertHeadersMiddleware,
   BeforeAllMiddleware
@@ -53,8 +51,6 @@ export const startServer = (): Server => {
   app.use(NormalizeRequestBody)
   app.use(AssertHeadersMiddleware)
   app.use(passport.initialize())
-  app.use(LogRequestMiddleware(logger))
-  app.use(TransformResponseBodyMiddleware)
 
   const corsWhitelist = ["http://localhost:8080", Env.appHost]
   app.use(

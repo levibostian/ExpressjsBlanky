@@ -97,6 +97,11 @@ export class ConsoleLogger implements Logger {
   }
 }
 
+type HoneybadgerBreadcrumbs = {
+  event: string
+  extras?: KeyObject
+}[]
+
 export class HoneybadgerLogger implements Logger {
   constructor() {
     Honeybadger.configure({
@@ -142,9 +147,18 @@ export class HoneybadgerLogger implements Logger {
   }
 
   breadcrumb(key: string, extras?: KeyObject): void {
-    const contextData: KeyObject = {}
-    contextData[key] = extras
+    // allowing `any` to allow us to get this property not in the type definition.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const existingBreadcrumbs: HoneybadgerBreadcrumbs =
+      (Honeybadger as any).context["BREADCRUMB"] || []
 
-    this.context(contextData)
+    existingBreadcrumbs.push({
+      event: key,
+      extras
+    })
+
+    this.context({
+      BREADCRUMB: existingBreadcrumbs
+    })
   }
 }
