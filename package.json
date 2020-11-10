@@ -9,14 +9,14 @@
     "dev:setup": "./bin/dev_setup.sh dev",
     "dev": "npx tsc --watch",
     "dev:debug": "./bin/dev_setup.sh debug",
-    "build": "rm -rf dist && npx tsc",
+    "build": "rm -rf dist && npx tsc && find dist -type f -name '*.test.js*' -delete",
     "db:migrate:create": "npx knex --knexfile db/knexfile.ts migrate:make",
     "db:migrate": "npx knex --knexfile db/knexfile.ts migrate:latest",
     "db:migrate:list": "npx knex --knexfile db/knexfile.ts migrate:list",
     "db:migrate:undo": "npx knex --knexfile db/knexfile.ts migrate:down",
     "generate:doc": "npx apidoc -i app/ -o docs/",
     "format": "npx prettier --write \"{app,tests}/**/*.ts\"",
-    "lint": "npx eslint --fix --ext ts,js . && npx tsc -b tsconfig.lint.json"
+    "lint": "npx eslint --fix --ext ts,js . && npx tsc --noEmit"
   },
   "husky": {
     "hooks": {

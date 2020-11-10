@@ -1,6 +1,6 @@
-import { UserModel } from "../../../app//model"
+import { UserModel } from ".."
 import uid2 from "uid2"
-import { FakeDataGenerator } from "../types"
+import { FakeDataGenerator } from "./_.test"
 
 export class UserFakeDataGenerator extends UserModel implements FakeDataGenerator {
   public dependencies: FakeDataGenerator[] = []

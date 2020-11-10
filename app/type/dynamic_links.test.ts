@@ -1,6 +1,6 @@
-import { projects } from "../../../app/projects"
-import { DynamicLink } from "../../../app/type/dynamic_link"
-import { QueryString } from "../../../app/type/query_string"
+import { projects } from "../projects"
+import { DynamicLink } from "../type/dynamic_link"
+import { QueryString } from "../type/query_string"
 
 describe(`isValidUrlForDynamicLink`, () => {
   const validQueryParams = {
@@ -37,13 +37,13 @@ describe(`isValidUrlForDynamicLink`, () => {
 
 describe("createDynamicLink", () => {
   it(`given query param string without ? prefix, expect append`, async () => {
-    expect(DynamicLink.create({ foo: 1, bar: true }, projects[0])).toMatchInlineSnapshot(
-      `"https://expressjsblanky.page.link/?link=https%3A%2F%2Fapp.foo.com%2F%3Ffoo%3D1%26bar%3Dtrue%26mobile_link%3Dtrue&apn=com.example.foo&ibi=com.example.foo"`
+    expect(DynamicLink.create({ foo: 1, bar: true }, projects[0]).url).toMatchInlineSnapshot(
+      `"https://expressjsblanky.page.link/?link=https%3A%2F%2Fapp.foo.com%2Fbar%3Dtrue%26foo%3D1&apn=com.example.foo&ibi=com.example.foo&mobile_link=true"`
     )
   })
   it(`given query param string with ? prefix, expect get url`, async () => {
-    expect(DynamicLink.create({ foo: 1, bar: true }, projects[0])).toMatchInlineSnapshot(
-      `"https://expressjsblanky.page.link/?link=https%3A%2F%2Fapp.foo.com%2F%3Ffoo%3D1%26bar%3Dtrue%26mobile_link%3Dtrue&apn=com.example.foo&ibi=com.example.foo"`
+    expect(DynamicLink.create({ foo: 1, bar: true }, projects[0]).url).toMatchInlineSnapshot(
+      `"https://expressjsblanky.page.link/?link=https%3A%2F%2Fapp.foo.com%2Fbar%3Dtrue%26foo%3D1&apn=com.example.foo&ibi=com.example.foo&mobile_link=true"`
     )
   })
 })

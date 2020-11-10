@@ -43,11 +43,12 @@ export class AppFirebase implements Firebase {
    * Make sure to call `createDynamicLink()` before you call this.
    */
   async getShortDynamicLink(
-    longLink: DynamicLink,
+    dynamicLink: DynamicLink,
     project: Project
   ): Promise<HttpResponse.Type<string>> {
     const webApiKey = this.firebaseApps.get(project)!
     const linkType = "UNGUESSABLE" // "SHORT" or "UNGUESSABLE". Specifies the randomly generated string at the end. Short is length of min 4 to be easy to type but should not be used for sensitive data since 4 is easy to guess. unguessable is 17 length.
+    const longLink = dynamicLink.url
 
     this.logger.breadcrumb("creating short dynamic link", {
       linkType,

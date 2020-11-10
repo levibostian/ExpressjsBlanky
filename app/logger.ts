@@ -76,11 +76,11 @@ export class ConsoleLogger implements Logger {
   }
 
   error(stacktraceError: Error, title: string, message: string, extras?: KeyObject): void {
-    const extraInfo = extras ? `extras: ${JSON.stringify(extras)}, ` : ""
     console.error(
-      `ERROR: ${title}, message: ${message || stacktraceError.message}, ${extraInfo}stack: ${
-        stacktraceError.stack
-      }`
+      `ERROR: ${title}, message: ${message || stacktraceError.message}, extras: ${JSON.stringify({
+        stacktraceError,
+        extras
+      })}`
     )
   }
 

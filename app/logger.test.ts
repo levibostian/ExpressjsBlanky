@@ -1,4 +1,4 @@
-import { hidePrivateData } from "../../app/logger"
+import { hidePrivateData } from "./logger"
 
 describe(`hidePrivateData`, () => {
   it(`hide values when values not strings`, async () => {
@@ -27,18 +27,16 @@ describe(`hidePrivateData`, () => {
 
     expect(actual).toEqual(expected)
   })
-  it(`hide values when values object`, async () => {
-    const data = {
+  it(`given object, expect do not hide`, async () => {
+    const given = {
       password: {
         "other stuff": "3"
       }
     }
 
-    const expected = {
-      password: "***(hidden)***"
-    }
+    const expected = given
 
-    const actual = hidePrivateData(["password"], data)
+    const actual = hidePrivateData(["password"], given)
 
     expect(actual).toEqual(expected)
   })

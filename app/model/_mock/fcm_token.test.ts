@@ -1,7 +1,7 @@
 import { FcmTokenModel } from "../../../app/model"
 import uid2 from "uid2"
-import { FakeDataGenerator } from "../types"
-import { UserFakeDataGenerator } from "./user"
+import { FakeDataGenerator } from "./_.test"
+import { UserFakeDataGenerator } from "./user.test"
 
 export class FcmTokenFakeDataGenerator extends FcmTokenModel implements FakeDataGenerator {
   public dependencies: FakeDataGenerator[] = []
