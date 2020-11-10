@@ -18,6 +18,7 @@ spec:
       labels:
         app: {{ .Chart.Name }}
     spec:
+      serviceAccountName: {{ .Chart.Name }}-service-account
       containers:
       - name: {{ .Chart.Name }}
         image: {{ .Values.image }} # this value comes from the skaffold.yaml

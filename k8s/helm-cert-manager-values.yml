@@ -1,0 +1,31 @@
+# Resource request and limit values were taken from the default helm chart values. The values in the chart were commented out, but the comments listed it which made me feel they were good values to use. 
+
+# To use this file, run this command:
+# helm upgrade  -f k8s/helm-cert-manager-values.yml cert-manager --namespace cert-manager --version v1.0.4 jetstack/cert-manager
+# Replace the version with the latest version of the chart released to the helm repo (`helm show chart jetstack/cert-manager` to find)
+
+resources: 
+  requests:
+    cpu: 10m
+    memory: 32Mi
+  limits:
+    cpu: 10m
+    memory: 32Mi
+
+webhook:
+  resources: 
+    requests:
+      cpu: 10m
+      memory: 32Mi
+    limits: 
+      cpu: 10m
+      memory: 32Mi
+
+cainjector:
+  resources: 
+    requests:
+      cpu: 10m
+      memory: 32Mi
+    limits: 
+      cpu: 10m
+      memory: 32Mi
