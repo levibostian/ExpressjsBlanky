@@ -107,6 +107,7 @@
     "uid2": "^0.0.3"
   },
   "devDependencies": {
+    "@levibostian/eslint-config-node": "^1.0.2",
     "@tsconfig/node12": "^1.0.7",
     "@types/bull": "^3.14.4",
     "@types/bull-arena": "^3.0.1",
