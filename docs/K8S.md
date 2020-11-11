@@ -117,6 +117,8 @@ We use a popular ingress controller plugin called [cert-manager](https://cert-ma
 
 - To install cert-manager, follow [these instructions](https://cert-manager.io/docs/installation/kubernetes/#installing-with-helm) to install cert-manager with Helm.
 
+> Note: Make sure to use `k8s/helm-cert-manager-values.yml` override values when installing.
+
 - Next, create your SSL issuer config. cert-manager does not understand Let's Encrypt by default. Open `k8s/setup/ssl-issuer.yaml` and edit the `email` fields to an email address of yours. This email address is used by the Let's Encrypt service to email you about expiring certificates (indicating there is a problem with cert-manager) or if there is a problem with your certificate (meaning you may need to update cert-manager). After editing this file, `kubectl apply -f k8s/setup/ssl-issuer.yaml` to install it to your cluster.
 
 - Lastly, you will want to edit your `k8s/setup/ingress-rules.yaml` file to include these pieces:

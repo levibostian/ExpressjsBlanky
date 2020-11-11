@@ -1,14 +1,12 @@
-name: Testing deployment 
+name: Deployment 
 on:
   push:
     branches:
-      - main
+      - master 
       - beta 
+      - production-deploy
 
 env:
-  DEPLOY_ENV: testing
-  MAKE_RELEASE: true
-  K8S_NAMESPACE: app-testing
   DOCKER_REGISTRY: ghcr.io # github registry. You need to also edit skaffold config with this. 
   DOCKER_USERNAME: username-here
   CICI_DECRYPT_KEY: ${{ secrets.CICI_DECRYPT_KEY }}
@@ -19,7 +17,7 @@ env:
 
 jobs:
   deploy:
-    name: Deploy to testing
+    name: Deploy app
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -34,8 +32,21 @@ jobs:
         run: sudo gem install cici && cici decrypt --verbose --set common && cici decrypt --verbose --set $DEPLOY_ENV
       - name: Setup k8s
         run: mkdir -p ~/.kube/ && cat $KUBE_CONFIG | base64 --decode > ~/.kube/config
-      - name: Deploy
+      - name: Deploy to testing 
+        if: ${{ github.head_ref != 'production-deploy' }}
+        env:
+          DEPLOY_ENV: testing
+          MAKE_RELEASE: true
+          K8S_NAMESPACE: app-testing
+          # This overrides the default GITHUB_TOKEN which is used by semantic-release 
+          GITHUB_TOKEN: ${{ secrets.REPOS_PUSH_GITHUB_TOKEN }} # personal access token where github username has push access to the repo to make comments and releases. 
+        run: ./bin/deploy.sh
+      - name: Deploy to production
+        if: ${{ github.head_ref == 'production-deploy' }}
         env: 
+          DEPLOY_ENV: production
+          MAKE_RELEASE: false
+          K8S_NAMESPACE: app-production
           # This overrides the default GITHUB_TOKEN which is used by semantic-release 
           GITHUB_TOKEN: ${{ secrets.REPOS_PUSH_GITHUB_TOKEN }} # personal access token where github username has push access to the repo to make comments and releases. 
         run: ./bin/deploy.sh

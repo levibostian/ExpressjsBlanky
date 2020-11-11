@@ -55,3 +55,11 @@ The `clusterlint` tool is a great way to find applications that you do not yet h
 ### Installing trusted applications from trusted sources
 
 There are applications that are running on the k8s cluster that we did not create. Example: [cert-manager](https://cert-manager.io/). The cluster has tried to only install applications that are popular which prove they are stable and trusted. Also, they are installed through stable/official Helm repositories or k8s manifests from the GitHub repositories of the projects. This helps trust that we are only installing trusted applications through trusted installation methods.
+
+### Secure Docker images
+
+This project's CI server is setup to scan the Docker image (operating system) and nodejs dependencies for known security vulnerabilities. The CI server runs on each push and pull request made. The results are archived to the CI results where you can download the results and view them.
+
+> Note: This is only scanning vulnerabilities. It's up to you to update your OS and software packages to fix these issues.
+
+The Testing and Production environment Docker images are run on a [_distroless_ operating system](https://github.com/GoogleContainerTools/distroless/). The idea behind this is what the smaller your operating system is, the less chances of security threats there are. Disroless Docker images are some of the smallest images that you can use. They are operating systems that only include the runtime needed to execute your program but nothing else.

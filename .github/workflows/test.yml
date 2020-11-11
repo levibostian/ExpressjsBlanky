@@ -2,9 +2,10 @@ name: Test
 # only run on PRs and when push a commit on a branch that we don't deploy on. 
 on: 
   push:
-    branches-ignore: # we deploy on these branches. No need to test on them. 
-      - 'master'
-      - 'beta'
+    # branches-ignore: # we deploy on these branches. No need to test on them. 
+    # NOTE: We are enabling testing on these branches because we want codecov to generate a report on that branch so we have something to compare to. 
+      # - 'master'
+      # - 'beta'
     tags-ignore: # Don't run tests on tags as tags are made off of master branch. 
       - '*'
   pull_request: # Run on all PRs. 
@@ -21,8 +22,7 @@ jobs:
     name: Test 
     runs-on: ubuntu-latest
     # skip if '[skip ci]' exists in commit message 
-    if: |
-      !contains(format('{0} {1}', github.event.head_commit.message, github.event.pull_request.title), '[skip ci]')
+    if: ${{ !contains(format('{0} {1}', github.event.head_commit.message, github.event.pull_request.title), '[skip ci]') }}
     steps:
       - uses: actions/checkout@v2
       - name: Read .nvmrc
@@ -36,3 +36,31 @@ jobs:
         run: npx install-subset install --npm test && sudo gem install cici && cici decrypt --verbose --set common
       - name: Run tests 
         run:  cici decrypt --verbose && npm run test && npx codecov
+  test-docker-image:
+    name: Test Docker image
+    runs-on: ubuntu-latest
+    # skip if '[skip ci]' exists in commit message 
+    if: ${{ !contains(format('{0} {1}', github.event.head_commit.message, github.event.pull_request.title), '[skip ci]') }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Read .nvmrc
+        run: echo ::set-output name=NODE_VERSION::$(cat .nvmrc)
+        id: nvm
+      - name: Setup node
+        uses: actions/setup-node@v2-beta
+        with:
+          node-version: '${{ steps.nvm.outputs.NODE_VERSION }}'
+      - name: Install dependencies
+        run: npx install-subset install --npm build && sudo gem install cici && cici decrypt --verbose --set common && cici decrypt --set testing
+      - name: Build image
+        run: npm run build && docker build -f Dockerfile -t my-app:1.0.0 .
+      - uses: Azure/container-scan@v0
+        id: scan
+        continue-on-error: true # Some vulnerabilities may be difficult to fix because they are for packages we don't maintain. So allow failures. 
+        with:
+          image-name: my-app:1.0.0
+      - name: Archive Docker image scan results
+        uses: actions/upload-artifact@v2
+        with:
+          name: docker-image-scan-results
+          path: ${{ steps.scan.outputs.scan-report-path }}

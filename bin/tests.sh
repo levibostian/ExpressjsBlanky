@@ -17,6 +17,8 @@ function installJest() {
 npx --no-install jest -v > /dev/null || installJest
 
 # Note: do not override environment variables here. Set in ./tests/setup.ts instead. 
+# Note: If you want to run a test function with more details (not --silent) I recommend you run 
+#       the specific test with a VSCode Jest plugin to run that 1 function. It will not be silent. 
 BASE_TEST_COMMAND="npx --no-install jest --runInBand --detectOpenHandles --forceExit --silent $@"
 
 if [[ $1 == "unit" ]]; then 
