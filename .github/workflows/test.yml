@@ -33,6 +33,6 @@ jobs:
         with:
           node-version: '${{ steps.nvm.outputs.NODE_VERSION }}'
       - name: Install dependencies
-        run: npx install-subset install --npm test && sudo gem install cici
+        run: npx install-subset install --npm test && sudo gem install cici && cici decrypt --verbose --set common
       - name: Run tests 
-        run: cici decrypt --verbose && npm run test && npx codecov
+        run:  cici decrypt --verbose && npm run test && npx codecov

@@ -26,7 +26,7 @@ else
     for mapFile in `find dist -name "*.map" -type f`; do
         echo "Uploading source map file, $mapFile"
         sourceFile=${mapFile::-4}
-        curl --silent https://api.honeybadger.io/v1/source_maps \
+        curl https://api.honeybadger.io/v1/source_maps \
             -F api_key="$HONEY_BADGER_API_KEY" \
             -F revision="$NEXT_VERSION" \
             -F source_map="@$mapFile" \

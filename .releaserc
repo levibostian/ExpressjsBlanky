@@ -13,6 +13,7 @@
         ["@semantic-release/exec", {
             "publishCmd": "./bin/make_release.sh ${nextRelease.version}"
         }],
+        "@semantic-release/git",
         ["@semantic-release/github", {
             "assets": [
                {
@@ -21,7 +22,6 @@
                   "label": "Helm package ${nextRelease.version}"
                 }
             ]
-          }],
-        "@semantic-release/git"
+          }]
     ]
 }

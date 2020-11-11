@@ -1,4 +1,4 @@
-name: Testing deployment 
+name: Production deployment 
 on:
   push:
     branches:
@@ -8,18 +8,18 @@ env:
   DEPLOY_ENV: production
   MAKE_RELEASE: false
   K8S_NAMESPACE: app-production
-  DOCKER_REGISTRY: ghcr.io # github registry
+  DOCKER_REGISTRY: ghcr.io # github registry. You need to also edit skaffold config with this. 
   DOCKER_USERNAME: username-here
   CICI_DECRYPT_KEY: ${{ secrets.CICI_DECRYPT_KEY }}
   CICI_DECRYPT_IV: ${{ secrets.CICI_DECRYPT_IV }}
   DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  REPOS_PUSH_GITHUB_TOKEN: ${{ secrets.REPOS_PUSH_GITHUB_TOKEN }} # personal access token where github username has push access to the repo to make comments and releases. 
   HONEY_BADGER_API_KEY: ${{ secrets.HONEY_BADGER_API_KEY }}
   KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }} # base64 encoded kube config file to authenticate with k8s cluster with. 
 
 jobs:
   deploy:
-    name: Deploy to testing
+    name: Deploy to production
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -31,7 +31,7 @@ jobs:
         with:
           node-version: '${{ steps.nvm.outputs.NODE_VERSION }}'
       - name: Get secrets 
-        run: sudo gem install cici && cici decrypt --verbose --set $DEPLOY_ENV
+        run: sudo gem install cici && cici decrypt --verbose --set common && cici decrypt --verbose --set $DEPLOY_ENV
       - name: Setup k8s
         run: mkdir -p ~/.kube/ && cat $KUBE_CONFIG | base64 --decode > ~/.kube/config
       - name: Deploy
