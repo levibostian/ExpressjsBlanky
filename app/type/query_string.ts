@@ -10,7 +10,7 @@ export class QueryString {
   }
 
   static isAbleToBeQueryString(url: string): boolean {
-    return !url.startsWith("http")
+    return url.startsWith("http")
   }
 
   // takes object and creates a query string from it.

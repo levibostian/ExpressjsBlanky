@@ -117,6 +117,8 @@ We use a popular ingress controller plugin called [cert-manager](https://cert-ma
 
 - To install cert-manager, follow [these instructions](https://cert-manager.io/docs/installation/kubernetes/#installing-with-helm) to install cert-manager with Helm.
 
+> Note: Make sure to use `k8s/helm-cert-manager-values.yml` override values when installing.
+
 - Next, create your SSL issuer config. cert-manager does not understand Let's Encrypt by default. Open `k8s/setup/ssl-issuer.yaml` and edit the `email` fields to an email address of yours. This email address is used by the Let's Encrypt service to email you about expiring certificates (indicating there is a problem with cert-manager) or if there is a problem with your certificate (meaning you may need to update cert-manager). After editing this file, `kubectl apply -f k8s/setup/ssl-issuer.yaml` to install it to your cluster.
 
 - Lastly, you will want to edit your `k8s/setup/ingress-rules.yaml` file to include these pieces:
@@ -337,6 +339,144 @@ zk-pdb    2               1                     7s
 ```
 
 The key here is that `ALLOWED-DISRUPTIONS` is not 0. If 0, it might indicate that the PDB has not matched to the app.
+
+# Create new users
+
+When you use the DigitalOcean CLI tool to authenticate with the k8s cluster, you are logging in as an admin to the cluster. Treat this user just like the root user of a Linux server. You should avoid using it whenever possible! The admin of a cluster can do destructive behavior. At a minimum, you should not be allowing your CI server or others on your team to be admins against the k8s cluster.
+
+Instead, you should create users for each of these users and assign specific roles to them.
+
+> Note: [This is the resource I used to learn how to do this](https://www.digitalocean.com/community/tutorials/recommended-steps-to-secure-a-digitalocean-kubernetes-cluster)
+
+### Create a new user
+
+k8s is interesting in how it handles authentication. It doesn't use oauth, usernames and passwords, it instead allows anyone to connect to the k8s API as long as they have a valid SSL certificate to make a secure connection between the computer and the API. As long as you have a certificate setup on your computer that's been approved by the k8s cluster, it will allow you to connect to it as a specific user. k8s does it this way because from my understanding, it wants to be flexible and allow you, the company, to add your own authentication. Maybe you use SSO at your company. You can allow your company employees access to their k8s config file if they login with SSO. I could be very wrong by this, but that's how it seems to work from my understanding!
+
+That means that in order for us to create a "new user" we need to follow these steps:
+
+1. Make a new certificate signing request. In the examples below, you will see `sammy` as the username. Replace this with whatever user you are setting up for.
+
+```
+mkdir certs/
+openssl genrsa -out certs/sammy.key 4096
+vi certs/sammy.csr.cnf
+```
+
+Inside of this file you are editing, paste this:
+
+```
+[ req ]
+default_bits = 2048
+prompt = no
+default_md = sha256
+distinguished_name = dn
+[ dn ]
+CN = sammy
+O = developers
+[ v3_ext ]
+authorityKeyIdentifier=keyid,issuer:always
+basicConstraints=CA:FALSE
+keyUsage=keyEncipherment,dataEncipherment
+extendedKeyUsage=serverAuth,clientAuth
+```
+
+Edit `sammy` with the username you choose and `developers` with a group name you want.
+
+Next, create the request: `openssl req -config certs/sammy.csr.cnf -new -key certs/sammy.key -nodes -out certs/sammy.csr`
+
+2. Time to send the certificate request to k8s.
+
+Run this command below after editing the `sammy` parts:
+
+```
+cat <<EOF | kubectl apply -f -
+apiVersion: certificates.k8s.io/v1beta1
+kind: CertificateSigningRequest
+metadata:
+  name: sammy-authentication
+spec:
+  groups:
+  - system:authenticated
+  request: $(cat certs/sammy.csr | base64 | tr -d '\n')
+  usages:
+  - digital signature
+  - key encipherment
+  - server auth
+  - client auth
+EOF
+```
+
+Now you need to approve of this request. Because you are an admin signed into the k8s cluster right now, you can approve it yourself right now:
+
+```
+kubectl get csr # this lists the requests
+kubectl certificate approve sammy-authentication # approve of a request
+```
+
+Now that you approved it, you can download the signed certificate that you will use to authenticate: `kubectl get csr sammy-authentication -o jsonpath='{.status.certificate}' | base64 --decode > certs/sammy.crt`
+
+3. Create the kube config file. This file you will be able to hand to your team member or install on the CI server and then they can authenticate with k8s.
+
+Create a new file `certs/kube-config` and copy/paste below:
+
+```
+apiVersion: v1
+clusters:
+- cluster:
+    certificate-authority-data: <your-data>
+    server: https://<your-cluster-url>.ondigitalocean.com
+  name: do-nyc1-foo-k8s-cluster
+contexts:
+- context:
+    cluster: do-nyc1-foo-k8s-cluster
+    user: sammy
+  name: foo
+current-context: foo
+kind: Config
+preferences: {}
+users:
+- name: ci
+  user:
+    client-certificate-data: <base64-crt-file>
+    client-key-data: <base64-key-file>
+```
+
+There are some steps to take to fill in this file:
+
+- Run `cat certs/sammy.crt | base64` and paste that into `client-certificate-data`
+- Run `cat certs/sammy.key | base64` and paste that into `client-key-data`
+- Edit `user: sammy` with the username you are creating
+- `certificate-authority-data`, `server`, `name`, `contexts.context.cluster` all of this info you need to get from _your own_ `~/.kube/config` file on your machine. Why? Because your computer is already authenticated with the k8s cluster so your machine already has this info. You can also download a kube config file from DigitalOcean web app and copy the values from that. This info is what you use to point to the cluster.
+
+4. Test that your kube config file works. Run `kubectl --kubeconfig=certs/kube-config cluster-info` and you should see an error message:
+
+```
+To further debug and diagnose cluster problems, use 'kubectl cluster-info dump'.
+Error from server (Forbidden): services is forbidden: User "sammy" cannot list resource "services" in API group "" in the namespace "kube-system"
+```
+
+This is a good error! It means that you authenticated successfully to the cluster but you do not have permission as the "sammy` user to list services in the kube-system namespace.
+
+Time to move onto adding roles (permissions) to the user. As of now, this new user of yours can't do anything to the cluster.
+
+### Add permissions to the new user
+
+To assign a user a permission in a k8s cluster, you create a _role binding_ to assign _roles_ to a _user_ on a given _namespace_. You can create _cluster wide_ role bindings which applies a role to a user that applies to all namespaces.
+
+You can create roles yourself where you have the ability to pick and choose exactly what permissions to apply. k8s has some roles already created for you which makes things easy. We will use one of those per-built roles here.
+
+```
+kubectl create rolebinding sammy-edit-foo --clusterrole=edit --user=sammy --namespace=foo
+```
+
+Let's break this down:
+
+- `sammy-edit-foo` this is the name of the role binding. I like to follow a pattern `<username>-<role-name>-<namespace-name>`
+- `clusterrole=edit` give the sammy user the `edit` role. `edit` is a pre-built k8s cluster role that give r/w abilities to someone. There is another default `view` which is a read-only pre-built.
+- `user=sammy` the username to give permissions to.
+- `namespace=foo` the namespace to apply this role binding to. If you use namespaces in this command, you will need to run this command for every single namespace you want to give the user `edit` permissions to.
+
+Done! Now you can give the user the kube config file, have them put it in `~/.kube/config` on their machine and they can then run kubectl commands.
 
 # Private Docker image registry
 

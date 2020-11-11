@@ -1,0 +1,33 @@
+# https://kubernetes.io/docs/reference/access-authn-authz/rbac/#service-account-permissions
+# 
+# The ServiceAccount created for the application. We are mapping the application to a ServiceAccount as it's said to be more secure then using the `default` ServiceAccount given. Think of it like members on your team. You want to give each of them a set of permissions instead of giving everyone a "default" set of admin permissions. 
+# 
+# At this time, we do not need any roles added to the ServiceAccount created because our application does not need to access the k8s API to do anything. 
+kind: ServiceAccount
+apiVersion: v1
+metadata:
+  name: {{ .Chart.Name }}-service-account
+# give serviceaccount access to image pull secrets for private repo: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/#add-image-pull-secret-to-service-account
+imagePullSecrets: 
+- name: private-docker-repo
+# ---
+# apiVersion: rbac.authorization.k8s.io/v1
+# kind: Role
+# metadata:
+#   name: {{ .Chart.Name }}-role
+# rules:
+# - apiGroups: [""] # "" indicates the core API group
+#   resources: [""]
+#   verbs: [""]
+# ---
+# apiVersion: rbac.authorization.k8s.io/v1
+# kind: RoleBinding
+# metadata:
+#   name: {{ .Chart.Name }}-role-binding
+# subjects:
+#   - kind: ServiceAccount
+#     name: {{ .Chart.Name }}-service-account
+# roleRef:
+#   kind: Role 
+#   name: {{ .Chart.Name }}-role
+#   apiGroup: rbac.authorization.k8s.io

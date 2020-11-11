@@ -38,11 +38,11 @@ if [[ -z "${HONEY_BADGER_API_KEY}" ]]; then
     logVerbose "Skipping honeybadger deployment notice."
 else
     logVerbose "Honeybadger deployment notice"
-    curl --silent https://api.honeybadger.io/v1/deploys \
+    curl https://api.honeybadger.io/v1/deploys \
         -F api_key="$HONEY_BADGER_API_KEY" \
         -F deploy[environment]="$DEPLOY_ENV" \
         -F deploy[revision]="$NEXT_VERSION" \
-        -F deploy[repository]="https://github.com/$TRAVIS_REPO_SLUG" \ 
-        -F deploy[local_username]="travis-ci"
+        -F deploy[repository]="https://github.com/$GITHUB_REPOSITORY" \ 
+        -F deploy[local_username]="ci-server"
     logSuccess "Honeybadger deployment notice"
 fi 

@@ -1,4 +1,4 @@
-import _ from "../../../app/util"
+import _ from "."
 
 describe(`randomInt`, () => {
   it(`expect inclusive on min`, () => {

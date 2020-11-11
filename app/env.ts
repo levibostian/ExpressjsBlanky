@@ -6,8 +6,10 @@ import _ from "./util"
 
 import path from "path"
 
+const dotEnvLocation = path.join(__dirname, ".env")
+
 const dotEnvConfig: DotenvConfigOptions = {
-  path: path.join(__dirname, ".env")
+  path: dotEnvLocation
 }
 const result = dotenv.config(dotEnvConfig)
 
@@ -48,7 +50,8 @@ export interface Environment {
 export const requireEnv = (key: string): string => {
   const value: string = process.env[key]!
 
-  if (_.isNullOrUndefined(value)) throw Error(`Forgot to create ${key} in .env`)
+  if (_.isNullOrUndefined(value))
+    throw Error(`Forgot to create ${key} in .env file (path: ${dotEnvLocation})`)
 
   return value
 }

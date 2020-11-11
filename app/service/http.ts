@@ -80,7 +80,7 @@ export class Http {
       // const headers = error.response.headers
       return new HttpResponse.HttpResponseError(code, errorBody)
     } else if (error.request) {
-      console.log("Request was made, but no response received")
+      // Request was made, but no response received
       return new HttpResponse.HttpNoResponseError()
     } else {
       this.logger.error(

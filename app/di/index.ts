@@ -80,11 +80,15 @@ class DiContainer {
       case Dependency.KeyValueStorage:
         return (new RedisKeyValueStorage(this.inject(Dependency.RedisClient)) as unknown) as T
       case Dependency.AdminController:
-        return (new AppAdminController(this.inject(Dependency.DatabaseQueryRunner)) as unknown) as T
+        return (new AppAdminController(
+          this.inject(Dependency.DatabaseQueryRunner),
+          this.inject(Dependency.Logger)
+        ) as unknown) as T
       case Dependency.UserController:
         return (new AppUserController(
           this.inject(Dependency.EmailSender),
-          this.inject(Dependency.DatabaseQueryRunner)
+          this.inject(Dependency.DatabaseQueryRunner),
+          this.inject(Dependency.Logger)
         ) as unknown) as T
       case Dependency.PushNotificationService:
         return this.singletons.get(Dependency.PushNotificationService) as T

@@ -38,8 +38,8 @@ You will want to edit `github-username` and `repo-name`. Enter in the username/o
 
 # k8s secret to login to private repo
 
-This is simple. You need to run this command to create a k8s secret that contains a token to your docker private registry. 
+This is simple. You need to run this command to create a k8s secret that contains a token to your docker private registry.
 
 ```
-kubectl create secret docker-registry regcred --docker-server=ghcr.io --docker-username=github-username --docker-password=<token-you-generated> 
+kubectl create secret docker-registry private-docker-repo --docker-server=ghcr.io --docker-username=github-username --docker-password=<token-you-generated>
 ```

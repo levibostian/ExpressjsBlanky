@@ -16,25 +16,16 @@ export class DynamicLink {
   public url: string
 
   constructor(dynamicLinkUrl: string) {
-    if (!DynamicLink.isValidUrlForDynamicLink(dynamicLinkUrl)) {
-      throw new Error(
-        `Not a valid dynamic link URL. It's suggested to use DynamicLink class's static functions to create the dynamic link URL for you. Given: ${dynamicLinkUrl}`
-      )
-    }
-
     this.url = dynamicLinkUrl
   }
 
   static create(queryString: ParsedQueryString, project: Project): DynamicLink {
-    // If `mobile_link` isn't present, add it. This extra parameter exists in case we need to get a short link later on. See notes below about `isValidUrlForDynamicLink()`
-    queryString.mobile_link = true
-
     // Creates app link, `https://app.example.com/foo` what is used to create dynamic link from.
     let appLink = `${Env.appHost}/${QueryString.createQueryString(queryString)}`
     appLink = encodeURIComponent(appLink) // encode app link. If the app link is not encoded, the client side app might have an error because it will see 2 HTTP URLs in 1 string. Encode 1 of them and it will only find 1.
 
     return new DynamicLink(
-      `${project.config.dynamic_link_hostname}/?link=${appLink}&apn=${project.config.mobile_app_bundle}&ibi=${project.config.mobile_app_bundle}`
+      `${project.config.dynamic_link_hostname}/?link=${appLink}&apn=${project.config.mobile_app_bundle}&ibi=${project.config.mobile_app_bundle}&mobile_link=true`
     )
   }
 

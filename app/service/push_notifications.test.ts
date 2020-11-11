@@ -2,7 +2,7 @@ import {
   FcmPushNotificationMessageBuilder,
   PushNotificationPayload,
   ApnOptionsBuilder
-} from "../../../app/service/push_notifications"
+} from "../service/push_notifications"
 
 describe(`FcmPushNotificationMessageBuilder unit tests`, () => {
   describe(`buildTopicMessage`, () => {

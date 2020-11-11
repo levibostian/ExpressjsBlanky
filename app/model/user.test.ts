@@ -1,8 +1,8 @@
-import { UserModel } from "../../../app/model"
-import { UserFakeDataGenerator } from "../../fake_data"
-import { setup } from "../../integration/index"
-import { DatabaseQueryRunner } from "../../../app/model/database_query"
-import { Di, Dependency } from "../../../app/di"
+import { UserModel } from "."
+import { UserFakeDataGenerator } from "./_mock/user.test"
+import { setup } from "../_.test"
+import { DatabaseQueryRunner } from "./database_query"
+import { Di, Dependency } from "../di"
 
 const queryRunner: DatabaseQueryRunner = Di.inject(Dependency.DatabaseQueryRunner)
 
