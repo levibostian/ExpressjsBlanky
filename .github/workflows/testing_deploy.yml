@@ -14,7 +14,6 @@ env:
   CICI_DECRYPT_KEY: ${{ secrets.CICI_DECRYPT_KEY }}
   CICI_DECRYPT_IV: ${{ secrets.CICI_DECRYPT_IV }}
   DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-  REPOS_PUSH_GITHUB_TOKEN: ${{ secrets.REPOS_PUSH_GITHUB_TOKEN }} # personal access token where github username has push access to the repo to make comments and releases. 
   HONEY_BADGER_API_KEY: ${{ secrets.HONEY_BADGER_API_KEY }}
   KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }} # base64 encoded kube config file to authenticate with k8s cluster with. 
 
@@ -36,4 +35,7 @@ jobs:
       - name: Setup k8s
         run: mkdir -p ~/.kube/ && cat $KUBE_CONFIG | base64 --decode > ~/.kube/config
       - name: Deploy
+        env: 
+          # This overrides the default GITHUB_TOKEN which is used by semantic-release 
+          GITHUB_TOKEN: ${{ secrets.REPOS_PUSH_GITHUB_TOKEN }} # personal access token where github username has push access to the repo to make comments and releases. 
         run: ./bin/deploy.sh
