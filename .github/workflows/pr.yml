@@ -1,0 +1,21 @@
+name: Pull requests
+on: pull_request
+
+jobs:
+  comment:
+    name: Comment on pull requests 
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Comment PR
+        uses: thollander/actions-comment-pull-request@master
+        with:
+          message: |
+            Make sure to do the following before you merge because database migrations are not automated.
+            1. Run database migrations against `testing` environment. 
+            ```
+            cici decrypt --set testing
+            npm run db:migrate:list 
+            npm run db:migrate
+            ```
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 

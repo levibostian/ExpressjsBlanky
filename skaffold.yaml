@@ -46,6 +46,8 @@ profiles:
           dockerfile: Dockerfile
           buildArgs:
             ENV: "{{.DEPLOY_ENV}}"
+    local:
+      push: true
 
 # As long as you pass `--port-forward` to `skaffold dev/debug`, this maps local port 5000 to the node application
 portForward:

@@ -3,15 +3,15 @@
     "plugins": [
         "@semantic-release/commit-analyzer", 
         ["@semantic-release/npm", {
-            "npmPublish": false,
-            "tarballDir": false
+            "npmPublish": false
         }],
         "@semantic-release/release-notes-generator", 
         ["@semantic-release/changelog", {
             "changelogFile": "CHANGELOG.md"
         }],
         ["@semantic-release/exec", {
-            "publishCmd": "./bin/make_release.sh ${nextRelease.version}"
+            "prepareCmd": "./bin/make_release.sh ${nextRelease.version}",
+            "publishCmd": "./bin/deploy_app.sh"
         }],
         "@semantic-release/git",
         ["@semantic-release/github", {

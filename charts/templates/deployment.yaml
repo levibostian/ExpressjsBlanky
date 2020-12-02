@@ -64,7 +64,7 @@ spec:
       # Allow sufficient amount of time (90 seconds = periodSeconds * failureThreshold) in the liveness probe for your app's registered shutdown handlers to run to completion.
       terminationGracePeriodSeconds: 45
       imagePullSecrets:
-      - name: regcred
+      - name: private-docker-repo
       volumes:
       - name: {{ .Chart.Name }}-volume-projects
         secret:

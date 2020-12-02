@@ -31,7 +31,9 @@ jobs:
       - name: Get secrets 
         run: sudo gem install cici && cici decrypt --verbose --set common 
       - name: Setup k8s
-        run: mkdir -p ~/.kube/ && cat $KUBE_CONFIG | base64 --decode > ~/.kube/config
+        run: |
+          mkdir -p ~/.kube/ && cat $KUBE_CONFIG | base64 --decode > ~/.kube/config
+          sudo chmod u=rw,g=,o= ~/.kube/config
       - name: Deploy to testing 
         if: ${{ github.head_ref != 'production-deploy' }}
         env:
@@ -40,7 +42,7 @@ jobs:
           K8S_NAMESPACE: app-testing
           # This overrides the default GITHUB_TOKEN which is used by semantic-release 
           GITHUB_TOKEN: ${{ secrets.REPOS_PUSH_GITHUB_TOKEN }} # personal access token where github username has push access to the repo to make comments and releases. 
-        run: cici decrypt --verbose --set $DEPLOY_ENV && ./bin/deploy.sh
+        run: cici decrypt --verbose --set $DEPLOY_ENV && ./bin/start_deploy.sh
       - name: Deploy to production
         if: ${{ github.head_ref == 'production-deploy' }}
         env: 
@@ -49,4 +51,4 @@ jobs:
           K8S_NAMESPACE: app-production
           # This overrides the default GITHUB_TOKEN which is used by semantic-release 
           GITHUB_TOKEN: ${{ secrets.REPOS_PUSH_GITHUB_TOKEN }} # personal access token where github username has push access to the repo to make comments and releases. 
-        run: cici decrypt --verbose --set $DEPLOY_ENV && ./bin/deploy.sh
+        run: cici decrypt --verbose --set $DEPLOY_ENV && ./bin/start_deploy.sh && ./bin/deploy_app.sh

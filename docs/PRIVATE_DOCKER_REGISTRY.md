@@ -7,7 +7,7 @@ When it comes to private Docker registries, there are a few options. Docker Hub,
 
 # Create the registry
 
-As long as you have a GitHub account, you have a registry! If you have an organization, you may need to [enable the registry feature](https://docs.github.com/en/free-pro-team@latest/packages/getting-started-with-github-container-registry/enabling-github-container-registry-for-your-organization).
+As long as you have a GitHub account, you have a registry! All you need to do is [enable the container registry support](https://docs.github.com/en/free-pro-team@latest/packages/getting-started-with-github-container-registry/enabling-improved-container-support).
 
 # Login to `docker`
 
