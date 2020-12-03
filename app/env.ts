@@ -64,7 +64,7 @@ export const isDefined = (key: string): boolean => {
   return !isNotDefined
 }
 
-export const Env: Environment = {
+export const ENV: Environment = {
   loggers: {
     enableConsole: !isDefined("DISABLE_CONSOLE"),
     enableSql: !isDefined("DISABLE_SQL_LOGGING")

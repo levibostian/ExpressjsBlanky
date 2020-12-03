@@ -2,7 +2,7 @@ import { validationResult } from "express-validator"
 import { RequestHandler } from "express"
 import { FieldError } from "../type"
 
-export const ValidateParamsMiddleware: RequestHandler = (req, res, next) => {
+export const validateParamsMiddleware: RequestHandler = (req, res, next) => {
   const errors = validationResult(req)
   if (!errors.isEmpty()) {
     const response = res.responses.error.fieldsError((errors.array() as unknown) as FieldError[])

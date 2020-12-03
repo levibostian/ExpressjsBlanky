@@ -1,20 +1,20 @@
 import Knex from "knex"
 import { Model } from "objection"
-import { Env } from "../env"
+import { ENV } from "../env"
 import { UserModel } from "./user"
 import { FcmTokenModel } from "./fcm_token"
 import { Logger } from "../logger"
 
 export const knexConfig: Knex.Config = {
-  debug: Env.loggers.enableSql,
+  debug: ENV.loggers.enableSql,
   client: "postgresql",
   connection: {
-    user: Env.database.username,
-    database: Env.database.name,
-    password: Env.database.password,
-    port: Env.database.port,
-    host: Env.database.host,
-    ssl: Env.database.useSSL
+    user: ENV.database.username,
+    database: ENV.database.name,
+    password: ENV.database.password,
+    port: ENV.database.port,
+    host: ENV.database.host,
+    ssl: ENV.database.useSSL
   },
   asyncStackTraces: false // has a performance hit, so recommended to stay off.
 }

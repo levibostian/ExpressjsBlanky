@@ -56,7 +56,7 @@ export class FcmPushNotificationService implements PushNotificationService {
         project,
         admin.initializeApp(
           {
-            credential: admin.credential.cert(project.config.firebase_project)
+            credential: admin.credential.cert(project.config.firebaseProject)
           },
           project.name
         )

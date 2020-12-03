@@ -178,3 +178,7 @@ const _ = {
 }
 
 export default _
+
+export const _arrayIsEmpty = <T>(array: T[]): boolean => {
+  return false
+}

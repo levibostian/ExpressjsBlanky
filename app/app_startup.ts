@@ -1,14 +1,17 @@
 import { databaseHealthcheck, initDatabase } from "./model/database"
 import { Logger } from "./logger"
-import { Di, Dependency } from "./di"
+import { DI, Dependency } from "./di"
 import { assertEmail } from "./email"
 import { Firebase } from "./service/firebase"
 import { PushNotificationService } from "./service/push_notifications"
 import { assertRedis } from "./service/redis"
 import { projects, setupProjects } from "./projects"
 import { Files } from "./service"
+import { _arrayIsEmpty } from "./util"
 
 export const startLocalServices = async (logger: Logger, files: Files): Promise<void> => {
+  _arrayIsEmpty(["1"])
+
   logger.verbose(`X------ PROJECTS`)
   setupProjects(`config/projects.json`, files)
   logger.verbose(`X------ PROJECTS SUCCESS`)
@@ -29,16 +32,16 @@ export const startLocalServices = async (logger: Logger, files: Files): Promise<
 
 export const startRemoteServices = async (logger: Logger): Promise<void> => {
   logger.verbose(`---X-- POSTMARK CONNECTION`)
-  await assertEmail(logger)
+  await assertEmail()
   logger.verbose(`---X-- POSTMARK CONNECTION SUCCESS`)
 
   logger.verbose(`-----X- FIREBASE CONNECTION`)
-  const firebase: Firebase = Di.inject(Dependency.Firebase)
+  const firebase: Firebase = DI.inject(Dependency.Firebase)
   await firebase.startup()
   logger.verbose(`-----X- FIREBASE CONNECTION SUCCESS`)
 
   logger.verbose(`------X PUSH NOTIFICATIONS`)
-  const pushNotifications: PushNotificationService = Di.inject(Dependency.PushNotificationService)
+  const pushNotifications: PushNotificationService = DI.inject(Dependency.PushNotificationService)
   await pushNotifications.startup()
   logger.verbose(`------X PUSH NOTIFICATIONS SUCCESS`)
 }

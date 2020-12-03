@@ -2,9 +2,9 @@ import { UserModel } from "."
 import { UserFakeDataGenerator } from "./_mock/user.test"
 import { setup } from "../_.test"
 import { DatabaseQueryRunner } from "./database_query"
-import { Di, Dependency } from "../di"
+import { DI, Dependency } from "../di"
 
-const queryRunner: DatabaseQueryRunner = Di.inject(Dependency.DatabaseQueryRunner)
+const queryRunner: DatabaseQueryRunner = DI.inject(Dependency.DatabaseQueryRunner)
 
 describe(`UserModel tests`, () => {
   describe(`findOrCreateByEmail`, () => {

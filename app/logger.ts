@@ -1,5 +1,5 @@
 import Honeybadger from "honeybadger"
-import { Env } from "./env"
+import { ENV } from "./env"
 import _ from "./util"
 import { DeveloperError, KeyObject } from "./type"
 
@@ -34,7 +34,7 @@ export class AppLogger implements Logger {
   constructor() {
     this.loggers.push(new HoneybadgerLogger())
 
-    if (Env.loggers.enableConsole) {
+    if (ENV.loggers.enableConsole) {
       this.loggers.push(new ConsoleLogger())
     }
   }
@@ -105,7 +105,7 @@ type HoneybadgerBreadcrumbs = {
 export class HoneybadgerLogger implements Logger {
   constructor() {
     Honeybadger.configure({
-      apiKey: Env.honeybadger.key!,
+      apiKey: ENV.honeybadger.key!,
       filters: hideValuesForKeys,
       developmentEnvironments: ["development"]
     })
@@ -157,7 +157,7 @@ export class HoneybadgerLogger implements Logger {
     })
 
     this.context({
-      BREADCRUMB: existingBreadcrumbs
+      breadcrumb: existingBreadcrumbs
     })
   }
 }

@@ -1,5 +1,5 @@
 import { Project } from "../type/project"
-import { Env } from "../env"
+import { ENV } from "../env"
 import { ParsedQueryString, QueryString } from "./query_string"
 
 /**
@@ -21,11 +21,11 @@ export class DynamicLink {
 
   static create(queryString: ParsedQueryString, project: Project): DynamicLink {
     // Creates app link, `https://app.example.com/foo` what is used to create dynamic link from.
-    let appLink = `${Env.appHost}/${QueryString.createQueryString(queryString)}`
+    let appLink = `${ENV.appHost}/${QueryString.createQueryString(queryString)}`
     appLink = encodeURIComponent(appLink) // encode app link. If the app link is not encoded, the client side app might have an error because it will see 2 HTTP URLs in 1 string. Encode 1 of them and it will only find 1.
 
     return new DynamicLink(
-      `${project.config.dynamic_link_hostname}/?link=${appLink}&apn=${project.config.mobile_app_bundle}&ibi=${project.config.mobile_app_bundle}&mobile_link=true`
+      `${project.config.dynamicLinkHostname}/?link=${appLink}&apn=${project.config.mobileAppBundle}&ibi=${project.config.mobileAppBundle}&mobile_link=true`
     )
   }
 
@@ -36,7 +36,7 @@ export class DynamicLink {
    */
   static isValidUrlForDynamicLink(url: string): boolean {
     // url must start with https://app.example.com
-    if (!url.startsWith(Env.appHost)) return false
+    if (!url.startsWith(ENV.appHost)) return false
 
     // We require that the query string has a `mobile_link` property in it.
     const queryString = new QueryString(url).parse()

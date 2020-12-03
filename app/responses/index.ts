@@ -7,13 +7,13 @@ export interface ServerResponse {
 }
 
 export enum ResponseCodes {
-  success = 200,
-  userEnteredBadData = 400,
-  unauthorized = 401,
-  forbidden = 403,
-  fatalApiError = 500,
-  developerError = 500,
-  fieldsError = 422
+  Success = 200,
+  UserEnteredBadData = 400,
+  Unauthorized = 401,
+  Forbidden = 403,
+  FatalApiError = 500,
+  DeveloperError = 500,
+  FieldsError = 422
 }
 
 export class Responses {
@@ -56,7 +56,7 @@ export class Responses {
 
   private success(response: unknown): ServerResponse {
     return {
-      code: ResponseCodes.success,
+      code: ResponseCodes.Success,
       response
     }
   }
@@ -67,7 +67,7 @@ class ErrorResponse {
 
   userEnteredBadData(message: string): ServerResponse {
     return {
-      code: ResponseCodes.userEnteredBadData,
+      code: ResponseCodes.UserEnteredBadData,
       response: {
         message
       }
@@ -76,7 +76,7 @@ class ErrorResponse {
 
   forbidden(message: string): ServerResponse {
     return {
-      code: ResponseCodes.forbidden,
+      code: ResponseCodes.Forbidden,
       response: {
         message
       }
@@ -85,7 +85,7 @@ class ErrorResponse {
 
   fatalApiError(message: string): ServerResponse {
     return {
-      code: ResponseCodes.fatalApiError,
+      code: ResponseCodes.FatalApiError,
       response: {
         message
       }
@@ -94,7 +94,7 @@ class ErrorResponse {
 
   developerError(): ServerResponse {
     return {
-      code: ResponseCodes.developerError,
+      code: ResponseCodes.DeveloperError,
       response: {
         message:
           "Sorry! We found a problem. The team has been notified to take care of it. Try again later."
@@ -104,7 +104,7 @@ class ErrorResponse {
 
   fieldsError(errors: FieldError[]): ServerResponse {
     return {
-      code: ResponseCodes.fieldsError,
+      code: ResponseCodes.FieldsError,
       response: {
         message: errors[0].msg,
         errors

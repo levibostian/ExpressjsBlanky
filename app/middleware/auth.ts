@@ -2,9 +2,9 @@ import passport from "passport"
 import { Strategy as BearerStrategy } from "passport-http-bearer"
 import { Strategy as AnonymousStrategy } from "passport-anonymous"
 import { BasicStrategy } from "passport-http"
-import { Env } from "../env"
+import { ENV } from "../env"
 import { RequestHandler } from "express"
-import { Dependency, Di } from "../di"
+import { Dependency, DI } from "../di"
 import * as Result from "../type/result"
 import { UserController } from "../controller/user"
 import { Logger } from "../logger"
@@ -32,7 +32,7 @@ passport.use(new AnonymousStrategy())
 passport.use(
   "admin_bearer_auth",
   new BearerStrategy((token, done) => {
-    if (token === Env.auth.adminToken) {
+    if (token === ENV.auth.adminToken) {
       return done(null, true)
     }
     return done(null, false)
@@ -43,7 +43,7 @@ passport.use(
 passport.use(
   "admin_basic_auth",
   new BasicStrategy((userId, password, done) => {
-    if (userId === "admin" && password === Env.auth.adminToken) {
+    if (userId === "admin" && password === ENV.auth.adminToken) {
       return done(null, true)
     } else {
       return done(null, false)
@@ -57,11 +57,11 @@ passport.use(
 passport.use(
   "user_bearer_auth",
   new BearerStrategy(async (token, done) => {
-    const userController: UserController = Di.inject(Dependency.UserController)
+    const userController: UserController = DI.inject(Dependency.UserController)
 
     const user = await userController.getUserByAccessToken(token)
     if (Result.isError(user)) {
-      const logger: Logger = Di.inject(Dependency.Logger)
+      const logger: Logger = DI.inject(Dependency.Logger)
       logger.error(user, user.name, user.message)
 
       return done(null, false)

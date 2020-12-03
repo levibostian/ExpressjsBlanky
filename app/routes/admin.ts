@@ -2,10 +2,10 @@ import express from "express"
 import expressRoutesVersioning from "express-routes-versioning"
 import Arena from "bull-arena"
 import Bull from "bull"
-import { Di, Dependency } from "../di"
+import { DI, Dependency } from "../di"
 import { JobQueueManager } from "../jobs"
 import { createEndpoint } from "./util"
-import { Env } from "../env"
+import { ENV } from "../env"
 import { ServerResponse } from "../responses"
 import { check } from "express-validator"
 import { AdminController } from "../controller/admin"
@@ -37,7 +37,7 @@ router.post(
           email: string
         } = req.body
 
-        const controller: AdminController = Di.inject(Dependency.AdminController)
+        const controller: AdminController = DI.inject(Dependency.AdminController)
 
         const user = await controller.createOrGetUser(body.email)
         if (Result.isError(user)) return res.responses.error.developerError()
@@ -48,15 +48,15 @@ router.post(
   })
 )
 
-const jobQueueManager: JobQueueManager = Di.inject(Dependency.JobQueueManager)
+const jobQueueManager: JobQueueManager = DI.inject(Dependency.JobQueueManager)
 
 const arena = Arena(
   {
-    Bull,
+    Bull, // eslint-disable-line @typescript-eslint/naming-convention
     queues: jobQueueManager.getQueueInfo()
   },
   {
-    port: Env.redis.port,
+    port: ENV.redis.port,
     basePath: "/bull",
     disableListen: true
   }

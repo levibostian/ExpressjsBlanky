@@ -4,7 +4,7 @@ import "./env"
 import { databaseHealthcheck } from "./model/database"
 import { assertRedis } from "./service/redis"
 import { Logger } from "./logger"
-import { Di, Dependency } from "./di"
+import { DI, Dependency } from "./di"
 
 /**
  * Asserting services makes sure that our app is in a state that it can run.
@@ -16,7 +16,7 @@ import { Di, Dependency } from "./di"
 export const assertServices = async (): Promise<void> => {
   // Startup all of our services. Each of them asserts that we have everything configured by attempting to connect.
   // The app should be able to function, even if a service is down. However, this is to see if it's setup correctly.
-  const logger: Logger = Di.inject(Dependency.Logger)
+  const logger: Logger = DI.inject(Dependency.Logger)
 
   logger.verbose("Checking database heath...")
   await databaseHealthcheck()

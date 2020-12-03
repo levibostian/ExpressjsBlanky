@@ -3,14 +3,14 @@
 import ExpressBrute from "express-brute"
 import RedisStore from "express-brute-redis"
 import { RedisClient } from "redis"
-import { Di, Dependency } from "../di"
+import { DI, Dependency } from "../di"
 import { RequestHandler } from "express"
 
 const bruteOptions = {
   freeRetries: 10
 }
 
-const redisClient: RedisClient = Di.inject(Dependency.RedisClient)
+const redisClient: RedisClient = DI.inject(Dependency.RedisClient)
 const redisStore = new RedisStore({
   client: redisClient,
   prefix: "ExpressBrute"
@@ -54,7 +54,7 @@ export const bruteForcePrevent = (): RequestHandler => {
     next()
   }
 
-  // if (Env.enableBruteforcePrevention) {
+  // if (ENV.enableBruteforcePrevention) {
   //   return bruteforce.prevent
   // } else {
   //   return (req, res, next) => {

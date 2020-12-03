@@ -1,7 +1,7 @@
 import Bull, { Queue, QueueOptions } from "bull"
 import { Job } from "./type"
 import { Logger } from "../logger"
-import { Env } from "../env"
+import { ENV } from "../env"
 import { ClientOpts } from "redis"
 import Redis from "ioredis"
 import {
@@ -54,9 +54,9 @@ export class AppJobQueueManager implements JobQueueManager {
     // re-use redis connections for queues
     // https://github.com/OptimalBits/bull/blob/master/PATTERNS.md#reusing-redis-connections
     //
-    // Note: You will notice this does not use the Di.inject() pattern to create the Redis client instances. This is because (1) bull is unique in that it requires a certain number of redis clients as stated here https://github.com/OptimalBits/bull/blob/master/PATTERNS.md#reusing-redis-connections, but also because bull uses 'ioredis' instead of 'redis' npm module which can be unique compared to rest of the app.
-    const client = new Redis(Env.redis)
-    const subscriber = new Redis(Env.redis)
+    // Note: You will notice this does not use the DI.inject() pattern to create the Redis client instances. This is because (1) bull is unique in that it requires a certain number of redis clients as stated here https://github.com/OptimalBits/bull/blob/master/PATTERNS.md#reusing-redis-connections, but also because bull uses 'ioredis' instead of 'redis' npm module which can be unique compared to rest of the app.
+    const client = new Redis(ENV.redis)
+    const subscriber = new Redis(ENV.redis)
 
     const opts: QueueOptions = {
       createClient: function (type) {
@@ -66,7 +66,7 @@ export class AppJobQueueManager implements JobQueueManager {
           case "subscriber":
             return subscriber
           default:
-            return new Redis(Env.redis)
+            return new Redis(ENV.redis)
         }
       }
     }
@@ -120,7 +120,7 @@ export class AppJobQueueManager implements JobQueueManager {
         name: queue.name,
         hostId: queue.name,
         type: "bull",
-        redis: Env.redis
+        redis: ENV.redis
       })
     }
 

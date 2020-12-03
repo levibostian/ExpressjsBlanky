@@ -1,9 +1,9 @@
-import { Dependency, Di } from "../di"
+import { Dependency, DI } from "../di"
 import { RedisClient } from "redis"
 import { promisify } from "util"
 
 export const assertRedis = async (): Promise<void> => {
-  const redisClient: RedisClient = Di.inject(Dependency.RedisClient)
+  const redisClient: RedisClient = DI.inject(Dependency.RedisClient)
   const pingAsync = promisify(redisClient.ping).bind(redisClient)
 
   await pingAsync().then((result) => {

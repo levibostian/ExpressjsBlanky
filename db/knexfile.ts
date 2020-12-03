@@ -1,17 +1,17 @@
 /* eslint-disable no-process-env, @typescript-eslint/no-var-requires */
 import { Config } from "knex"
-import { Env } from "../app/env"
+import { ENV } from "../app/env"
 
 const config: Config = {
-  debug: Env.loggers.enableSql,
+  debug: ENV.loggers.enableSql,
   client: "postgresql",
   connection: {
-    user: Env.database.username,
-    database: Env.database.name,
-    password: Env.database.password,
-    port: Env.database.port,
-    host: Env.database.host,
-    ssl: Env.database.useSSL
+    user: ENV.database.username,
+    database: ENV.database.name,
+    password: ENV.database.password,
+    port: ENV.database.port,
+    host: ENV.database.host,
+    ssl: ENV.database.useSSL
   },
   migrations: {
     directory: "./migrations"
@@ -20,7 +20,7 @@ const config: Config = {
 
 console.log(
   "info",
-  `Database connection to: ${Env.database.host}:${Env.database.port}, db: ${Env.database.name}, useSSL: ${Env.database.useSSL}`
+  `Database connection to: ${ENV.database.host}:${ENV.database.port}, db: ${ENV.database.name}, useSSL: ${ENV.database.useSSL}`
 )
 
 export default config

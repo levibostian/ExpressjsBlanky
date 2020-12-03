@@ -4,7 +4,7 @@ import { AppLogger } from "../logger"
 import { RedisKeyValueStorage } from "../service/key_value_storage"
 import { SendPushNotificationJobUserJob } from "../jobs/send_push_notification_user"
 import { RedisClient } from "redis"
-import { Env } from "../env"
+import { ENV } from "../env"
 import { AppFirebase } from "../service/firebase"
 import { AppAdminController } from "../controller/admin"
 import { AppUserController } from "../controller/user"
@@ -32,7 +32,7 @@ class DiContainer {
   private singletons: Map<Dependency, unknown> = new Map()
 
   constructor() {
-    this.singletons.set(Dependency.RedisClient, new RedisClient(Env.redis))
+    this.singletons.set(Dependency.RedisClient, new RedisClient(ENV.redis))
 
     this.singletons.set(
       Dependency.PushNotificationService,
@@ -104,4 +104,4 @@ class DiContainer {
   }
 }
 
-export const Di = new DiContainer()
+export const DI = new DiContainer()

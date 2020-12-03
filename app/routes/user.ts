@@ -5,7 +5,7 @@ import { createEndpoint } from "./util"
 import { ServerResponse } from "../responses"
 import { UserModel } from "../model"
 import { check } from "express-validator"
-import { Dependency, Di } from "../di"
+import { Dependency, DI } from "../di"
 import { UserController } from "../controller/user"
 import * as Result from "../type/result"
 
@@ -32,7 +32,7 @@ router.post(
           email: string
         } = req.body
 
-        const userController: UserController = Di.inject(Dependency.UserController)
+        const userController: UserController = DI.inject(Dependency.UserController)
 
         const sendLoginLinkResult = await userController.sendLoginLink(body.email, req.project)
         if (Result.isError(sendLoginLinkResult)) return res.responses.error.developerError()
@@ -53,7 +53,7 @@ router.post(
           passwordless_token: string
         } = req.body
 
-        const userController: UserController = Di.inject(Dependency.UserController)
+        const userController: UserController = DI.inject(Dependency.UserController)
 
         const user = await userController.exchangePasswordlessToken(body.passwordless_token)
         if (Result.isError(user)) return res.responses.error.developerError()
@@ -82,7 +82,7 @@ router.post(
         } = req.body
         const user = req.user! as UserModel
 
-        const userController: UserController = Di.inject(Dependency.UserController)
+        const userController: UserController = DI.inject(Dependency.UserController)
 
         const addTokenResult = await userController.addFcmToken(user.id, body.token)
         if (Result.isError(addTokenResult)) return res.responses.error.developerError()

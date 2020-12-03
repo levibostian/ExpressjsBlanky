@@ -1,6 +1,6 @@
 import { NextFunction, RequestHandler, Request, Response } from "express"
 import { ParsedQs } from "qs"
-import { ValidateParamsMiddleware } from "../middleware"
+import { validateParamsMiddleware } from "../middleware"
 import ConnectSequence from "connect-sequence"
 import { ServerResponse } from "../responses"
 
@@ -31,7 +31,7 @@ export const createEndpoint = (endpoint: Endpoint): RequestHandler => {
 
     seq
       .appendList(endpoint.validate)
-      .append(ValidateParamsMiddleware)
+      .append(validateParamsMiddleware)
       .append(async (req, res, next) => {
         const serverResponse = await endpoint.request(req, res, next)
 

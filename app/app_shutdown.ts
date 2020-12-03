@@ -1,19 +1,19 @@
 import { RedisClient } from "redis"
-import { Di, Dependency } from "./di"
+import { DI, Dependency } from "./di"
 import { JobQueueManager } from "./jobs"
 import { Logger } from "./logger"
 
 const closeRedis = async (logger: Logger): Promise<void> => {
   // we must close job queue manager before closing redis as the queue manager uses redis
   logger.verbose("Closing job queue manager queues")
-  const jobQueue: JobQueueManager = Di.inject(Dependency.JobQueueManager)
+  const jobQueue: JobQueueManager = DI.inject(Dependency.JobQueueManager)
   await jobQueue.closeQueues()
 
   // lastly, close redis
   logger.verbose("Closing redis client")
   // Help: https://stackoverflow.com/a/54560610/1486374
-  const redisClient: RedisClient = Di.inject(Dependency.RedisClient)
-  await new Promise((res, rej) => {
+  const redisClient: RedisClient = DI.inject(Dependency.RedisClient)
+  await new Promise<void>((res, rej) => {
     redisClient.quit((err, result) => {
       if (err) {
         rej(err)
@@ -26,7 +26,7 @@ const closeRedis = async (logger: Logger): Promise<void> => {
 }
 
 export const shutdownApp = async (): Promise<void> => {
-  const logger: Logger = Di.inject(Dependency.Logger)
+  const logger: Logger = DI.inject(Dependency.Logger)
 
   logger.verbose("Starting app shutdown")
 
@@ -35,7 +35,7 @@ export const shutdownApp = async (): Promise<void> => {
   logger.verbose("Done closing redis connection")
 
   logger.verbose("Closing DI graph")
-  await Di.close()
+  await DI.close()
 
   logger.verbose("Done app shutdown")
 }

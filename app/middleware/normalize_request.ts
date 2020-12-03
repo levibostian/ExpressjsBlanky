@@ -25,7 +25,7 @@ const normalizeBody = (body: any): void => {
   }
 }
 
-export const NormalizeRequestBody: RequestHandler = (req, res, next) => {
+export const normalizeRequestBody: RequestHandler = (req, res, next) => {
   if (req.body) {
     normalizeBody(req.body)
   }

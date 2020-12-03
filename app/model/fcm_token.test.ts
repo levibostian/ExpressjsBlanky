@@ -1,12 +1,12 @@
 import { setup } from "../_.test"
 import { UserFakeDataGenerator } from "./_mock/user.test"
 import { FcmTokenModel } from "."
-import { Di, Dependency } from "../di"
+import { DI, Dependency } from "../di"
 import uid2 from "uid2"
 import { DatabaseQueryRunner } from "./database_query"
 import { FcmTokenFakeDataGenerator } from "./_mock/fcm_token.test"
 
-const queryRunner: DatabaseQueryRunner = Di.inject(Dependency.DatabaseQueryRunner)
+const queryRunner: DatabaseQueryRunner = DI.inject(Dependency.DatabaseQueryRunner)
 
 describe(`FcmTokenModel tests`, () => {
   describe("foreign keys", () => {

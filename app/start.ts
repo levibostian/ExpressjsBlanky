@@ -1,15 +1,15 @@
 // Setup environment, first
 import "./env"
 
-import { Dependency, Di } from "./di"
+import { Dependency, DI } from "./di"
 import { Logger } from "./logger"
 import { Files } from "./service"
 import { startLocalServices, startRemoteServices } from "./app_startup"
 import _ from "./util"
 
-const logger: Logger = Di.inject(Dependency.Logger)
-const files: Files = Di.inject(Dependency.Files)
-new Promise(async (res, rej) => {
+const logger: Logger = DI.inject(Dependency.Logger)
+const files: Files = DI.inject(Dependency.Files)
+new Promise<void>(async (res, rej) => {
   logger.verbose("============== STARTING UP SERVER ==============")
   res()
 })

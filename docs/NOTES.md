@@ -150,7 +150,7 @@ export class UserModel extends BaseModel {}
 
 Notice that we made the `model.ts` file that is pretty simple. It only defines some basic types with no imports. No circular dependencies anymore. Moving types into their own files fixes most problems I have found.
 
-Another place that I see circular dependencies being common is when using `Di.inject(Dependency.X)` in your code. That is because the file `di/index.ts` has _lots_ of import statements inside of it which means there are lots of opportunities for circular dependencies. Avoid this by only using `Di.inject(Dependency.X)` in places like in `app/routes/` code or `healthcheck.ts` Those places are good places but other code like controllers, jobs, those should all by put in the dependency graph and use it's constructor to get all of it's dependencies.
+Another place that I see circular dependencies being common is when using `DI.inject(Dependency.X)` in your code. That is because the file `di/index.ts` has _lots_ of import statements inside of it which means there are lots of opportunities for circular dependencies. Avoid this by only using `DI.inject(Dependency.X)` in places like in `app/routes/` code or `healthcheck.ts` Those places are good places but other code like controllers, jobs, those should all by put in the dependency graph and use it's constructor to get all of it's dependencies.
 
 ##### Find circular dependencies
 

@@ -7,19 +7,19 @@ import bodyParser from "body-parser"
 import passport from "passport"
 import helmet from "helmet"
 import {
-  NormalizeRequestBody,
-  ReturnResponseErrorHandler,
-  AssertHeadersMiddleware,
-  BeforeAllMiddleware
+  normalizeRequestBody,
+  returnResponseErrorHandler,
+  assertHeadersMiddleware,
+  beforeAllMiddleware
 } from "./middleware"
 import http, { Server } from "http"
 import controllers from "./routes"
 import "./middleware/auth"
 import { Logger } from "./logger"
-import { Di, Dependency } from "./di"
+import { DI, Dependency } from "./di"
 import { createTerminus } from "@godaddy/terminus"
 import { shutdownApp } from "./app_shutdown"
-import { Env } from "./env"
+import { ENV } from "./env"
 import cors from "cors"
 
 export const serverPostStart = async (): Promise<void> => {
@@ -27,7 +27,7 @@ export const serverPostStart = async (): Promise<void> => {
 }
 
 export const startServer = (): Server => {
-  const logger: Logger = Di.inject(Dependency.Logger)
+  const logger: Logger = DI.inject(Dependency.Logger)
 
   process.on("uncaughtException", (err: Error) => {
     logger.error(err, `Node uncaught exception`, err.message)
@@ -36,11 +36,11 @@ export const startServer = (): Server => {
   const app = express()
 
   logger.context({
-    env: Env
+    env: ENV
   })
 
   app.use(
-    BeforeAllMiddleware, // I want to use this before honeybadger request handler before I want to reset the context of honeybadger before.
+    beforeAllMiddleware, // I want to use this before honeybadger request handler before I want to reset the context of honeybadger before.
     Honeybadger.requestHandler // Use *before* all other app middleware
   )
   app.use(helmet())
@@ -48,11 +48,11 @@ export const startServer = (): Server => {
   app.use("/", express.static(__dirname + "/static")) // Host files located in the `./static` directory at the root.
   app.use(bodyParser.urlencoded({ extended: false, limit: "100kb" }))
   app.use(bodyParser.json({ limit: "100kb" }))
-  app.use(NormalizeRequestBody)
-  app.use(AssertHeadersMiddleware)
+  app.use(normalizeRequestBody)
+  app.use(assertHeadersMiddleware)
   app.use(passport.initialize())
 
-  const corsWhitelist = ["http://localhost:8080", Env.appHost]
+  const corsWhitelist = ["http://localhost:8080", ENV.appHost]
   app.use(
     cors({
       origin: function (origin, callback) {
@@ -69,7 +69,7 @@ export const startServer = (): Server => {
   app.use(controllers)
 
   app.use(Honeybadger.errorHandler) // Use *after* all other app middleware but before our own error handlers
-  app.use(ReturnResponseErrorHandler)
+  app.use(returnResponseErrorHandler)
 
   const server: Server = http.createServer(app)
 

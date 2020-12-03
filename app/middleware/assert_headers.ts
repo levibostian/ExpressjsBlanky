@@ -15,7 +15,7 @@ class UndefinedHeader extends Error {
   }
 }
 
-export const AssertHeadersMiddleware: RequestHandler = async (req, res, next) => {
+export const assertHeadersMiddleware: RequestHandler = async (req, res, next) => {
   const assert = new RequestHeadersAssert(req.headers)
 
   try {

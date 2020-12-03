@@ -9,7 +9,7 @@ process.env.NODE_ENV = "development" // to prevent honeybadger from reporting er
 import "./env" // Setup .env
 
 import { resetDatabase } from "./model/database"
-import { Di, Dependency } from "./di"
+import { DI, Dependency } from "./di"
 import { Logger } from "./logger"
 import { JobQueueManager } from "./jobs"
 import { shutdownApp } from "./app_shutdown"
@@ -19,7 +19,7 @@ import { FakeDataGenerator, createDependencies } from "./model/_mock/_.test"
 import { startServer } from "./server"
 import { Server } from "http"
 import request, { Test, SuperTest } from "supertest"
-import { Env } from "./env"
+import { ENV } from "./env"
 import { RedisClient } from "redis"
 import dayjs from "dayjs"
 import uid2 from "uid2"
@@ -27,7 +27,7 @@ import uid2 from "uid2"
 export const clearKeyValueStorage = async (): Promise<void> => {
   // We are not using flush command even though it is easier then this method. This is because in the redis server, we have flush commands disabled and we want to have our tests Redis server behave like the prod server to make sure that everything will work on both. Respect the command being disabled and do the manual work for tests.
   return new Promise(async (res, rej) => {
-    const redis: RedisClient = Di.inject(Dependency.RedisClient)
+    const redis: RedisClient = DI.inject(Dependency.RedisClient)
 
     redis.keys("*", (err, allKeys) => {
       if (err) {
@@ -42,15 +42,15 @@ export const clearKeyValueStorage = async (): Promise<void> => {
 }
 
 beforeAll(async () => {
-  const logger: Logger = Di.inject(Dependency.Logger)
-  const files: Files = Di.inject(Dependency.Files)
+  const logger: Logger = DI.inject(Dependency.Logger)
+  const files: Files = DI.inject(Dependency.Files)
 
   await startLocalServices(logger, files)
 })
 beforeEach(async () => {
   await resetDatabase()
 
-  const jobQueue: JobQueueManager = Di.inject(Dependency.JobQueueManager)
+  const jobQueue: JobQueueManager = DI.inject(Dependency.JobQueueManager)
   await jobQueue.clearQueues()
 
   await clearKeyValueStorage()
@@ -58,7 +58,7 @@ beforeEach(async () => {
 afterEach(async () => {
   // if (server) server.close()
 
-  Di.resetOverrides()
+  DI.resetOverrides()
 })
 afterAll(async () => {
   await shutdownApp()
@@ -70,13 +70,12 @@ afterEach(async () => {
   if (server) server.close()
 })
 
-interface AuthHeader {
-  Authorization: string
-}
-
 interface ApiVersionHeader {
   "accept-version": string
-  app_package: string
+}
+
+interface AuthHeader {
+  Authorization: string
 }
 
 export const authHeader = (accessToken: string): AuthHeader => {
@@ -84,16 +83,12 @@ export const authHeader = (accessToken: string): AuthHeader => {
 }
 
 export const adminAuthHeader = (): AuthHeader => {
-  return { Authorization: `Bearer ${Env.auth.adminToken}` }
+  return { Authorization: `Bearer ${ENV.auth.adminToken}` }
 }
 
-export const endpointVersionHeader = (
-  version: string,
-  appPackage = "com.example.nameOfApp"
-): ApiVersionHeader => {
+export const endpointVersionHeader = (version: string): ApiVersionHeader => {
   return {
-    "accept-version": version,
-    app_package: appPackage
+    "accept-version": version
   }
 }
 
