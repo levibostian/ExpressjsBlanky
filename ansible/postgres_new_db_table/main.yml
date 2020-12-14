@@ -1,0 +1,55 @@
+- name: Create new database
+  community.general.postgresql_db:
+    name: "{{ postgres.database_name }}"
+    login_password: "{{ postgres.superuser_password}}"
+- name: Create new role
+  community.general.postgresql_user:
+    db: "{{ postgres.database_name }}"
+    login_password: "{{ postgres.superuser_password}}"
+    name: "{{ postgres.role_name }}"
+    password: "{{ postgres.role_password }}"
+    priv: CONNECT/table:db, SELECT, INSERT, UPDATE, DELETE table
+    encrypted: true
+# REVOKE CONNECT ON DATABASE name_of_db FROM PUBLIC;
+- name: REVOKE connect to database from everyone (the default)
+  community.general.postgresql_privs:
+    database: "{{ postgres.database_name }}"
+    login_password: "{{ postgres.superuser_password}}"
+    state: absent
+    privs: CONNECT
+    role: PUBLIC
+# GRANT CONNECT ON DATABASE name_of_db TO name_of_role;
+- name: GRANT connect to the new role
+  community.general.postgresql_privs:
+    database: "{{ postgres.database_name }}"
+    login_password: "{{ postgres.superuser_password}}"
+    state: present
+    privs: CONNECT
+    role: "{{ postgres.role_name }}"
+# GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO name_of_role;
+- name: GRANT connect to the new role
+  community.general.postgresql_privs:
+    database: "{{ postgres.database_name }}"
+    login_password: "{{ postgres.superuser_password}}"
+    privs: SELECT,INSERT,UPDATE,DELETE
+    objs: ALL_IN_SCHEMA
+    role: "{{ postgres.role_name }}"
+- name: Change owner of database
+  community.general.postgresql_db:
+    name: "{{ postgres.database_name }}"
+    login_password: "{{ postgres.superuser_password}}"
+    owner: "{{ postgres.role_name }}"
+# host   name_of_db   name_of_role all     password
+- name: Accept connections into new database
+  community.general.postgresql_pg_hba:
+    dest: /etc/postgresql/11/main/pg_hba.conf
+    conttype: host
+    databases: "{{ postgres.database_name }}"
+    users: "{{ postgres.role_name }}"
+    address: all
+    method: password
+    state: present
+- name: Restart postgres
+  service:
+    name: postgresql
+    state: restarted

@@ -1,0 +1,24 @@
+- name: Unattended upgrades
+  hosts: dbservers
+  remote_user: trunk
+  become: true
+  roles:
+    - unattended_upgrades
+- name: Redis
+  hosts: dbservers
+  remote_user: trunk
+  become: true
+  roles:
+    - redis 
+- name: Postgres
+  hosts: dbservers
+  remote_user: trunk
+  become: yes
+  roles:
+    - postgres
+- name: fail2ban
+  hosts: dbservers
+  remote_user: trunk
+  become: yes
+  roles:
+    - { role: nickjj.fail2ban, sudo: true }

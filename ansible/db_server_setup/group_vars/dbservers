@@ -1,0 +1,21 @@
+trunk_password: trunkpassword
+redis:
+  password: foo
+  config_file_location: /etc/redis/redis.conf
+  rename_commands:
+    - name: FLUSHDB
+      value: 60ZJtiiFV9pEb80afYagPeEyBqdwPTsjGQLLk9Rx
+    - name: FLUSHALL
+      value: 1QzgateEDP7u5Dqf0xXX0HkpX3R0lrKFoSf1SoJg
+    - name: DEBUG
+      value: NrUvBAc51fr2EQchpmhrmZHrgq1P0BjDm85pdQR7
+    - name: CONFIG
+      value: TYKTRqfmiNDH2dhs6yQmFS2aOXS9m3JiS2A7d0FA
+postgres:
+  osaccount_password: postres-password-bar
+  superuser_password: postgres-su-password
+fail2ban_services:
+  - name: ssh
+    port: 222
+    filter: sshd
+    logpath: '%(sshd_log)s'

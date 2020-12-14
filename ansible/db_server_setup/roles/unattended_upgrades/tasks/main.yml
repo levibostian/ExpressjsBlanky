@@ -1,0 +1,17 @@
+- name: Install unattended upgrades
+  apt:
+    name:
+      - unattended-upgrades
+      - apt-listchanges
+- name: Configure unattended-upgrades
+  copy:
+    force: yes
+    src: templates/20auto-upgrades
+    dest: /etc/apt/apt.conf.d/20auto-upgrades
+    owner: root
+    group: root
+    mode: u=rw,g=r,o=r
+- name: Assert unattended-upgrades setup
+  register: result
+  command: unattended-upgrade -d
+  failed_when: '"Starting unattended upgrades script" not in result.stdout'

@@ -1,0 +1,24 @@
+- name: Setup alternate SSH port
+  lineinfile:
+    dest: "/etc/ssh/sshd_config"
+    regexp: "^#Port.*"
+    line: "Port 222"
+- name: Do not allow logging in as root on the server. You must use another user account instead 
+  lineinfile:
+    dest: "/etc/ssh/sshd_config"
+    regexp: "^PermitRootLogin.*"
+    line: "PermitRootLogin no"
+- name: Do not allow using a password for login. Must use ssh key instead 
+  lineinfile:
+    dest: "/etc/ssh/sshd_config"
+    regexp: "^#PasswordAuthentication .*"
+    line: "PasswordAuthentication no"    
+- name: Do not allow logging into machine with no password 
+  lineinfile:
+    dest: "/etc/ssh/sshd_config"
+    regexp: "^#PermitEmptyPasswords .*"
+    line: "PermitEmptyPasswords no"        
+- name: Restart sshd
+  service:
+    name: sshd
+    state: restarted

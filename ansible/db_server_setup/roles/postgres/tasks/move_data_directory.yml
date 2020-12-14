@@ -1,0 +1,52 @@
+
+  # Get the full old data_directory that postgres currently uses. Includes /postgresql/11/main at the end
+- name: Get data directory 
+  remote_user: trunk 
+  become: yes
+  become_user: postgres 
+  shell: psql -At -c 'SHOW data_directory'
+  register: old_data_directory
+  # Get the full new data_directory that postgres will use. Includes /postgresql/11/main at the end
+- name: Get external volume name 
+  shell: ls /mnt | grep "volume_"
+  register: external_volume_name
+- name: Get config file location
+  remote_user: trunk 
+  become: yes
+  become_user: postgres 
+  shell: psql -At -c 'SHOW config_file'
+  register: postgres_config_file
+
+  # Required to stop postgres before changing the location of storage
+- name: Stop postgres
+  service:
+    name: postgresql
+    state: stopped
+
+- name: Generate rsync command
+  shell: echo "rsync -av {{old_data_directory.stdout | regex_search('.*/postgresql')}} /mnt/{{external_volume_name.stdout}}"
+  register: rsync_command
+ 
+- name: Assert rsync command 
+  assert:
+    that: rsync_command.stdout is match("rsync -av \/.*\/postgresql.* \/mnt\/volume_.*")
+    success_msg: "rsync command valid. {{rsync_command.stdout}}"
+    fail_msg: "rsync command *not* valid! {{rsync_command.stdout}}"
+
+- name: Copy current directory contents to new location
+  shell: '{{rsync_command.stdout}}'
+
+# Takes current location such as "/var/lib/postgresql/11/main" and new location such as "/mnt/volume_nyc01" and generates full path: "/mnt/volume_nyc01/postgresql/11/main"
+- name: Get new data_directory location
+  shell: echo "/mnt/{{external_volume_name.stdout}}/{{old_data_directory.stdout | regex_search('postgresql/.*')}}"
+  register: new_data_directory  
+
+- name: Move location to external block storage 
+  lineinfile:
+    path: '{{postgres_config_file.stdout}}'
+    regexp: "^data_directory = .*"
+    line: "data_directory = '{{new_data_directory.stdout}}'"
+- name: Start postgres
+  service:
+    name: postgresql
+    state: started

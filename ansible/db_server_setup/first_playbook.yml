@@ -1,0 +1,31 @@
+- name: Common 
+  hosts: dbservers
+  remote_user: root
+  become: yes
+  roles:
+    - common
+- name: Create a non-root user account 
+  hosts: dbservers
+  remote_user: root 
+  become: yes 
+  tasks:
+    - name: Create user 
+      user:
+        name: trunk 
+        groups: 
+          - sudo
+        shell: /bin/bash
+        append: yes 
+        create_home: yes 
+        password: "{{ trunk_password | password_hash('sha512') }}"
+    - name: Add SSH key to new trunk user 
+      ansible.posix.authorized_key:
+        user: trunk
+        exclusive: no    
+        key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"
+- name: Config SSH 
+  hosts: dbservers
+  remote_user: root
+  become: yes
+  roles:
+    - ssh

@@ -1,0 +1,88 @@
+
+- name: Install postgres
+  apt:
+    name:
+      - postgresql
+- name: Install python package required by community.general.postgresql* roles
+  pip:
+    name: psycopg2-binary
+- name: Change postgres superuser postgres password
+  become: yes
+  become_user: postgres
+  community.general.postgresql_user:
+    name: postgres
+    password: "{{ postgres.superuser_password}}"
+    encrypted: yes 
+- name: Change postgres role password
+  user:
+    name: postgres
+    update_password: always
+    password: "{{ postgres.osaccount_password | password_hash('sha512') }}"
+
+- name: Get current data_directory 
+  remote_user: trunk 
+  become: yes
+  become_user: postgres 
+  shell: psql -At -c 'SHOW data_directory'
+  register: old_data_directory
+
+- name: Move data_directory
+  block: 
+    - name: Install rsync to move current content 
+      apt:
+        name: rsync
+      # Will first see if we need to move the data directory. If so, do it. 
+    - name: Move data_directory to external storage 
+      include_role:
+        name: postgres 
+        tasks_from: move_data_directory      
+  always:
+    - name: Remove rsync package
+      apt:
+        name: rsync
+        state: absent
+  when: '"/mnt" not in old_data_directory.stdout'
+
+- name: Postgres accept connections over the Internet
+  lineinfile:
+    path: '{{postgres_config_file.stdout}}'
+    regexp: "^#.*listen_addresses = .*"
+    line: "listen_addresses = '*' # what IP addresses to listen on;"
+  notify: restart pg 
+
+- name: Get hba config file 
+  remote_user: trunk 
+  become: yes
+  become_user: postgres 
+  shell: psql -At -c 'SHOW hba_file'
+  register: hba_file
+# Replace: `local all all peer` with `local all all md5`
+- name: Remove 'local all all peer'
+  community.general.postgresql_pg_hba:
+    dest: '{{hba_file.stdout}}'
+    contype: local
+    users: all
+    databases: all
+    method: peer
+    state: absent
+- name: Add 'local all all md5'
+  community.general.postgresql_pg_hba:
+    dest: '{{hba_file.stdout}}'
+    contype: local
+    users: all
+    databases: all
+    method: md5
+    state: present
+  notify: restart pg 
+- name: Ping postgres to make sure it's online and working 
+  community.postgresql.postgresql_ping:
+    db: postgres
+    login_host: localhost
+    login_user: postgres
+    login_password: '{{ postgres.superuser_password}}'
+
+- name: Remove pip packages no longer needed 
+  pip:
+    state: absent
+    name: psycopg2-binary
+
