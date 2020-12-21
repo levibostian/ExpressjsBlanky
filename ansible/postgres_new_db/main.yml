@@ -1,55 +1,101 @@
-- name: Create new database
-  community.general.postgresql_db:
-    name: "{{ postgres.database_name }}"
-    login_password: "{{ postgres.superuser_password}}"
-- name: Create new role
-  community.general.postgresql_user:
-    db: "{{ postgres.database_name }}"
-    login_password: "{{ postgres.superuser_password}}"
-    name: "{{ postgres.role_name }}"
-    password: "{{ postgres.role_password }}"
-    priv: CONNECT/table:db, SELECT, INSERT, UPDATE, DELETE table
-    encrypted: true
-# REVOKE CONNECT ON DATABASE name_of_db FROM PUBLIC;
-- name: REVOKE connect to database from everyone (the default)
-  community.general.postgresql_privs:
-    database: "{{ postgres.database_name }}"
-    login_password: "{{ postgres.superuser_password}}"
-    state: absent
-    privs: CONNECT
-    role: PUBLIC
-# GRANT CONNECT ON DATABASE name_of_db TO name_of_role;
-- name: GRANT connect to the new role
-  community.general.postgresql_privs:
-    database: "{{ postgres.database_name }}"
-    login_password: "{{ postgres.superuser_password}}"
-    state: present
-    privs: CONNECT
-    role: "{{ postgres.role_name }}"
-# GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO name_of_role;
-- name: GRANT connect to the new role
-  community.general.postgresql_privs:
-    database: "{{ postgres.database_name }}"
-    login_password: "{{ postgres.superuser_password}}"
-    privs: SELECT,INSERT,UPDATE,DELETE
-    objs: ALL_IN_SCHEMA
-    role: "{{ postgres.role_name }}"
-- name: Change owner of database
-  community.general.postgresql_db:
-    name: "{{ postgres.database_name }}"
-    login_password: "{{ postgres.superuser_password}}"
-    owner: "{{ postgres.role_name }}"
-# host   name_of_db   name_of_role all     password
-- name: Accept connections into new database
-  community.general.postgresql_pg_hba:
-    dest: /etc/postgresql/11/main/pg_hba.conf
-    conttype: host
-    databases: "{{ postgres.database_name }}"
-    users: "{{ postgres.role_name }}"
-    address: all
-    method: password
-    state: present
-- name: Restart postgres
-  service:
-    name: postgresql
-    state: restarted
+- name: Set the SSH connection configurations
+  hosts: all
+  gather_facts: false 
+  collections:
+    - levibostian.connection
+  roles:
+    - set_ansible_ssh_port
+    - set_ansible_user
+
+- name: Create new Postgres database 
+  hosts: dbservers
+  become: yes
+  remote_user: trunk
+  vars:
+    database_name: expressjsblanky
+  tasks:
+  - name: Install python package required by community.general.postgresql* roles
+    pip:
+      name: psycopg2-binary
+
+  - name: Create new database
+    become_user: postgres 
+    community.general.postgresql_db:
+      name: "{{ database_name }}"
+      login_password: "{{ postgres.superuser_password }}"
+
+  - name: Create new non-superuser role 
+    become_user: postgres 
+    community.general.postgresql_user:
+      db: "{{ database_name }}"
+      login_password: "{{ postgres.superuser_password }}"
+      name: "{{ postgres.non_superuser_role_name }}"
+      password: "{{ postgres.non_superuser_role_password }}"
+      encrypted: true
+
+  # REVOKE CONNECT ON DATABASE name_of_db FROM PUBLIC;
+  - name: REVOKE connect to database from everyone (the default)
+    become_user: postgres 
+    community.general.postgresql_privs:
+      database: "{{ database_name }}"
+      login_password: "{{ postgres.superuser_password }}"
+      state: absent
+      type: database
+      privs: CONNECT
+      role: PUBLIC 
+
+  # GRANT CONNECT ON DATABASE name_of_db TO name_of_role;
+  - name: GRANT connect to the new role
+    become_user: postgres 
+    community.general.postgresql_privs:
+      database: "{{ database_name }}"
+      login_password: "{{ postgres.superuser_password }}"
+      type: database
+      state: present
+      privs: CONNECT
+      role: "{{ postgres.non_superuser_role_name }}"
+
+  # GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO name_of_role;
+  - name: GRANT connect to the new role
+    become_user: postgres 
+    community.general.postgresql_privs:
+      database: "{{ database_name }}"
+      login_password: "{{ postgres.superuser_password }}"
+      privs: SELECT,INSERT,UPDATE,DELETE
+      type: table
+      objs: ALL_IN_SCHEMA
+      role: "{{ postgres.non_superuser_role_name }}"
+
+  - name: Change owner of database
+    become_user: postgres 
+    community.general.postgresql_db:
+      name: "{{ database_name }}"
+      login_password: "{{ postgres.superuser_password }}"
+      owner: "{{ postgres.non_superuser_role_name }}"
+
+  - name: Get hba config file   
+    become_user: postgres 
+    shell: psql -At -c 'SHOW hba_file'
+    register: hba_file
+
+  # host   name_of_db   name_of_role all     password
+  - name: Accept connections into new database
+    become_user: postgres 
+    community.general.postgresql_pg_hba:
+      dest: '{{hba_file.stdout}}'
+      contype: host
+      databases: "{{ database_name }}"
+      users: "{{ postgres.non_superuser_role_name }}"
+      address: all
+      method: password
+      state: present
+
+  - name: Restart postgres
+    service:
+      name: postgresql
+      state: restarted
+
+  - name: Remove pip packages no longer needed 
+    pip:
+      state: absent
+      name: psycopg2-binary

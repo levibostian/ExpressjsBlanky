@@ -56,16 +56,6 @@ To run this playbook, I have created a script to help make this simple. `./ansib
 
 > Note: You will be asked for a "BECOME password". Enter in the password you have entered for `trunk_password` in the config file. 
 
-### Postgres create new databases
-
-This playbook is the boilerplate code to create new databases for your postgres database. These playbooks will create the database and run commands to secure it. 
-
-Time to run the playbook to setup the server!
-
-```
-ansible-playbook --ask-become-pass -i <inventory-file> postgres_new_db/main.yml`
-```
-
 After you are done running the playbook:
 1. Setup a [DigitalOcean firewall](https://www.digitalocean.com/docs/networking/firewalls/quickstart/) and attach it to your new server(s). When you create this firewall, here are the rules that you need:
 
@@ -79,6 +69,14 @@ Outgoing rules:
 * Allow all
 
 Along with the firewall, you can setup [DigitalOcean monitoring](https://www.digitalocean.com/docs/monitoring/) to get notified when things like CPU usage spikes happen on the server. 
+
+### Postgres create new databases
+
+This playbook is the boilerplate code to create new databases for your postgres database. These playbooks will create the database and run commands to secure it. 
+
+To run this playbook, I have created a script to help make this simple. `./ansible/db_server_setup/run.sh`
+
+> Note: You will be asked for a "BECOME password". Enter in the password you have entered for `trunk_password` in the config file. 
 
 # Assumptions
 

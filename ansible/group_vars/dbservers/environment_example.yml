@@ -13,3 +13,5 @@ redis:
 postgres:
   osaccount_password: postres-password-bar
   superuser_password: postgres-su-password
+  non_superuser_role_name: rolename
+  non_superuser_role_password: role-password-here

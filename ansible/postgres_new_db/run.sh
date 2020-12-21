@@ -19,4 +19,4 @@ echo "Running on environment...$SELECTED_ENV"
 
 echo "NOTE: You are going to be asked for a BECOME password. This is the password for the 'trunk' OS user account. Enter the 'trunk_password' you put in the group_vars/dbservers/X.yml file."
 
-eval "ansible-playbook --ask-become-pass -i ansible/inventory.ini -l $SELECTED_ENV ansible/db_server_setup/main.yml"
+eval "ansible-playbook --ask-become-pass -i ansible/inventory.ini -l $SELECTED_ENV ansible/postgres_new_db/main.yml"
