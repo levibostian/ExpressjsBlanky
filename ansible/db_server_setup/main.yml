@@ -1,24 +1,39 @@
-- name: Unattended upgrades
-  hosts: dbservers
-  remote_user: trunk
-  become: true
+- name: Set the SSH connection configurations
+  hosts: all
+  gather_facts: false 
+  collections:
+    - levibostian.connection
   roles:
+    - set_ansible_ssh_port
+    - set_ansible_user
+
+- name: Create a non-root user account 
+  hosts: dbservers
+  become: yes 
+  tasks:
+    - name: Create user 
+      user:
+        name: trunk 
+        groups: 
+          - sudo
+        shell: /bin/bash
+        append: yes 
+        create_home: yes 
+        password: "{{ trunk_password | password_hash('sha512') }}"
+    - name: Add SSH key to new trunk user 
+      ansible.posix.authorized_key:
+        user: trunk
+        exclusive: no    
+        key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"
+
+# By this point, we are guaranteed to have a trunk user so we can use that now
+- hosts: dbservers
+  remote_user: trunk 
+  become: yes
+  roles:
+    - common  
+    - ssh
     - unattended_upgrades
-- name: Redis
-  hosts: dbservers
-  remote_user: trunk
-  become: true
-  roles:
     - redis 
-- name: Postgres
-  hosts: dbservers
-  remote_user: trunk
-  become: yes
-  roles:
     - postgres
-- name: fail2ban
-  hosts: dbservers
-  remote_user: trunk
-  become: yes
-  roles:
     - { role: nickjj.fail2ban, sudo: true }

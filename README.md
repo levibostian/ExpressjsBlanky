@@ -1,3 +1,8 @@
+![node version for project: 12 (LTS)](https://img.shields.io/badge/node%20version-12%20(LTS)-green)
+![language used for project: typescript](https://img.shields.io/badge/language-Typescript-blue)
+![databases used for project: postgres and redis](https://img.shields.io/badge/database-Postgres%20%26%20Redis-red)
+![technologies used to deploy project. For the app, kubernetes. For database, debian VM server](https://img.shields.io/badge/deployment-App%3A%20Kubernetes%2C%20database%3A%20Debian%20VM-orange)
+
 # ExpressjsBlanky
 
 Boilerplate project for Expressjs apps. The template that [I](https://github.com/levibostian/) use for the apps that I build.

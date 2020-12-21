@@ -19,6 +19,13 @@
     update_password: always
     password: "{{ postgres.osaccount_password | password_hash('sha512') }}"
 
+- name: Get config file location
+  remote_user: trunk 
+  become: yes
+  become_user: postgres 
+  shell: psql -At -c 'SHOW config_file'
+  register: postgres_config_file
+
 - name: Get current data_directory 
   remote_user: trunk 
   become: yes

@@ -1,6 +1,0 @@
-[dbservers]
-134.209.222.219
-
-[dbservers:vars]
-ansible_python_interpreter=/usr/bin/python3
-ansible_port=222

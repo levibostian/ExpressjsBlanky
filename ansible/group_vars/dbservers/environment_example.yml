@@ -1,7 +1,6 @@
 trunk_password: trunkpassword
 redis:
   password: foo
-  config_file_location: /etc/redis/redis.conf
   rename_commands:
     - name: FLUSHDB
       value: 60ZJtiiFV9pEb80afYagPeEyBqdwPTsjGQLLk9Rx
@@ -14,8 +13,3 @@ redis:
 postgres:
   osaccount_password: postres-password-bar
   superuser_password: postgres-su-password
-fail2ban_services:
-  - name: ssh
-    port: 222
-    filter: sshd
-    logpath: '%(sshd_log)s'

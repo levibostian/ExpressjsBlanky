@@ -1,13 +1,21 @@
+# Ansible 
+
+This API project requires some servers running software like databases to connect to. To setup these servers, this project is setup with the tool [Ansible](https://www.ansible.com/) to do all of the server setup. 
+
+Why use Ansible? 
+* **Prevent human error** - Manually setting up servers is a lot of copy and pasting and typing of commands. It is not uncommon for a typo to happen and the server has issues. By automating this process, we have eliminated the chance of this happening. 
+* **Create servers, fast** - I create at least a dozen new servers every year. Each server that I create manually takes about half a day of work to create, configure, and test. Being able to create these servers in a matter of seconds or minutes makes a difference! 
+* **Documentation** - I find it very frustrating to take over a Linux server that was setup and configured by someone else before you. You don't know what softwares were installed, how each software is configured, what user accounts exist and who has access to what. It may seem like it's easier to just delete the server and start over! By using a tool like Ansible, you are able to read the Ansible scripts and know *exactly* what has been done to the server - no more, no less. I try my very best to make sure that all changes done to a server exists here in the Ansible playbooks. 
+
 # Getting started
 
-* Create a new Debian server in DigitalOcean. When creating this server, make sure these options are set:
+* Create a new Debian server in DigitalOcean. Login to DigitalOcean's website and create this new server manually. When creating this server, make sure these options are set:
 
-1. Select 64bit Debian image. This doc is written when the latest version is 10. 
-2. Add 1 block storage volume to the server. Choose whatever size you want. The database server setup playbook will move the postgres database location to this external volume. 
-3. Add the server to a virtual network (in DigitalOcean, it's called a VPC). We will make sure that the kubernetes cluster that our application is hosted on will be added to this private network. 
+1. Select the 64bit Debian image. **This doc is written when the latest version is 10.**
+2. Add 1 block storage volume to the server. Choose whatever size you want (it can be expanded in the future). Choose the default formatting option. (All database storage will exist on this block storage, not the included storage of the server) 
 4. Enable monitoring so you can enable alerts on big loads to the server. 
-5. Set authentication to SSH keys. We want to make this server SSH key login, only. No password login with SSH. 
-6. Hostname, tags are all up to you. 
+5. Set authentication to SSH keys. We want to make this server SSH key login, only. *No password login with SSH.*
+6. Hostname, tags are all up to you. I like to make the hostname be something like "<app-name>-production-database"
 7. You don't need to enable system backups/snapshots. We will run pg_dump to run periodic postgres database backups. 
 
 When you create this new server, that's all that you need to do to the server. Ansible will perform *all* setup of this server!
@@ -21,9 +29,18 @@ ansible-galaxy install -r galaxy-requirements.yml
 pip install -r pip-requirements.txt
 ```
 
-* Go into `group_vars/dbservers` file. This file contains all of the dynamic variables that are read by the Ansible playbooks. Modify these values to values that you want for your server. Change the password values, for example. 
+* Time to make some variables. 
 
-* Go into `testing_inventory` or `production_inventory`. Towards the top, you will see 
+```
+cp ansible/group_vars/dbservers/environment_example.yml ansible/group_vars/dbservers/production.yml
+cp ansible/group_vars/dbservers/environment_example.yml ansible/group_vars/dbservers/testing.yml
+```
+
+Inside of these 2 new files you just created, edit all of the lines that include `# !!!`. This is mostly a bunch of passwords. 
+
+> Note: `group_vars/dbservers/all.yml` should not need modified. They are variables that are applied to all environments. Secrets such as API keys or passwords do not belong here. 
+
+* Open `inventory.ini`. In the `[testing]` and `[production]` sections, list all of the *public IPv4 IP addresses* that you created in DigitalOcean. 
 
 * Now, it's time to run the Ansible playbook for the task that you want to complete. 
 
@@ -35,30 +52,33 @@ View the list of playbooks available and how to run them in the [Playbooks](#Pla
 
 This playbook is designed to setup a server for hosting a Database. Redis and Postgres. The playbook will install all softwares, configure them, and secure the server. 
 
-##### Run playbook
+To run this playbook, I have created a script to help make this simple. `./ansible/db_server_setup/run.sh`
 
-This first playbook is initial setup like changing the SSH port of the server and creating a non-root user. 
-```
-ansible-playbook --extra-var ansible_port=22 -i <inventory-file> db_server_setup/initial_setup.yml
-```
-> Note: Replace `<inventory-file>` with the name of your inventory file. 
-
-After setup, run this other playbook to get all of the rest of the server setup:
-
-```
-ansible-playbook --ask-become-pass -i <inventory-file> db_server_setup/main.yml
-```
 > Note: You will be asked for a "BECOME password". Enter in the password you have entered for `trunk_password` in the config file. 
 
 ### Postgres create new databases
 
 This playbook is the boilerplate code to create new databases for your postgres database. These playbooks will create the database and run commands to secure it. 
 
-##### Run playbook 
+Time to run the playbook to setup the server!
 
 ```
 ansible-playbook --ask-become-pass -i <inventory-file> postgres_new_db/main.yml`
 ```
+
+After you are done running the playbook:
+1. Setup a [DigitalOcean firewall](https://www.digitalocean.com/docs/networking/firewalls/quickstart/) and attach it to your new server(s). When you create this firewall, here are the rules that you need:
+
+Incoming rules:
+* Port 222 (or whatever port that you setup in the Ansible playbook)
+That's it! We do not open any ports for connecting to things like Redis or Postgres because those are connected via [private networking](https://www.digitalocean.com/docs/networking/vpc/). 
+
+> Tip: If you need to connect to your postgres or redis server from your local development machine for debugging, use a SSH tunnel. 
+
+Outgoing rules:
+* Allow all
+
+Along with the firewall, you can setup [DigitalOcean monitoring](https://www.digitalocean.com/docs/monitoring/) to get notified when things like CPU usage spikes happen on the server. 
 
 # Assumptions
 

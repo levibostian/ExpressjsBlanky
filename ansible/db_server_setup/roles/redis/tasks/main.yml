@@ -3,18 +3,18 @@
     name: redis-server
 - name: Associate Redis with systemd    
   lineinfile:
-    path: '{{redis.config_file_location}}'
-    regexp: "^supervised .*"
+    path: '{{redis_config_file_location}}'
+    regexp: "^(# )?supervised.*"
     line: supervised systemd
   notify: restart redis
 - name: Allow connections from Internet
   lineinfile:
-    path: '{{redis.config_file_location}}'
-    regexp: "^bind .*"
+    path: '{{redis_config_file_location}}'
+    regexp: "^(# )?bind.*"
     line: "# bind"
 - name: Rename dangerous commands 
   blockinfile:
-    path: '{{redis.config_file_location}}'
+    path: '{{redis_config_file_location}}'
     marker: "# {mark} ANSIBLE MANAGED BLOCK - RENAME COMMAND {{item.name}}"
     insertafter: "^# Command renaming.*"
     block: |
@@ -22,8 +22,8 @@
   loop: "{{ redis.rename_commands }}"    
 - name: Set password
   lineinfile:
-    path: '{{redis.config_file_location}}'
-    regexp: "^requirepass .*"
+    path: '{{redis_config_file_location}}'
+    regexp: "^(# )?requirepass.*"
     line: "requirepass {{redis.password}}"
 - name: Restart redis
   service:

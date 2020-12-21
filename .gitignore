@@ -1,3 +1,6 @@
+ansible/group_vars/dbservers/production.yml
+ansible/group_vars/dbservers/testing.yml
+
 secrets
 app/config/projects.json
 

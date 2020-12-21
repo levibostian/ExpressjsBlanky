@@ -10,12 +10,6 @@
 - name: Get external volume name 
   shell: ls /mnt | grep "volume_"
   register: external_volume_name
-- name: Get config file location
-  remote_user: trunk 
-  become: yes
-  become_user: postgres 
-  shell: psql -At -c 'SHOW config_file'
-  register: postgres_config_file
 
   # Required to stop postgres before changing the location of storage
 - name: Stop postgres

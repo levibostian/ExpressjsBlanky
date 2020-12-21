@@ -2,4 +2,8 @@
 # Help doc: https://docs.ansible.com/ansible/latest/galaxy/user_guide.html#installing-multiple-roles-from-a-file
 # 
 # Use with: `ansible-galaxy install -r galaxy-requirements.yml`
+roles:
 - name: nickjj.fail2ban
+
+collections:
+- name: levibostian.connection

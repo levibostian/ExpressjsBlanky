@@ -1,0 +1,17 @@
+redis_config_file_location: /etc/redis/redis.conf
+ansible_python_interpreter: /usr/bin/python3
+
+ssh_connect_timeout: 3
+ssh_ports_test:
+  - 222
+  - 22
+
+ssh_users_test:
+  - "trunk"
+  - "root"
+
+fail2ban_services:
+  - name: ssh
+    port: 222
+    filter: sshd
+    logpath: '%(sshd_log)s'

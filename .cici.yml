@@ -7,5 +7,7 @@ sets:
   common: 
     secrets:
       - "app/config/projects.json"
+      - "ansible/group_vars/dbservers/production.yml"
+      - "ansible/group_vars/dbservers/testing.yml"
   production:
   testing:
